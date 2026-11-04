@@ -1,44 +1,113 @@
-# eSign v1.1 - Hệ thống Ký số Hybrid (Ed25519 & Falcon-512)
+# Falcon–Ed25519 thesis prototype
 
-<p align="center">
-  <img src="logobig.jpg" alt="eSign Logo" width="150"/>
-</p>
+Local Streamlit research application inherited from FALCON/eSign. Ed25519 signs
+the first document revision; Falcon-512 signs the subsequent revision containing
+that signature. Verification requires both layers and rejects bytes appended
+after the final container. See [project provenance](docs/PROJECT_PROVENANCE.md).
 
----
+The container format is custom. CMS, PAdES, FIPS 206 compliance and PDF-reader
+interoperability have not been established. Historical prototype installers do
+not contain the hardening in this source tree.
 
-## Giới thiệu
+## Local Windows setup
 
-**eSign v1.1** là một ứng dụng phần mềm Desktop tiên phong trong lĩnh vực mật mã, kết hợp sức mạnh của ký số truyền thống với các chuẩn mật mã hậu lượng tử (Post-Quantum Cryptography - PQC). 
+The regression environment uses Windows x64 and Python **3.11.9**, with
+`pqcrypto==0.3.4` (including `pqcrypto.sign.falcon_512`), `PyNaCl==1.6.2`,
+`streamlit==1.66.1` and `pytest==9.2.0`. These are observed tested versions,
+not a complete dependency lock; `requirements.txt` remains unpinned.
 
-Ứng dụng cung cấp giải pháp ký số **đa tầng (hybrid)** đảm bảo tính toàn vẹn và xác thực của tài liệu, chống lại nguy cơ bị bẻ khóa bởi máy tính lượng tử trong tương lai. Giao diện trực quan giúp bất kỳ ai cũng có thể tạo khóa, ký tài liệu và xác thực một cách dễ dàng.
+From PowerShell, use the existing environment without activating it:
 
-## Tính năng nổi bật
+```powershell
+Set-Location D:\Final_Thesis_GitHub
+.\.venv\Scripts\python.exe --version
+.\.venv\Scripts\python.exe -c "from pqcrypto.sign import falcon_512; print(falcon_512.PUBLIC_KEY_SIZE)"
+.\.venv\Scripts\python.exe -X utf8 -m streamlit run app.py --server.address 127.0.0.1 --server.port 8501 --server.headless true
+```
 
-* **Khởi Tạo Khóa Hybrid**: Sinh ngẫu nhiên bộ khóa (Public/Private) kết hợp giữa chuẩn cổ điển **Ed25519** và chuẩn hậu lượng tử mạng tinh thể **Falcon-512**.
-* **Ký Số Đa Tầng**: Ký tài liệu PDF bằng cách sử dụng khóa bí mật của cả hai thuật toán, tạo ra một lớp bảo vệ kép.
-* **Xác Thực Toàn Vẹn**: Kiểm tra đồng thời cả hai thành phần của chữ ký để đảm bảo tài liệu không bị chỉnh sửa trái phép.
-* **Giao diện Desktop Độc Lập**: Hoạt động mượt mà như một phần mềm bình thường mà không cần cấu hình môi trường phức tạp.
+Open `http://127.0.0.1:8501` in a local browser. If setting up a **new** environment
+instead, these commands install the observed top-level versions:
 
-## Tải về và Cài đặt
-## I. Dành cho End user
-### Yêu cầu hệ thống
-* Hệ điều hành Windows 10, 11
-* Trình duyệt Web: Microsoft Edge hoặc Google Chrome
-### Cách cài đặt
-1. Chuyển đến trang **[Releases](https://github.com/luluon-cyper/FALCON/releases/tag/v1.1)** của dự án.
-2. Tải xuống file cài đặt **`eSign_v1.1_Setup.exe`**.
-3. Chạy file vừa tải về và bấm **Next** để cài đặt.
-4. Mở ứng dụng **eSign** từ shortcut trên màn hình Desktop của bạn và sử dụng.
+```powershell
+py -3.11 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install pqcrypto==0.3.4 PyNaCl==1.6.2 streamlit==1.66.1 pytest==9.2.0
+```
 
-## II. Dành cho Developer
-### Yêu cầu hệ thống (Developer)
-* Môi trường: Python 3.9+
-* Hệ điều hành: Windows 10, 11
-* Thư viện Python:
-    - streamlit: Xây dựng giao diện Web App.
-    - pynacl: Cung cấp thuật toán ký số Ed25519.
-    - pqcrypto: Cung cấp thuật toán hậu lượng tử Falcon-512.
-    - pyinstaller: Đóng gói thành file .exe.
-* Công cụ đóng gói: Inno Setup
-* Cài đặt thư viện nhanh:
-pip install -r requirements.txt
+PyInstaller is listed for inherited packaging but is unnecessary for the local
+Streamlit workflow. Desktop packaging and the inherited browser watcher are not
+validated by the regression suite; start Streamlit directly as above.
+
+## Generate, sign and verify
+
+1. In **QUẢN LÝ KHÓA**, generate and download all four raw key files:
+   `ed25519_pub.key`, `ed25519_priv.key`, `falcon_pub.key`, `falcon_priv.key`.
+   The inherited generator writes persistent plaintext files in the working
+   directory and can overwrite prior keys. Keep needed keys backed up privately.
+2. In **KÝ SỐ TÀI LIỆU**, upload an unsigned PDF, the **Ed25519 private seed**,
+   **Falcon private key**, and the **matching Falcon public key**. That public
+   key is mandatory for final verification; the Ed25519 public key is derived
+   from its private seed. An incorrect Falcon public key prevents download.
+3. Download the signed PDF only after both cryptographic checks succeed. The
+   backend stages, fsyncs and verifies its candidate before atomic replacement;
+   the UI also checks a snapshot of the exact bytes supplied for download.
+4. In **XÁC THỰC TÀI LIỆU**, upload the signed PDF and both corresponding public
+   keys. Altered content, malformed containers, noncanonical padding, truncation,
+   appended bytes or wrong public keys produce rejection.
+
+The public signing API requires a keyword-only Falcon public-key path:
+
+```python
+from sign import sign_file
+from verify import verify_file
+
+result = sign_file("source.pdf", "signed.pdf", "ed25519_priv.key",
+                   "falcon_priv.key", pk_falcon="falcon_pub.key")
+valid, *_ = verify_file(result[0], "ed25519_pub.key", "falcon_pub.key")
+```
+
+There is no four-argument fallback. Both public functions retain their
+11-element return tuples. Inspect the verifier's first boolean, not tuple
+truthiness. Signing rejects source/key destination aliases, already-signed
+input and reserved marker collisions; it never strips old signatures.
+
+## Operational limits
+
+- Run this prototype locally. Streamlit uploads reach its Python process;
+  exposing that process remotely would send private keys to the remote server.
+  This is not a browser-side cryptography or multi-user key-storage system.
+- Upload copies are isolated in owned temporary directories and cleaned before
+  results/downloads, on success and ordinary exceptions. One cleanup retry handles
+  a transient OS failure. Persistent permission/sharing denial is reported with
+  the affected upload directory and prevents a signed download. Stop using the
+  affected directory and remove leftovers after resolving the denial.
+- Process termination, power loss and native crashes can leave temporary files.
+  Cleanup is not secure erasure; Streamlit/browser upload and download buffers
+  can retain bytes in memory. Generated working-directory keys are intentionally
+  persistent and are not temporary upload artifacts.
+- Atomic replacement provides visibility on supported filesystems, not a
+  power-loss durability guarantee. Path/fingerprint checks do not eliminate
+  concurrent filesystem races. Use trusted local directories and suitable ACLs.
+- Upload validation checks for nonempty data and a PDF header. It does not fully
+  parse PDF syntax, render documents, detect active content or establish signer
+  identity. Public keys must come from a trusted source. Key generation remains
+  non-transactional; a failed regeneration can leave partial persistent keys.
+
+## Regression tests
+
+```powershell
+.\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
+```
+
+Tests use small synthetic PDFs and disposable keys, including both frozen
+Phase 1 signatures. Original benchmark data is neither required nor changed.
+Eight native symlink cases skip on the current Windows environment because
+Developer Mode/symlink privilege is unavailable (error 1314); native hard-link
+and Windows file-sharing cases run normally. No elevation is required for the
+rest of the suite.
+
+The launch command enables Python UTF-8 mode because redirected Streamlit CLI
+help/output can otherwise fail under Windows legacy console encodings.
+
+See [Phase 2B.4B.3 regression results](docs/phase2b4b3-regression.md) for exact
+counts, fault coverage and remaining limits. Earlier phases are recorded in
+[docs/](docs/).

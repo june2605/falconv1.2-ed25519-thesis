@@ -1,10 +1,78 @@
 import streamlit as st
 import os
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+import re
+from nacl.signing import SigningKey
 from sign import sign_file
 from verify import verify_file
 from keygen import generate_keys
+
+
+@contextmanager
+def upload_directory():
+    """Own one upload directory and clean it before rendering any result.
+
+    Retry one ordinary cleanup failure (e.g. a transient Windows sharing
+    violation). Permanent OS denial is reported; it cannot be made leak-free
+    by a Python finally block. Preserve any original operation exception.
+    """
+    temporary = tempfile.TemporaryDirectory(prefix="esign-upload-")
+    primary = None
+    try:
+        yield Path(temporary.name)
+    except BaseException as error:
+        primary = error
+        raise
+    finally:
+        try:
+            temporary.cleanup()
+        except OSError:
+            try:
+                temporary.cleanup()
+            except OSError as cleanup_error:
+                reported = primary if primary is not None else cleanup_error
+                reported.upload_cleanup_path = temporary.name
+                reported.add_note("Upload temporary-file cleanup failed")
+                if primary is None:
+                    raise
+
+
+def read_uploads(**uploads):
+    """Capture browser uploads before creating disk copies; never use their names."""
+    captured = {}
+    for name, uploaded in uploads.items():
+        if uploaded is None:
+            raise ValueError("Missing upload")
+        data = uploaded.getvalue()
+        if not isinstance(data, bytes) or not data:
+            raise ValueError("Empty or invalid upload")
+        captured[name] = data
+    # This is a header check, not a complete PDF syntax/content validator.
+    if re.match(rb"%PDF-[0-9]\.[0-9](?:\r\n|\r|\n)", captured["document"]) is None:
+        raise ValueError("Expected a PDF header")
+    return captured
+
+
+def report_error(operation, error):
+    """Do not echo exception strings that might contain uploaded key material."""
+    if isinstance(error, PermissionError):
+        reason = "Không thể truy cập tệp. Hãy kiểm tra quyền và đóng ứng dụng đang giữ tệp."
+    elif isinstance(error, ValueError):
+        reason = "Tệp, khóa hoặc chữ ký không hợp lệ; hãy kiểm tra các tệp đã tải lên."
+    else:
+        reason = "Thao tác không hoàn tất. Hãy kiểm tra tệp và thử lại."
+    st.error(f"{operation}: {reason}")
+    cleanup_path = getattr(error, "upload_cleanup_path", None)
+    backend_cleanup = any("Signing temporary-file cleanup failed" in note
+                          for note in getattr(error, "__notes__", ()))
+    if cleanup_path or backend_cleanup:
+        message = "Không thể xóa hết tệp tạm. Đóng ứng dụng đang giữ tệp và kiểm tra thư mục tạm."
+        if cleanup_path:
+            message += f" Thư mục: {cleanup_path}"
+        st.warning(message)
+
 
 st.set_page_config(
     page_title="PQC Hybrid Signature",
@@ -106,7 +174,7 @@ with st.sidebar:
 
     menu = st.session_state.menu
     st.markdown("---")
-    st.info("Hệ thống đảm bảo an toàn dữ liệu tuyệt đối trước nguy cơ từ máy tính lượng tử.")
+    st.info("Nguyên mẫu nghiên cứu chữ ký hybrid. Hãy kiểm tra nguồn tin cậy của các khóa công khai.")
 
 
 PK_ED, SK_ED = "ed25519_pub.key", "ed25519_priv.key"
@@ -118,34 +186,40 @@ def render_page_header(title, desc):
 
 
 if menu == "QUẢN LÝ KHÓA":
+    generation_failed = False
     render_page_header("Khởi tạo bộ khóa Hybrid", "Tạo và lưu trữ các cặp khóa an toàn kết hợp thuật toán cổ điển và hậu lượng tử.")
     
     with st.container(border=True):
         st.markdown('<div class="section-header">Bảng điều khiển sinh khóa</div>', unsafe_allow_html=True)
         
         if st.button("BẮT ĐẦU TẠO BỘ KHÓA MỚI", use_container_width=True):
-            with st.spinner("Đang tính toán các tham số mạng tinh thể và đường cong elliptic..."):
-                for k in [SK_ED, PK_ED, SK_FALCON, PK_FALCON]:
-                    if os.path.exists(k): os.remove(k)
-                generate_keys(PK_ED, SK_ED, PK_FALCON, SK_FALCON)
-            st.success("Chúc mừng! Bộ khóa Hybrid đã được khởi tạo thành công.")
+            try:
+                with st.spinner("Đang tính toán các tham số mạng tinh thể và đường cong elliptic..."):
+                    generate_keys(PK_ED, SK_ED, PK_FALCON, SK_FALCON)
+                st.success("Bộ khóa Hybrid đã được khởi tạo.")
+            except Exception as error:
+                generation_failed = True
+                report_error("Lỗi tạo khóa", error)
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    if os.path.exists(SK_ED) and os.path.exists(SK_FALCON):
-        with st.container(border=True):
-            st.markdown('<div class="section-header">Tải bộ khóa về máy</div>', unsafe_allow_html=True)
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("#### Hệ mật mã Ed25519")
-                with open(PK_ED, "rb") as f: st.download_button("Tải Public Key", f, PK_ED, use_container_width=True)
-                with open(SK_ED, "rb") as f: st.download_button("Tải Private Key (Bảo mật)", f, SK_ED, use_container_width=True)
-  
-            with col2:
-                st.markdown("#### Hệ mật mã Falcon-512")
-                with open(PK_FALCON, "rb") as f: st.download_button("Tải Public Key", f, PK_FALCON, use_container_width=True)
-                with open(SK_FALCON, "rb") as f: st.download_button("Tải Private Key (Bảo mật)", f, SK_FALCON, use_container_width=True)
+    if not generation_failed and all(os.path.exists(path) for path in (PK_ED, SK_ED, PK_FALCON, SK_FALCON)):
+        try:
+            # Read all keys and close every handle before rendering downloads.
+            key_downloads = {path: Path(path).read_bytes() for path in (PK_ED, SK_ED, PK_FALCON, SK_FALCON)}
+            with st.container(border=True):
+                st.markdown('<div class="section-header">Tải bộ khóa về máy</div>', unsafe_allow_html=True)
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("#### Hệ mật mã Ed25519")
+                    st.download_button("Tải Public Key", key_downloads[PK_ED], PK_ED, use_container_width=True)
+                    st.download_button("Tải Private Key (Bảo mật)", key_downloads[SK_ED], SK_ED, use_container_width=True)
+                with col2:
+                    st.markdown("#### Hệ mật mã Falcon-512")
+                    st.download_button("Tải Public Key", key_downloads[PK_FALCON], PK_FALCON, use_container_width=True)
+                    st.download_button("Tải Private Key (Bảo mật)", key_downloads[SK_FALCON], SK_FALCON, use_container_width=True)
+        except Exception as error:
+            report_error("Lỗi tải khóa", error)
     
     st.info("""
     **Hướng dẫn sử dụng**
@@ -169,7 +243,7 @@ elif menu == "KÝ SỐ TÀI LIỆU":
         st.markdown('<div class="section-header">1. Tải lên tài liệu cần ký</div>', unsafe_allow_html=True)
         pdf_file = st.file_uploader("Kéo thả file PDF vào đây", type=["pdf"], label_visibility="collapsed")
         
-    if pdf_file:
+    if pdf_file is not None:
         with st.container(border=True):
             st.markdown('<div class="section-header">2. Cung cấp khóa ký và khóa công khai Falcon</div>', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
@@ -179,27 +253,36 @@ elif menu == "KÝ SỐ TÀI LIỆU":
 
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("THỰC HIỆN KÝ SỐ HYBRID", use_container_width=True):
-                if sk_ed and sk_fal and pk_fal_sign:
+                if all(item is not None for item in (sk_ed, sk_fal, pk_fal_sign)):
                     try:
+                        captured = read_uploads(document=pdf_file, ed_private=sk_ed,
+                                                falcon_private=sk_fal, falcon_public=pk_fal_sign)
                         with st.spinner("Đang xử lý chữ ký kép..."):
-                            with tempfile.TemporaryDirectory(prefix="esign-upload-") as folder:
-                                work = Path(folder)
+                            with upload_directory() as work:
                                 source = work / "source.pdf"
                                 ed_private = work / "ed25519-private.key"
                                 falcon_private = work / "falcon-private.key"
                                 falcon_public = work / "falcon-public.key"
                                 output = work / "signed.pdf"
-                                source.write_bytes(pdf_file.getvalue())
-                                ed_private.write_bytes(sk_ed.getvalue())
-                                falcon_private.write_bytes(sk_fal.getvalue())
-                                falcon_public.write_bytes(pk_fal_sign.getvalue())
+                                source.write_bytes(captured["document"])
+                                ed_private.write_bytes(captured["ed_private"])
+                                falcon_private.write_bytes(captured["falcon_private"])
+                                falcon_public.write_bytes(captured["falcon_public"])
                                 sign_file(source, output, ed_private, falcon_private, pk_falcon=falcon_public)
                                 signed_bytes = output.read_bytes()
+                                # Check exactly the immutable bytes offered to Streamlit,
+                                # independently of the signer's return value/live output.
+                                download_copy = work / "download.pdf"
+                                ed_public = work / "ed25519-public.key"
+                                download_copy.write_bytes(signed_bytes)
+                                ed_public.write_bytes(bytes(SigningKey(captured["ed_private"]).verify_key))
+                                if verify_file(download_copy, ed_public, falcon_public)[0] is not True:
+                                    raise ValueError("Signed download verification failed")
                         
-                        st.success("Tài liệu của bạn đã được ký an toàn!")
-                        st.download_button("TẢI XUỐNG PDF ĐÃ KÝ", signed_bytes, file_name=f"signed_{pdf_file.name}", use_container_width=True)
+                        st.success("Tài liệu đã được ký và kiểm tra bằng cả hai khóa công khai.")
+                        st.download_button("TẢI XUỐNG PDF ĐÃ KÝ", signed_bytes, file_name=f"signed_{Path(pdf_file.name).name}", mime="application/pdf", use_container_width=True)
                     except Exception as e:
-                        st.error(f"Lỗi xử lý: {str(e)}")
+                        report_error("Lỗi ký tài liệu", e)
                 else:
                     st.warning("Vui lòng tải lên 2 khóa bí mật và khóa công khai Falcon tương ứng.")
                     
@@ -226,7 +309,7 @@ else:
         st.markdown('<div class="section-header">1. Tải lên tài liệu đã ký</div>', unsafe_allow_html=True)
         pdf_v = st.file_uploader("Kéo thả file PDF cần kiểm tra vào đây", type=["pdf"], label_visibility="collapsed")
         
-    if pdf_v:
+    if pdf_v is not None:
         with st.container(border=True):
             st.markdown('<div class="section-header">2. Cung cấp khóa công khai (Public Keys)</div>', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
@@ -235,27 +318,26 @@ else:
 
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("TIẾN HÀNH XÁC THỰC", use_container_width=True):
-                if pk_ed and pk_fal:
+                if all(item is not None for item in (pk_ed, pk_fal)):
                     try:
+                        captured = read_uploads(document=pdf_v, ed_public=pk_ed, falcon_public=pk_fal)
                         with st.spinner("Đang đối soát chuỗi mã hóa đa tầng..."):
-                            with tempfile.NamedTemporaryFile(delete=False) as p_tmp, \
-                                 tempfile.NamedTemporaryFile(delete=False) as e_tmp, \
-                                 tempfile.NamedTemporaryFile(delete=False) as f_tmp:
-                                
-                                p_tmp.write(pdf_v.getvalue()); e_tmp.write(pk_ed.getvalue()); f_tmp.write(pk_fal.getvalue())
-                                p_tmp.close(); e_tmp.close(); f_tmp.close()
-                                
-                                is_valid, *_ = verify_file(p_tmp.name, e_tmp.name, f_tmp.name)
-                            for f_path in [p_tmp.name, e_tmp.name, f_tmp.name]:
-                                if os.path.exists(f_path): os.remove(f_path)
+                            with upload_directory() as work:
+                                document = work / "document.pdf"
+                                ed_public = work / "ed25519-public.key"
+                                falcon_public = work / "falcon-public.key"
+                                document.write_bytes(captured["document"])
+                                ed_public.write_bytes(captured["ed_public"])
+                                falcon_public.write_bytes(captured["falcon_public"])
+                                is_valid = verify_file(document, ed_public, falcon_public)[0] is True
                         
                         if is_valid:
                             st.balloons()
-                            st.success("### KẾT QUẢ: HỢP LỆ\nTài liệu nguyên bản và chữ ký khớp tuyệt đối. Không có dấu hiệu bị chỉnh sửa.")
+                            st.success("### KẾT QUẢ: HỢP LỆ\nCả hai chữ ký hợp lệ với các khóa công khai đã cung cấp.")
                         else:
                             st.error("### KẾT QUẢ: KHÔNG HỢP LỆ\nCảnh báo: Tài liệu đã bị sửa đổi trái phép hoặc bộ khóa không khớp!")
                     except Exception as e:
-                        st.error(f"Lỗi xác thực: Có thể định dạng file không đúng hoặc thiếu marker chữ ký. Chi tiết: {str(e)}")
+                        report_error("Lỗi xác thực", e)
                 else:
                     st.warning("Vui lòng tải lên đầy đủ cả 2 file khóa công khai.")
     
