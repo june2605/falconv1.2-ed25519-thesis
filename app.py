@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import tempfile
+from pathlib import Path
 from sign import sign_file
 from verify import verify_file
 from keygen import generate_keys
@@ -170,44 +171,46 @@ elif menu == "KÝ SỐ TÀI LIỆU":
         
     if pdf_file:
         with st.container(border=True):
-            st.markdown('<div class="section-header">2. Cung cấp khóa bí mật (Private Keys)</div>', unsafe_allow_html=True)
+            st.markdown('<div class="section-header">2. Cung cấp khóa ký và khóa công khai Falcon</div>', unsafe_allow_html=True)
             col1, col2 = st.columns(2)
             sk_ed = col1.file_uploader("Khóa Ed25519 Private (.key)", type=["key"])
             sk_fal = col2.file_uploader("Khóa Falcon Private (.key)", type=["key"])
+            pk_fal_sign = col2.file_uploader("Khóa Falcon Public để kiểm tra chữ ký (.key)", type=["key"], key="signing_falcon_public")
 
             st.markdown("<br>", unsafe_allow_html=True)
             if st.button("THỰC HIỆN KÝ SỐ HYBRID", use_container_width=True):
-                if sk_ed and sk_fal:
+                if sk_ed and sk_fal and pk_fal_sign:
                     try:
                         with st.spinner("Đang xử lý chữ ký kép..."):
-                            with tempfile.NamedTemporaryFile(delete=False) as p_tmp, \
-                                 tempfile.NamedTemporaryFile(delete=False) as e_tmp, \
-                                 tempfile.NamedTemporaryFile(delete=False) as f_tmp, \
-                                 tempfile.NamedTemporaryFile(delete=False) as out_tmp:
-                                
-                                p_tmp.write(pdf_file.getvalue()); e_tmp.write(sk_ed.getvalue()); f_tmp.write(sk_fal.getvalue())
-                                p_tmp.close(); e_tmp.close(); f_tmp.close()
-                                
-                                sign_file(p_tmp.name, out_tmp.name, e_tmp.name, f_tmp.name)
-                                with open(out_tmp.name, "rb") as f: signed_bytes = f.read()
-                            
-                            for f_path in [p_tmp.name, e_tmp.name, f_tmp.name, out_tmp.name]:
-                                if os.path.exists(f_path): os.remove(f_path)
+                            with tempfile.TemporaryDirectory(prefix="esign-upload-") as folder:
+                                work = Path(folder)
+                                source = work / "source.pdf"
+                                ed_private = work / "ed25519-private.key"
+                                falcon_private = work / "falcon-private.key"
+                                falcon_public = work / "falcon-public.key"
+                                output = work / "signed.pdf"
+                                source.write_bytes(pdf_file.getvalue())
+                                ed_private.write_bytes(sk_ed.getvalue())
+                                falcon_private.write_bytes(sk_fal.getvalue())
+                                falcon_public.write_bytes(pk_fal_sign.getvalue())
+                                sign_file(source, output, ed_private, falcon_private, pk_falcon=falcon_public)
+                                signed_bytes = output.read_bytes()
                         
                         st.success("Tài liệu của bạn đã được ký an toàn!")
                         st.download_button("TẢI XUỐNG PDF ĐÃ KÝ", signed_bytes, file_name=f"signed_{pdf_file.name}", use_container_width=True)
                     except Exception as e:
                         st.error(f"Lỗi xử lý: {str(e)}")
                 else:
-                    st.warning("Vui lòng tải lên đầy đủ cả 2 file khóa bí mật.")
+                    st.warning("Vui lòng tải lên 2 khóa bí mật và khóa công khai Falcon tương ứng.")
                     
     st.info("""
     **Hướng dẫn sử dụng**
 
     1. Tải lên file PDF cần ký.
-    2. Tải lên 2 khóa bí mật:
+    2. Tải lên khóa ký và khóa công khai Falcon tương ứng:
     - Ed25519 Private Key
     - Falcon Private Key
+    - Falcon Public Key tương ứng để kiểm tra trước khi xuất file
     3. Nhấn **"THỰC HIỆN KÝ SỐ HYBRID"**.
     4. Tải xuống file PDF đã được ký.
 

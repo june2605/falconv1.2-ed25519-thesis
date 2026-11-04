@@ -85,5 +85,5 @@ def keys(key_factory):
 @pytest.fixture
 def signed_pdf(tmp_path, pdf_path, keys):
     path = tmp_path / "signed.pdf"
-    sign_file(pdf_path, path, keys.sk_ed, keys.sk_falcon)
+    sign_file(pdf_path, path, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     return path

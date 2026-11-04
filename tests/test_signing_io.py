@@ -42,7 +42,7 @@ def test_unsigned_source_alias_is_rejected_without_overwrite(pdf_path, keys, tmp
         _symlink(output, pdf_path)
     with patch("sign.SigningKey", wraps=sign.SigningKey) as crypto:
         with pytest.raises(ValueError) as error:
-            sign.sign_file(source, output, keys.sk_ed, keys.sk_falcon)
+            sign.sign_file(source, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
         assert error.value.code == "path.alias"
         crypto.assert_not_called()
     assert pdf_path.read_bytes() == original
@@ -58,7 +58,7 @@ def test_signer_protects_private_key_destinations(pdf_path, keys, tmp_path, key_
         output = tmp_path / "key-alias.pdf"
         os.link(key_path, output)
     with pytest.raises(ValueError) as error:
-        sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon)
+        sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert error.value.code == "path.alias"
     assert key_path.read_bytes() == original
 
@@ -77,7 +77,7 @@ def test_preflight_and_signing_use_the_same_snapshot(pdf_path, keys, tmp_path, m
 
     monkeypatch.setattr(sign, "validate_unsigned_input", change_after_check)
     output = tmp_path / "captured.pdf"
-    result = sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon)
+    result = sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert result[0] == output and len(result) == 11
     assert checked == [original]
     assert output.read_bytes().startswith(original)
@@ -100,7 +100,7 @@ def test_new_signature_validation_preserves_destination(pdf_path, keys, tmp_path
     else:
         monkeypatch.setattr(sign.falcon_512, "sign", lambda key, message: b"f" * (sign.falcon_512.SIGNATURE_SIZE + 1))
     with pytest.raises(ValueError) as error:
-        sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon)
+        sign.sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert error.value.code == "signature.size"
     assert pdf_path.read_bytes() == source
     if existing_output:

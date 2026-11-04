@@ -30,7 +30,7 @@ def test_signing_pdf_with_placeholder_like_content_remains_valid(keys, tmp_path)
     original = make_pdf((utils.ZERO_BYTE_RANGE + b"SigLength: 0000000010 Contents: <00>").decode("ascii"))
     source, output = tmp_path / "ordinary-text.pdf", tmp_path / "signed.pdf"
     source.write_bytes(original)
-    sign.sign_file(source, output, keys.sk_ed, keys.sk_falcon)
+    sign.sign_file(source, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert source.read_bytes() == original
     assert output.read_bytes().startswith(original)
     assert verify_file(output, keys.pk_ed, keys.pk_falcon)[0] is True

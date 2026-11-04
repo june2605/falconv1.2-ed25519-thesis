@@ -42,7 +42,7 @@ def layer_results(data, keys):
 
 def test_sign_and_verify_preserve_input_and_tuple_contract(pdf_path, pdf_bytes, keys, tmp_path):
     output = tmp_path / "roundtrip.pdf"
-    signing_result = sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon)
+    signing_result = sign_file(pdf_path, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert isinstance(signing_result, tuple) and len(signing_result) == 11
     assert signing_result[0] == output
     assert pdf_path.read_bytes() == pdf_bytes

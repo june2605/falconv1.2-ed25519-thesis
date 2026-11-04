@@ -223,7 +223,7 @@ def test_repeated_hybrid_signing_is_rejected_by_phase2b3(signed_pdf, keys, tmp_p
     output = tmp_path / "signed-again.pdf"
     original = signed_pdf.read_bytes()
     with pytest.raises(SignatureFormatError) as error:
-        sign_file(signed_pdf, output, keys.sk_ed, keys.sk_falcon)
+        sign_file(signed_pdf, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
     assert error.value.code == "input.reserved_marker"
     assert not output.exists()
     assert signed_pdf.read_bytes() == original

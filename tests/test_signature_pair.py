@@ -228,7 +228,7 @@ def test_same_path_repeat_rejection_preserves_the_signed_input(signed_pdf, keys)
     original = signed_pdf.read_bytes()
     with patch("sign.prepare_file_with_placeholder", wraps=utils.prepare_file_with_placeholder) as prepare:
         with pytest.raises(SignatureFormatError) as error:
-            sign_file(signed_pdf, signed_pdf, keys.sk_ed, keys.sk_falcon)
+            sign_file(signed_pdf, signed_pdf, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
         assert error.value.code == "input.reserved_marker"
         prepare.assert_not_called()
     assert signed_pdf.read_bytes() == original
@@ -248,7 +248,7 @@ def test_signer_rejects_reserved_marker_collisions_without_writing(token, suffix
             patch("sign.SigningKey", wraps=SigningKey) as ed_sign, \
             patch.object(falcon_512, "sign", wraps=falcon_512.sign) as fal_sign:
         with pytest.raises(SignatureFormatError) as error:
-            sign_file(source, output, keys.sk_ed, keys.sk_falcon)
+            sign_file(source, output, keys.sk_ed, keys.sk_falcon, pk_falcon=keys.pk_falcon)
         assert error.value.code == "input.reserved_marker"
         prepare.assert_not_called()
         ed_sign.assert_not_called()

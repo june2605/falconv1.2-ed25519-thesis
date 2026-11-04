@@ -48,7 +48,8 @@ def main():
             input_file,
             signed_file,
             sk_ed,
-            sk_falcon
+            sk_falcon,
+            pk_falcon=pk_falcon
         )
 
         # Verify file
