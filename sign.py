@@ -4,7 +4,8 @@ from utils import *
 import time
 from pathlib import Path
 from signing_io import SigningPathError, SigningTransaction, capture_source, validate_signing_paths
-from verify import verify_file
+from verify import verify_file, verify_file_with_public_keys
+from hybrid_keys import HybridKeyPair, validate_key_pair
 
 from utils import prepare_file_with_placeholder
 
@@ -39,7 +40,30 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str, *, 
         return _sign_captured(snapshot, output_path, requested_output, protected_paths, transaction, sk1, sk2, pk2)
 
 
-def _sign_captured(snapshot, output_path, requested_output, protected_paths, transaction, sk1, sk2, pk2):
+def sign_with_key_material(input_path, output_path, key_pair: HybridKeyPair):
+    """Sign using in-memory keys without creating private-key or public-key files.
+
+    PDF intermediate files and the final candidate still use the same owned
+    transaction. Return the legacy 11 timing slots. This is not a vault/identity
+    API and does not offer secret-memory isolation or guaranteed zeroization.
+    """
+    requested_source = Path(input_path).absolute()
+    snapshot = capture_source(requested_source)
+    validate_unsigned_input(snapshot.data)
+    requested_output = Path(output_path).absolute()
+    protected_paths = (requested_source,)
+    destination = validate_signing_paths(snapshot, requested_output, protected_paths=protected_paths)
+    validate_key_pair(key_pair)
+    # Bytes and model fields are immutable under ordinary use. Capture each
+    # reference for this operation; never discover or write a key filename.
+    sk1, sk2 = key_pair.ed25519_private_seed, key_pair.falcon_private_key
+    pk2 = key_pair.public_keys.falcon_public_key
+    with SigningTransaction(destination) as transaction:
+        return _sign_captured(snapshot, output_path, requested_output, protected_paths,
+                              transaction, sk1, sk2, pk2, memory_keys=True)
+
+
+def _sign_captured(snapshot, output_path, requested_output, protected_paths, transaction, sk1, sk2, pk2, *, memory_keys=False):
     transaction.write_stage("source.pdf", snapshot.data)
     #====================
     # sign ed25519
@@ -103,11 +127,16 @@ def _sign_captured(snapshot, output_path, requested_output, protected_paths, tra
     candidate = transaction.write_candidate(signed_pdf_bytes)
     time_io_falcon = time.time() - start_io
 
-    ed_public = transaction.write_stage("ed25519-public.key", bytes(sk.verify_key))
-    falcon_public = transaction.write_stage("falcon-public.key", pk2)
     # Verify the actual closed, fsynced staged file, using only captured keys.
     # A nonempty false-result tuple, or an integer equal to True, is not success.
-    result = verify_file(candidate, ed_public, falcon_public)
+    if memory_keys:
+        result = verify_file_with_public_keys(candidate, bytes(sk.verify_key), pk2)
+    else:
+        # Keep the legacy path adapter and its established fault-injection
+        # boundary. These files contain public bytes only, never private keys.
+        ed_public = transaction.write_stage("ed25519-public.key", bytes(sk.verify_key))
+        falcon_public = transaction.write_stage("falcon-public.key", pk2)
+        result = verify_file(candidate, ed_public, falcon_public)
     if result[0] is not True:
         raise ValueError("Hybrid signature self-verification failed")
     transaction.mark_verified()

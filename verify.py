@@ -12,24 +12,41 @@ def verify_file(pdf_path: str, pk_ed: str, pk_falcon: str):
     with open(pk_falcon, "rb") as f:
         pk2 = f.read()
 
-    if len(pk1) != 32:
-        return (False,
-                0,0,0,0,
-                0,0,0,0,
-                0,0)
+    return verify_file_with_public_keys(pdf_path, pk1, pk2)
 
-    if len(pk2) != 897:
-        return (False,
-                0,0,0,0,
-                0,0,0,0,
-                0,0)
-    
+
+def _public_key_lengths_valid(pk1, pk2):
+    if type(pk1) is not bytes or type(pk2) is not bytes:
+        raise TypeError("Public keys must be immutable bytes")
+    return len(pk1) == 32 and len(pk2) == falcon_512.PUBLIC_KEY_SIZE
+
+
+def verify_file_with_public_keys(pdf_path, pk_ed: bytes, pk_falcon: bytes):
+    """Verify the actual file using public bytes, with the legacy 11 slots."""
+    if not _public_key_lengths_valid(pk_ed, pk_falcon):
+        return (False,) + (0,) * 10
     start_io = time.time()
     with open(pdf_path, "rb") as f:
         pdf_bytes = f.read()
     time_io = time.time() - start_io
+    return _verify_document(pdf_bytes, pk_ed, pk_falcon, time_io)
 
-    
+
+def verify_bytes(pdf_bytes: bytes, pk_ed: bytes, pk_falcon: bytes):
+    """No filesystem access; return the same 11 slots, with I/O time zero.
+
+    A true first element proves both signatures under supplied public keys,
+    not signer identity or registry trust. Mutable buffers are not normalized.
+    """
+    if type(pdf_bytes) is not bytes:
+        raise TypeError("Document must be immutable bytes")
+    if not _public_key_lengths_valid(pk_ed, pk_falcon):
+        return (False,) + (0,) * 10
+    return _verify_document(pdf_bytes, pk_ed, pk_falcon, 0)
+
+
+def _verify_document(pdf_bytes, pk1, pk2, time_io):
+    """Shared inherited parser/message/crypto flow for all verification APIs."""
     ok_ed = False
     ok_falcon = False
 

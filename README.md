@@ -70,6 +70,31 @@ There is no four-argument fallback. Both public functions retain their
 truthiness. Signing rejects source/key destination aliases, already-signed
 input and reserved marker collisions; it never strips old signatures.
 
+## Phase 3.1 in-memory foundation
+
+The new Python APIs keep private-key material in memory and share the inherited
+PDF protocol and atomic publication logic:
+
+```python
+from keygen import generate_hybrid_key_pair
+from sign import sign_with_key_material
+from verify import verify_bytes
+
+pair = generate_hybrid_key_pair()  # Generates and validates both pairs; no files.
+result = sign_with_key_material("source.pdf", "signed.pdf", pair)
+with open(result[0], "rb") as document:
+    report = verify_bytes(document.read(), pair.public_keys.ed25519_public_key,
+                          pair.public_keys.falcon_public_key)
+assert report[0] is True
+```
+
+PDF stages still use owned temporary files; the memory-key signer creates no
+key files. `pair.key_id` identifies the ordered public-key tuple, not a trusted
+identity. This is an in-memory foundation, not encrypted storage or a memory
+isolation boundary. The Streamlit UI and legacy `generate_keys()` export still
+use plaintext key files. See [Phase 3.1](docs/phase3-1-regression.md) and the
+[Falcon provenance investigation](docs/falcon-implementation-provenance.md).
+
 ## Operational limits
 
 - Run this prototype locally. Streamlit uploads reach its Python process;
