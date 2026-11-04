@@ -2,13 +2,16 @@ from pqcrypto.sign import falcon_512
 from nacl.signing import SigningKey
 from utils import *
 import time
+from signing_io import capture_source, validate_signing_paths
 
 from utils import prepare_file_with_placeholder
 
 def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
-    # Preflight the unsigned source before opening keys or touching output.
-    with open(input_path, "rb") as source:
-        validate_unsigned_input(source.read())
+    # The exact immutable snapshot checked here is used for both signatures.
+    snapshot = capture_source(input_path)
+    validate_unsigned_input(snapshot.data)
+    protected_paths = (sk_ed, sk_falcon)
+    destination = validate_signing_paths(snapshot, output_path, protected_paths=protected_paths)
 
     with open(sk_ed, "rb") as k:
         sk1 = k.read()
@@ -26,9 +29,7 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
     #====================
 
     start_parse = time.time()
-    prepare_file_with_placeholder(input_path, output_path)
-    with open(output_path, "rb") as f:
-        pdf_bytes = f.read()
+    pdf_bytes = prepare_bytes_with_placeholder(snapshot.data, DEFAULT_SIGNATURE_CAPACITIES[0])
 
     byte_range = parse_prepared_placeholder(pdf_bytes).byte_range
 
@@ -48,8 +49,6 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
 
     start_io = time.time()
     signed_pdf_bytes = embed_signature_into_pdf(pdf_bytes, signature)
-    with open(output_path, "wb") as f:
-        f.write(signed_pdf_bytes)
     time_io_ed25519 = time.time() - start_io
 
     time_total_ed25519 = (
@@ -64,9 +63,7 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
     #===================
 
     start_parse = time.time()
-    prepare_file_with_placeholder(output_path,output_path, DEFAULT_SIGNATURE_CAPACITIES[1], 1)
-    with open(output_path, "rb") as f:
-        pdf_bytes = f.read()
+    pdf_bytes = prepare_bytes_with_placeholder(signed_pdf_bytes, DEFAULT_SIGNATURE_CAPACITIES[1], 1)
 
     byte_range = parse_prepared_placeholder(pdf_bytes, 1).byte_range
     time_parse_falcon = time.time() - start_parse
@@ -83,7 +80,10 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
 
     start_io = time.time()
     signed_pdf_bytes = embed_signature_into_pdf(pdf_bytes, signature, 1)
-    with open(output_path, "wb") as f:
+    # All construction/capacity checks finish before the first destination write.
+    # This is still a non-atomic write; publication safety belongs to 2B.4B.2.
+    validate_signing_paths(snapshot, destination, protected_paths=protected_paths)
+    with open(destination, "wb") as f:
         f.write(signed_pdf_bytes)
     time_io_falcon = time.time() - start_io
     time_total_falcon = (

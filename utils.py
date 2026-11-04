@@ -20,6 +20,7 @@ SIG_LENGTH_REGEX = re.compile(rb"SigLength:\s*(\d{1,20})")
 CONTENTS_PREFIX = b"Contents: <"
 CONTENTS_SUFFIX = b">\n"
 DEFAULT_SIGNATURE_CAPACITIES = (128, 2048)
+MAX_DECIMAL_VALUE = 9999999999
 
 _BYTE_RANGE_REGEX = re.compile(
     rb"ByteRange: \[ ([0-9]{10}) ([0-9]{10}) ([0-9]{10}) ([0-9]{10}) \]\n"
@@ -209,36 +210,54 @@ def parse_signature_pair(pdf_bytes: bytes) -> SignaturePair:
     return SignaturePair(ed25519, falcon)
 
 
-def prepare_file_with_placeholder(input_path: str, output_path: str, placeholder_len: int = DEFAULT_SIGNATURE_CAPACITIES[0], type_sign : int = 0) -> None:
-    with open(input_path, "rb") as f:
-        original = f.read()
-    
-    hex_placeholder = b"0" * (placeholder_len*2)
+def _validate_placeholder_arguments(placeholder_len: int, type_sign: int) -> None:
+    if type(type_sign) is not int or type_sign not in (0, 1):
+        raise SignatureFormatError("container.type", "Unsupported signature type")
+    if (type(placeholder_len) is not int or placeholder_len <= 0
+            or placeholder_len > MAX_DECIMAL_VALUE // 2):
+        raise SignatureFormatError("placeholder.capacity", "Capacity must be positive integer bytes within the wire bounds")
+    if type_sign == 0 and placeholder_len < crypto_sign_BYTES:
+        raise SignatureFormatError("placeholder.capacity", "Ed25519 capacity must fit its 64-byte signature")
+
+
+def prepare_bytes_with_placeholder(original: bytes, placeholder_len: int = DEFAULT_SIGNATURE_CAPACITIES[0], type_sign: int = 0) -> bytes:
+    """Append a trailer using known offsets; never search or patch source bytes."""
+    _validate_placeholder_arguments(placeholder_len, type_sign)
+    if not isinstance(original, bytes):
+        raise SignatureFormatError("input.type", "Captured source must be immutable bytes")
+    if any(marker[:-1] in original for marker in (SIG_MARKER_START[type_sign], SIG_MARKER_END[type_sign])):
+        raise SignatureFormatError("placeholder.marker", "Source already contains the target signature marker")
+
+    length_line = SIG_LEN % placeholder_len + SIG_LEN_SUFFIX
+    gap_start = len(original) + len(SIG_MARKER_START[type_sign]) + len(ZERO_BYTE_RANGE)
+    gap_end = gap_start + len(length_line) + len(CONTENTS_PREFIX) + placeholder_len * 2 + len(CONTENTS_SUFFIX)
+    byte_range = (0, gap_start, gap_end, len(SIG_MARKER_END[type_sign]))
+    if any(value > MAX_DECIMAL_VALUE for value in byte_range):
+        raise SignatureFormatError("placeholder.capacity", "Predicted ByteRange exceeds its fixed-width fields")
 
     container = (
-        SIG_MARKER_START[type_sign] +
-        ZERO_BYTE_RANGE + 
-        SIG_LEN % placeholder_len +
-        SIG_LEN_SUFFIX +
-        CONTENTS_PREFIX +
-        hex_placeholder +
-        CONTENTS_SUFFIX +
-        SIG_MARKER_END[type_sign]
+        SIG_MARKER_START[type_sign] + BYTE_RANGE_TEMPLATE % byte_range
+        + length_line + CONTENTS_PREFIX + b"0" * (placeholder_len * 2)
+        + CONTENTS_SUFFIX + SIG_MARKER_END[type_sign]
     )
+    return original + container
 
-    combined = original + container
 
-    start1 = 0
-    len1 = combined.rfind(SIG_LEN[:10])
-    start2 = combined.find(CONTENTS_PREFIX, len1) + len(CONTENTS_PREFIX) + placeholder_len*2 + len(CONTENTS_SUFFIX)
-    len2 = len(combined) - start2
+def prepare_file_with_placeholder(input_path: str, output_path: str, placeholder_len: int = DEFAULT_SIGNATURE_CAPACITIES[0], type_sign : int = 0) -> None:
+    """Legacy file wrapper; intentional in-place preparation remains supported.
 
-    byte_range = BYTE_RANGE_TEMPLATE % (start1, len1, start2, len2)
+    Identical input/output arguments explicitly request the legacy in-place
+    operation. Hidden aliases through distinct paths are rejected. Construction
+    finishes before opening output, but write failures are not atomic.
+    """
+    from signing_io import capture_source, validate_signing_paths
 
-    patched = combined.replace(ZERO_BYTE_RANGE, byte_range, 1)
-
-    with open(output_path, "wb") as f:
-        f.write(patched)
+    _validate_placeholder_arguments(placeholder_len, type_sign)
+    snapshot = capture_source(input_path)
+    destination = snapshot.path if input_path == output_path else validate_signing_paths(snapshot, output_path)
+    prepared = prepare_bytes_with_placeholder(snapshot.data, placeholder_len, type_sign)
+    with open(destination, "wb") as f:
+        f.write(prepared)
     
 
 def extract_byte_range_and_placeholder(pdf_bytes: bytes, sign_type: int = 0, index: int = -1) -> Tuple[List[int], int, int]:
@@ -265,37 +284,31 @@ def compute_shake256_digest_for_byte_range(pdf_bytes: bytes, byte_range: List[in
     return shake.digest(digest_len)
 
 def embed_signature_into_pdf(pdf_bytes: bytes, signature: bytes,sign_type: int = 0 ,index: int = -1) -> bytes:
-    _, maker_start, maker_end = extract_byte_range_and_placeholder(pdf_bytes, sign_type, index)
-    
-    contents_start = pdf_bytes.find(CONTENTS_PREFIX, maker_start, maker_end)
-    contents_end = pdf_bytes.find(CONTENTS_SUFFIX, contents_start, maker_end)
+    container = parse_signature_container(pdf_bytes, sign_type, index)
+    if not isinstance(signature, (bytes, bytearray, memoryview)):
+        raise SignatureFormatError("signature.type", "Signature must be bytes-like")
+    signature = bytes(signature)
+    if (sign_type == 0 and len(signature) != crypto_sign_BYTES
+            or sign_type == 1 and not 0 < len(signature) <= falcon_512.SIGNATURE_SIZE):
+        raise SignatureFormatError("signature.size", "Signature size is invalid for the selected algorithm")
+    hex_len = len(signature) * 2
+    if hex_len > MAX_DECIMAL_VALUE or hex_len > container.contents_end - container.contents_start:
+        raise SignatureFormatError("signature.capacity", "Signature does not fit its fixed-width Contents capacity")
 
-    hex_len= contents_end-(contents_start + len(CONTENTS_PREFIX))
-
-    sig_hex = signature.hex().encode()
-
-    padded_sig = sig_hex + b"0" * (hex_len - len(sig_hex))
-
-    pdf_bytes = (
-        pdf_bytes[:contents_start+len(CONTENTS_PREFIX)] +
-        padded_sig +
-        pdf_bytes[contents_end:]
+    gap = (
+        SIG_LEN % hex_len + SIG_LEN_SUFFIX + CONTENTS_PREFIX
+        + signature.hex().encode("ascii")
+        + b"0" * (container.contents_end - container.contents_start - hex_len)
+        + CONTENTS_SUFFIX
     )
-
-    sig_len_str = SIG_LEN % len(sig_hex)
-
-    template = SIG_LENGTH_REGEX.search(pdf_bytes, maker_start, maker_end)
-    if template:
-        start = template.start()
-        end = template.end()
-
-        pdf_bytes = (
-            pdf_bytes[:start] +
-            sig_len_str +
-            pdf_bytes[end:]
-        )
-    
-    return pdf_bytes
+    embedded = pdf_bytes[:container.gap_start] + gap + pdf_bytes[container.gap_end:]
+    if len(embedded) != len(pdf_bytes):
+        raise SignatureFormatError("signature.layout", "Embedding must preserve exact file length")
+    completed = parse_completed_signature(embedded, sign_type, index)
+    if (completed.byte_range != container.byte_range
+            or (completed.marker_start, completed.marker_end) != (container.marker_start, container.marker_end)):
+        raise SignatureFormatError("signature.layout", "Embedding changed container offsets")
+    return embedded
 
 def extract_signature_hex_from_pdf(pdf_bytes: bytes, sign_type: int = 0 ,index: int = -1) -> bytes:
     container = parse_completed_signature(pdf_bytes, sign_type, index)
