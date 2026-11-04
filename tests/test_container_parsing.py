@@ -218,8 +218,12 @@ def test_frozen_phase1_single_pair_signatures_still_verify(case, tmp_path):
     assert isinstance(result, tuple) and len(result) == 11 and result[0] is True
 
 
-def test_repeated_hybrid_signing_policy_is_not_changed_in_this_step(signed_pdf, keys, tmp_path):
+def test_repeated_hybrid_signing_is_rejected_by_phase2b3(signed_pdf, keys, tmp_path):
+    # Intentional Phase 2B.3 policy change: the earlier phases allowed history.
     output = tmp_path / "signed-again.pdf"
-    sign_file(signed_pdf, output, keys.sk_ed, keys.sk_falcon)
-    result = verify_file(output, keys.pk_ed, keys.pk_falcon)
-    assert len(result) == 11 and result[0] is True
+    original = signed_pdf.read_bytes()
+    with pytest.raises(SignatureFormatError) as error:
+        sign_file(signed_pdf, output, keys.sk_ed, keys.sk_falcon)
+    assert error.value.code == "input.reserved_marker"
+    assert not output.exists()
+    assert signed_pdf.read_bytes() == original

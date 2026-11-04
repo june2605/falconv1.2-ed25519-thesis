@@ -8,6 +8,9 @@ from pqcrypto.sign import falcon_512
 
 SIG_MARKER_START = [b"%%ED25519_PQ_SIG_START\n", b"%%FALCON_PQ_SIG_START\n"]
 SIG_MARKER_END = [b"%%ED25519_PQ_SIG_END\n", b"%%FALCON_PQ_SIG_END\n"]
+# Reserve the complete marker names even without LF, including names embedded
+# in PDF content. This is deliberately stricter than local container parsing.
+RESERVED_SIGNATURE_MARKERS = tuple(marker[:-1] for marker in SIG_MARKER_START + SIG_MARKER_END)
 
 BYTE_RANGE_TEMPLATE = b"ByteRange: [ %010d %010d %010d %010d ]\n"
 ZERO_BYTE_RANGE = BYTE_RANGE_TEMPLATE % (0, 0, 0, 0)
@@ -49,6 +52,18 @@ class SignatureContainer:
     @property
     def capacity_bytes(self) -> int:
         return (self.contents_end - self.contents_start) // 2
+
+
+@dataclass(frozen=True)
+class SignaturePair:
+    ed25519: SignatureContainer
+    falcon: SignatureContainer
+
+
+def validate_unsigned_input(pdf_bytes: bytes) -> None:
+    """Reject signing any reserved marker name, regardless of its PDF meaning."""
+    if any(marker in pdf_bytes for marker in RESERVED_SIGNATURE_MARKERS):
+        raise SignatureFormatError("input.reserved_marker", "Input is already signed or contains a reserved signature marker")
 
 
 def _container_bounds(pdf_bytes: bytes, sign_type: int, index: int) -> Tuple[int, int]:
@@ -169,6 +184,29 @@ def parse_completed_signature(pdf_bytes: bytes, sign_type: int = 0, index: int =
     if pdf_bytes.count(b"0", signature_end, container.contents_end) != padding_length:
         raise SignatureFormatError("contents.padding", "Unused Contents capacity must contain only ASCII zero padding")
     return container
+
+
+def parse_signature_pair(pdf_bytes: bytes) -> SignaturePair:
+    """Validate exactly one completed Ed25519 -> Falcon pair ending at EOF.
+
+    Local parsers remain available for prepared/intermediate revisions. Only
+    this whole-file validator enforces global marker cardinality and pairing.
+    It does not normalize input or decide cryptographic signature validity.
+    """
+    if any(pdf_bytes.count(marker) != 1 for marker in RESERVED_SIGNATURE_MARKERS):
+        raise SignatureFormatError("pair.markers", "Expected exactly one occurrence of each reserved marker name")
+    ed25519 = parse_completed_signature(pdf_bytes, 0, 0)
+    falcon = parse_completed_signature(pdf_bytes, 1, 0)
+    if ed25519.marker_start >= falcon.marker_start:
+        raise SignatureFormatError("pair.order", "Ed25519 must precede Falcon")
+    if ed25519.marker_end != falcon.marker_start:
+        raise SignatureFormatError("pair.adjacency", "Falcon must immediately follow the Ed25519 container")
+    if falcon.marker_end != len(pdf_bytes):
+        raise SignatureFormatError("pair.trailing", "No bytes may follow the final Falcon container")
+    # Local ByteRanges already end at their own containers and start at zero.
+    # Adjacency therefore places the complete Ed25519 container in Falcon's
+    # first covered interval, and keeps the Ed25519 revision boundary intact.
+    return SignaturePair(ed25519, falcon)
 
 
 def prepare_file_with_placeholder(input_path: str, output_path: str, placeholder_len: int = DEFAULT_SIGNATURE_CAPACITIES[0], type_sign : int = 0) -> None:

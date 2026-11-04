@@ -6,6 +6,10 @@ import time
 from utils import prepare_file_with_placeholder
 
 def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str) :
+    # Preflight the unsigned source before opening keys or touching output.
+    with open(input_path, "rb") as source:
+        validate_unsigned_input(source.read())
+
     with open(sk_ed, "rb") as k:
         sk1 = k.read()
     

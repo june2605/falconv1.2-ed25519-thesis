@@ -30,20 +30,39 @@ def verify_file(pdf_path: str, pk_ed: str, pk_falcon: str):
     time_io = time.time() - start_io
 
     
-    index = -1
     ok_ed = False
     ok_falcon = False
 
+    # Validate both completed containers and their global topology before
+    # either algorithm receives a message. Shared pair validation is charged
+    # to the existing Ed25519 parse slot; Falcon's parse slot covers decoding.
     try:
         start_parse_ed = time.time()
-        byte_range_ed, _, _ = extract_byte_range_and_placeholder(pdf_bytes, 0 ,index)
-        sig_hex_ed = extract_signature_hex_from_pdf(pdf_bytes, 0 ,index)
+        pair = parse_signature_pair(pdf_bytes)
+        byte_range_ed = pair.ed25519.byte_range
+        sig_hex_ed = pdf_bytes[
+            pair.ed25519.contents_start:
+            pair.ed25519.contents_start + pair.ed25519.signature_length
+        ]
         signature_ed = bytes.fromhex(sig_hex_ed.decode())
         time_parse_ed = time.time() - start_parse_ed
 
-    except:
-        time_parse_ed = 0
-        ok_ed=False
+    except ValueError:
+        time_parse_ed = time.time() - start_parse_ed
+        return (False,
+                time_parse_ed, 0, 0, time_parse_ed,
+                0, 0, 0, 0,
+                time_io, time_io + time_parse_ed)
+
+    start_parse_falcon = time.time()
+    byte_range_falcon = pair.falcon.byte_range
+    sig_hex_falcon = pdf_bytes[
+        pair.falcon.contents_start:
+        pair.falcon.contents_start + pair.falcon.signature_length
+    ]
+    # The pair parser has already required bounded ASCII hexadecimal here.
+    signature_falcon = bytes.fromhex(sig_hex_falcon.decode())
+    time_parse_falcon = time.time() - start_parse_falcon
 
     try:
         start_hash_ed = time.time()
@@ -69,33 +88,6 @@ def verify_file(pdf_path: str, pk_ed: str, pk_falcon: str):
         time_hash_ed +
         time_crypto_ed
     )
-
-    try:
-        start_parse_falcon = time.time()
-
-        byte_range_falcon, _, _ = extract_byte_range_and_placeholder(
-            pdf_bytes,
-            1,
-            index
-        )
-
-        sig_hex_falcon = extract_signature_hex_from_pdf(
-            pdf_bytes,
-            1,
-            index
-        )
-
-        signature_falcon = bytes.fromhex(
-            sig_hex_falcon.decode()
-        )
-
-        time_parse_falcon = (
-            time.time() - start_parse_falcon
-        )
-
-    except Exception:
-        time_parse_falcon = 0
-        ok_falcon = False
 
     # Hash
     try:
