@@ -1,0 +1,40 @@
+.venv/
+build/
+dist/
+__pycache__/
+*.spec
+*.key
+*.iss
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets and private keys
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+key/
+keys/
+secrets/
+
+# Generated data
+*.db
+*.sqlite
+*.sqlite3
+data_test/
+benchmark/
+esign_test.zip
+
+# Temporary files
+tmp/
+temp/
+*.tmp
