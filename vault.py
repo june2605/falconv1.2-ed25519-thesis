@@ -1,15 +1,19 @@
-"""Managed local encrypted vault lifecycle; no PDF signing/UI integration."""
+"""Managed encrypted vault lifecycle and authenticated handle provenance."""
 
+from contextlib import contextmanager
+from dataclasses import dataclass
 from functools import wraps
 import hmac
-from threading import RLock
+import os
+from threading import RLock, current_thread
+from weakref import WeakKeyDictionary
 
 from hybrid_keys import HybridKeyPair
 from vault_crypto import UnsealedVault, seal_key_pair, unseal_key_pair, _reseal_key_pair
 from vault_format import VaultError, parse_vault
 from vault_io import (
     VaultConflictError, VaultExistsError, VaultIOError, VaultPathError,
-    VaultPermissionError, VaultTransaction, VaultVerificationError, capture_vault, check_path,
+    VaultPermissionError, VaultSnapshot, VaultTransaction, VaultVerificationError, capture_vault, check_path,
     cooperative_locks, recheck_snapshot, require_absent,
 )
 
@@ -17,6 +21,26 @@ from vault_io import (
 class VaultLockedError(VaultError):
     code = "vault.locked"
     message = "Managed vault handle is locked"
+
+
+class VaultHandleError(VaultError):
+    code = "vault.handle"
+    message = "Invalid or cross-context managed vault handle"
+
+
+_HANDLE_CONTEXT = object()
+_HANDLE_REGISTRY = WeakKeyDictionary()
+_HANDLE_REGISTRY_LOCK = RLock()
+
+
+@dataclass(frozen=True)
+class _HandleBinding:
+    snapshot: VaultSnapshot  # Encrypted bytes and public filesystem metadata only.
+    result_id: int
+    pair_id: int
+    process: int
+    thread: object
+    context: object
 
 
 def _operation(function):
@@ -33,7 +57,7 @@ def _operation(function):
             # Preserve only fixed cleanup diagnostics, never native values/text.
             for note in getattr(error, "__notes__", ()):
                 if "cleanup" in note.lower():
-                    safe.add_note("Vault artifact cleanup failed; encrypted artifact may remain")
+                    safe.add_note("Owned artifact cleanup failed; manual review may be required")
                 elif "lock release" in note.lower():
                     safe.add_note("Vault lock release failed")
             raise safe from None
@@ -43,7 +67,7 @@ def _operation(function):
 class UnlockedVault:
     """Revocable managed access, not secure erasure or revocation of copied bytes."""
 
-    __slots__ = ("_result", "_mutex", "_path", "_revision")
+    __slots__ = ("_result", "_mutex", "_path", "_revision", "__weakref__")
 
     def __init__(self, result, snapshot):
         self._result = result
@@ -92,6 +116,45 @@ class UnlockedVault:
         return f"UnlockedVault(locked={self.is_locked})"
 
 
+def _register_unlocked_handle(handle, snapshot):
+    binding = _HandleBinding(snapshot, id(handle._result), id(handle._result.key_pair),
+                             os.getpid(), current_thread(), _HANDLE_CONTEXT)
+    with _HANDLE_REGISTRY_LOCK:
+        _HANDLE_REGISTRY[handle] = binding
+
+
+def _handle_binding(handle):
+    if type(handle) is not UnlockedVault:
+        raise VaultHandleError()
+    if getattr(handle, "_result", False) is None:
+        raise VaultLockedError()
+    with _HANDLE_REGISTRY_LOCK:
+        binding = _HANDLE_REGISTRY.get(handle)
+    if (binding is None or binding.process != os.getpid()
+            or binding.thread is not current_thread() or binding.context is not _HANDLE_CONTEXT):
+        raise VaultHandleError()
+    return binding
+
+
+def _validate_managed_handle(handle, binding):
+    if _handle_binding(handle) is not binding:
+        raise VaultHandleError()
+    if (type(handle._result) is not UnsealedVault or id(handle._result) != binding.result_id
+            or id(handle._result.key_pair) != binding.pair_id
+            or handle._path is not binding.snapshot.path
+            or handle._revision != binding.snapshot.revision):
+        raise VaultHandleError()
+
+
+@contextmanager
+def _managed_key_access(handle):
+    # Validate process/thread context before touching the per-handle mutex.
+    binding = _handle_binding(handle)
+    with handle._mutex:
+        _validate_managed_handle(handle, binding)
+        yield binding, handle._result.key_pair
+
+
 def _same_recovery(actual, pair, expected_uuid):
     return (type(actual) is UnsealedVault
             and type(actual.key_pair) is HybridKeyPair
@@ -132,7 +195,9 @@ def unlock_vault(path, password: str) -> UnlockedVault:
         result = unseal_key_pair(captured.data, password)
         # Recheck after potentially expensive KDF/native validation.
         recheck_snapshot(captured)
-        return UnlockedVault(result, captured)
+        handle = UnlockedVault(result, captured)
+        _register_unlocked_handle(handle, captured)
+        return handle
 
 
 def lock_vault(handle: UnlockedVault) -> None:
@@ -140,6 +205,8 @@ def lock_vault(handle: UnlockedVault) -> None:
         raise VaultLockedError()
     with handle._mutex:
         handle._result = None
+        with _HANDLE_REGISTRY_LOCK:
+            _HANDLE_REGISTRY.pop(handle, None)
 
 
 @_operation

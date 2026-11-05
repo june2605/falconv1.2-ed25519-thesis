@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import stat
 import tempfile
-from typing import Iterable
+from typing import Callable, Iterable
 
 
 class SigningPathError(ValueError):
@@ -19,6 +19,18 @@ class SourceSnapshot:
     path: Path
     data: bytes
     stat_info: os.stat_result
+
+
+@dataclass(frozen=True)
+class SigningProtection:
+    """Internal caller-owned storage paths and a preflight/prepublication guard.
+
+    The caller must retain its required locks for the whole signing operation.
+    This is not an identity assertion or an independently trusted capability.
+    """
+
+    protected_paths: tuple
+    check: Callable[[Path], None]
 
 
 def _fingerprint(info):
@@ -109,8 +121,9 @@ class SigningTransaction:
     cleanup, and path checks cannot defeat a hostile concurrent filesystem.
     """
 
-    def __init__(self, destination):
+    def __init__(self, destination, *, _before_publish=None):
         self.destination = Path(destination)
+        self._before_publish = _before_publish
         self.workspace = None
         self.candidate = None
         self._owned = set()
@@ -209,6 +222,8 @@ class SigningTransaction:
     def publish(self):
         if not self._verified or self._published or self.workspace is not None:
             raise RuntimeError("Publication requires a verified candidate and cleaned working files")
+        if self._before_publish is not None:
+            self._before_publish()
         if not os.path.samestat(self._parent_identity, self.destination.parent.stat()):
             raise SigningPathError("path.changed", "Destination directory changed during signing")
         if _optional_fingerprint(self.destination) != self._destination_before:

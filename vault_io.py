@@ -403,6 +403,14 @@ def require_absent(checked):
     raise VaultExistsError()
 
 
+def lock_file_path(path):
+    """Use the same canonical sidecar name for lifecycle and signing guards."""
+    checked = check_path(path)
+    name = os.path.normcase(str(checked.path))
+    digest = hashlib.sha256(name.encode("utf-8", errors="strict")).hexdigest()
+    return checked.path.parent / f"{_PREFIX}lock-{digest}.lck"
+
+
 @contextmanager
 def cooperative_locks(paths):
     checked = tuple(check_path(path) for path in paths)
@@ -411,8 +419,7 @@ def cooperative_locks(paths):
     native = _native()
     try:
         for name, item in sorted(canonical.items()):
-            digest = hashlib.sha256(name.encode("utf-8", errors="strict")).hexdigest()
-            lock_path = item.path.parent / f"{_PREFIX}lock-{digest}.lck"
+            lock_path = lock_file_path(item)
             # Lock sidecars are persistent. Native open validates existing ACL,
             # link count, reparse attributes and file type through the handle.
             handles.append(native.acquire_lock(lock_path))

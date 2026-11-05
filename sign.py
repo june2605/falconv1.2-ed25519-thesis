@@ -3,7 +3,7 @@ from nacl.signing import SigningKey
 from utils import *
 import time
 from pathlib import Path
-from signing_io import SigningPathError, SigningTransaction, capture_source, validate_signing_paths
+from signing_io import SigningPathError, SigningProtection, SigningTransaction, capture_source, validate_signing_paths
 from verify import verify_file, verify_file_with_public_keys
 from hybrid_keys import HybridKeyPair, validate_key_pair
 
@@ -40,25 +40,33 @@ def sign_file(input_path: str, output_path: str, sk_ed: str, sk_falcon: str, *, 
         return _sign_captured(snapshot, output_path, requested_output, protected_paths, transaction, sk1, sk2, pk2)
 
 
-def sign_with_key_material(input_path, output_path, key_pair: HybridKeyPair):
+def sign_with_key_material(input_path, output_path, key_pair: HybridKeyPair, *, _protection=None):
     """Sign using in-memory keys without creating private-key or public-key files.
 
     PDF intermediate files and the final candidate still use the same owned
     transaction. Return the legacy 11 timing slots. This is not a vault/identity
     API and does not offer secret-memory isolation or guaranteed zeroization.
+    The optional internal protection context supplies storage paths and checks;
+    ordinary three-argument callers retain their original behavior.
     """
+    if _protection is not None and type(_protection) is not SigningProtection:
+        raise TypeError("Invalid internal signing protection context")
     requested_source = Path(input_path).absolute()
     snapshot = capture_source(requested_source)
     validate_unsigned_input(snapshot.data)
     requested_output = Path(output_path).absolute()
     protected_paths = (requested_source,)
+    if _protection is not None:
+        _protection.check(requested_output)
+        protected_paths += _protection.protected_paths
     destination = validate_signing_paths(snapshot, requested_output, protected_paths=protected_paths)
     validate_key_pair(key_pair)
     # Bytes and model fields are immutable under ordinary use. Capture each
     # reference for this operation; never discover or write a key filename.
     sk1, sk2 = key_pair.ed25519_private_seed, key_pair.falcon_private_key
     pk2 = key_pair.public_keys.falcon_public_key
-    with SigningTransaction(destination) as transaction:
+    before_publish = None if _protection is None else lambda: _protection.check(requested_output)
+    with SigningTransaction(destination, _before_publish=before_publish) as transaction:
         return _sign_captured(snapshot, output_path, requested_output, protected_paths,
                               transaction, sk1, sk2, pk2, memory_keys=True)
 
