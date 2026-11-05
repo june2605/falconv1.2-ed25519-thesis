@@ -1,0 +1,54 @@
+{
+  "checks": [
+    "desktop_connected",
+    "only_nine_allowlisted_methods",
+    "correct_metadata_and_capability_flags",
+    "all_five_routes",
+    "light_dark_themes",
+    "signing_prerequisites_and_no_password_inputs",
+    "untrusted_navigation_and_popup_blocked",
+    "unapproved_raw_messages_ignored"
+  ],
+  "passed": true,
+  "windowDpi": 96,
+  "metadata": {
+    "info": {
+      "ok": true,
+      "protocolVersion": 1,
+      "data": {
+        "applicationName": "HybridSign",
+        "applicationVersion": "0.1.0",
+        "runtime": "pywebview-edgechromium",
+        "desktopStatus": "connected"
+      }
+    },
+    "caps": {
+      "ok": true,
+      "protocolVersion": 1,
+      "data": {
+        "nativeShell": true,
+        "vaultOperations": true,
+        "pdfSigning": true,
+        "pdfVerification": false,
+        "accountRegistry": false,
+        "vaultCreate": true,
+        "vaultUnlock": true,
+        "vaultLock": true,
+        "vaultPasswordChange": false,
+        "vaultBackupRestore": false
+      }
+    },
+    "invalid": {
+      "ok": false,
+      "protocolVersion": 1,
+      "error": {
+        "code": "INVALID_REQUEST",
+        "message": "Invalid desktop request."
+      }
+    }
+  },
+  "windowVisible": true,
+  "exitCode": 0,
+  "ownedThreadsStopped": true,
+  "pdfModulesImported": false
+}

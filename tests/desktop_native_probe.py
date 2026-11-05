@@ -48,8 +48,8 @@ def create(*args, **kwargs):
             assert ctypes.windll.user32.IsWindowVisible(int(window.native.Handle.ToInt64()))
             results["windowDpi"] = int(window.native.DeviceDpi)
             methods = window.evaluate_js("Object.keys(window.pywebview.api).sort()")
-            assert methods == ["create_vault", "get_app_info", "get_capabilities", "get_vault_state", "lock_vault", "unlock_vault"], methods
-            results["checks"].append("only_six_allowlisted_methods")
+            assert methods == ["choose_pdf", "create_vault", "get_app_info", "get_capabilities", "get_signing_state", "get_vault_state", "lock_vault", "sign_pdf", "unlock_vault"], methods
+            results["checks"].append("only_nine_allowlisted_methods")
             window.evaluate_js("window.__probe = {}; window.pywebview.api.get_app_info().then(x => window.__probe.info=x); window.pywebview.api.get_capabilities().then(x=>window.__probe.caps=x); window.pywebview.api.get_app_info('invalid').then(x=>window.__probe.invalid=x); void 0")
             deadline = time.monotonic() + 3
             while time.monotonic() < deadline:
@@ -62,7 +62,7 @@ def create(*args, **kwargs):
             assert response["caps"]["data"] == {"nativeShell": True, "vaultOperations": True,
                                                 "vaultCreate": True, "vaultUnlock": True, "vaultLock": True,
                                                 "vaultPasswordChange": False, "vaultBackupRestore": False,
-                                                "pdfSigning": False, "pdfVerification": False,
+                                                "pdfSigning": True, "pdfVerification": False,
                                                 "accountRegistry": False}, response
             results["metadata"] = response
             results["checks"].append("correct_metadata_and_capability_flags")
@@ -90,17 +90,9 @@ def create(*args, **kwargs):
             assert window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Verify PDF').disabled")
             window.evaluate_js("window.location.hash='/sign'; void 0")
             time.sleep(0.1)
-            window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Just exploring')).click(); void 0")
-            time.sleep(0.1)
-            window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Preview unlock').click(); void 0")
-            time.sleep(0.1)
-            window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Preview unlocked state').click(); void 0")
-            time.sleep(0.7)
-            window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Continue to review').click(); void 0")
-            time.sleep(0.1)
             assert window.evaluate_js("[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Sign PDF').disabled")
             assert not window.evaluate_js("!!document.querySelector('input[type=password]')")
-            results["checks"].append("crypto_actions_disabled_no_password_inputs")
+            results["checks"].append("signing_prerequisites_and_no_password_inputs")
             original_url = window.get_current_url().split("#")[0]
             for url in ["https://example.invalid/", "file:///C:/Windows/win.ini", "data:text/html,evil"]:
                 window.evaluate_js(f"window.location.href={json.dumps(url)}; void 0")
@@ -133,7 +125,7 @@ def create(*args, **kwargs):
             rect = wintypes.RECT()
             hwnd = int(window.native.Handle.ToInt64())
             assert ctypes.windll.dwmapi.DwmGetWindowAttribute(hwnd, 9, ctypes.byref(rect), ctypes.sizeof(rect)) == 0
-            directory = Path("frontend/qa/phase4b2a")
+            directory = Path("frontend/qa/phase4b3a")
             directory.mkdir(parents=True, exist_ok=True)
             ImageGrab.grab(bbox=(rect.left, rect.top, rect.right, rect.bottom), all_screens=True).save(directory / "native-dashboard.png")
             results["windowVisible"] = True
@@ -153,6 +145,6 @@ results["exitCode"] = exit_code
 results["ownedThreadsStopped"] = not any(thread.name.startswith("HybridSign-") for thread in threading.enumerate())
 results["pdfModulesImported"] = any(name in __import__('sys').modules for name in ("sign", "verify"))
 if results["passed"] and exit_code == 0:
-    Path("frontend/qa/phase4b2a/native-checks.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    Path("frontend/qa/phase4b3a/native-checks.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
 print("NATIVE_PROBE=" + json.dumps(results), flush=True)
 raise SystemExit(0 if results["passed"] and exit_code == 0 else 1)

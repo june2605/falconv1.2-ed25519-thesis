@@ -30,6 +30,9 @@ class Command(Enum):
     VAULT_SELECT = "vault_select"
     VAULT_RETRY_CHECK = "vault_retry_check"
     VAULT_FORGET_SELECTION = "vault_forget_selection"
+    PDF_SELECT = "pdf_select"
+    PDF_CHECK = "pdf_check"
+    PDF_SIGN = "pdf_sign"
 
 
 class WorkerError(Exception):

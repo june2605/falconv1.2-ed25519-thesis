@@ -14,6 +14,7 @@ import desktop.vault_service as service
 import vault_io
 
 control = json.loads(sys.stdin.buffer.readline())
+signing = control.get('signing', False)
 mode, vault_path, password = control["mode"], Path(control["path"]), control.pop("password")
 results = {"passed": False, "maskedNativePassword": False, "guiThreadConfirmed": False,
            "shutdownLockedOnWorker": False, "noSecretBridgeOrDiskWrites": True, "generatedPairs": 0}
@@ -33,7 +34,7 @@ def capture(window, name, *, current=False):
     rect = wintypes.RECT()
     hwnd = int(window.native.Handle.ToInt64())
     assert ctypes.windll.dwmapi.DwmGetWindowAttribute(hwnd, 9, ctypes.byref(rect), ctypes.sizeof(rect)) == 0
-    directory = Path("frontend/qa/phase4b2a1" if current else "frontend/qa/phase4b2a")
+    directory = Path('frontend/qa/phase4b3a') if signing else Path("frontend/qa/phase4b2a1" if current else "frontend/qa/phase4b2a")
     directory.mkdir(parents=True, exist_ok=True)
     ImageGrab.grab(bbox=(rect.left, rect.top, rect.right, rect.bottom), all_screens=True).save(directory / name)
 
@@ -114,6 +115,47 @@ def password_form(self, creating):
 
 NativeDialogs._file_dialog = file_selection
 NativeDialogs._build_password_dialog = password_form
+
+if signing:
+    import desktop.signing_service as signing_service
+    from desktop.pdf_io import output_choice
+    from signing_io import SigningTransaction
+    original_sign = signing_service.sign_vault_document
+    original_stage, original_candidate = SigningTransaction.write_stage, SigningTransaction.write_candidate
+
+    def sign_on_owner(*args):
+        assert threading.current_thread().name == 'HybridSign-worker'
+        time.sleep(1.5)  # Observe an actual pending operation and a native close attempt.
+        return original_sign(*args)
+
+    def no_plaintext(data):
+        assert password.encode() not in data
+        for pair in pairs:
+            for secret in (pair.ed25519_private_seed, pair.falcon_private_key):
+                assert secret not in data and secret.hex().encode() not in data
+
+    def stage(self, name, data):
+        no_plaintext(data)
+        return original_stage(self, name, data)
+
+    def candidate(self, data):
+        no_plaintext(data)
+        return original_candidate(self, data)
+
+    def pdf_dialog(self, saving, suggested_name=None):
+        from System.Threading import Thread
+        assert int(Thread.CurrentThread.ManagedThreadId) == gui_ids[0]
+        return output_choice(control['output']) if saving else control['input']
+
+    def close_notice(self):
+        from System.Threading import Thread
+        assert int(Thread.CurrentThread.ManagedThreadId) == gui_ids[0]
+        results['activeClosePrevented'] = True
+
+    signing_service.sign_vault_document = sign_on_owner
+    SigningTransaction.write_stage, SigningTransaction.write_candidate = stage, candidate
+    NativeDialogs._pdf_dialog = pdf_dialog
+    NativeDialogs.signing_close_notice = close_notice
 
 
 def create(*args, **kwargs):
@@ -241,6 +283,41 @@ def create(*args, **kwargs):
             wait("document.querySelector('.vault-status-line')?.textContent.includes('Unlocked')")
             results["nativeExplicitLockAndStaleRejection"] = True
             assert not window.evaluate_js("document.querySelector('main').textContent.includes('DEMO VAULT')")
+            if signing:
+                from verify import verify_file_with_public_keys, verify_bytes
+                source, output = Path(control['input']), Path(control['output'])
+                source_before, vault_before = source.read_bytes(), vault_path.read_bytes()
+                files_before = set(source.parent.rglob('*'))
+                window.evaluate_js("[...document.querySelectorAll('button[aria-label^=Dismiss]')].forEach(b=>b.click()); void 0")
+                window.evaluate_js("window.location.hash='/sign'; void 0")
+                click('Choose PDF')
+                click('Continue to review')
+                time.sleep(.15)
+                capture(window, 'signing-review.png')
+                click('Sign PDF')
+                wait("document.querySelector('main').textContent.includes('Signing and self-verifying')")
+                from System import Action
+                window.native.BeginInvoke(Action(window.native.Close))
+                deadline = time.monotonic() + 2
+                while not results.get('activeClosePrevented') and time.monotonic() < deadline:
+                    time.sleep(.02)
+                assert results.get('activeClosePrevented') and not window.native.IsDisposed
+                wait("!![...document.querySelectorAll('h2')].find(x=>x.textContent==='Signed PDF saved')", timeout=20)
+                assert output.exists() and source.read_bytes() == source_before
+                assert vault_path.read_bytes() == vault_before and vault_path.stat().st_size == 2416
+                ed, falcon = bytes.fromhex(public['ed25519PublicKey']), bytes.fromhex(public['falconPublicKey'])
+                verified = verify_file_with_public_keys(output, ed, falcon)
+                assert verified[0] is True
+                tampered = output.read_bytes().replace(b'%PDF-', b'%PDE-', 1)
+                assert verify_bytes(tampered, ed, falcon)[0] is False
+                assert set(source.parent.rglob('*')) - files_before == {output}
+                assert not window.evaluate_js("!!document.querySelector('input[type=password], input[type=file]')")
+                results['signingEvidence'] = {'outputExists': True, 'sourceUnchanged': True,
+                    'vaultUnchangedAndEncrypted': True, 'diskVerifierAccepted': True,
+                    'tamperRejected': True, 'noPrivateKeyFiles': True, 'selfVerifiedShown': True,
+                    'outputBytes': output.stat().st_size}
+                time.sleep(.2)
+                capture(window, 'signing-completed.png')
             if mode == "create":
                 window.evaluate_js("[...document.querySelectorAll('button[aria-label^=Dismiss]')].forEach(b=>b.click()); void 0")
                 window.on_top = True
@@ -259,6 +336,7 @@ webview.create_window = create
 exit_code = launcher.main()
 results["ownedThreadsStopped"] = not any(thread.name.startswith("HybridSign-") for thread in threading.enumerate())
 if results["passed"] and exit_code == 0:
-    Path("frontend/qa/phase4b2a/vault-" + mode + "-checks.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    report_dir = Path('frontend/qa/phase4b3a' if signing else 'frontend/qa/phase4b2a')
+    (report_dir / ('vault-' + mode + '-checks.json')).write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
 print("VAULT_PROBE=" + json.dumps(results), flush=True)
 raise SystemExit(0 if results["passed"] and exit_code == 0 else 1)

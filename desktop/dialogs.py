@@ -60,6 +60,48 @@ class NativeDialogs:
     def password(self, *, creating):
         return self._on_gui(lambda: self._password_dialog(creating))
 
+    def choose_pdf(self):
+        return self._on_gui(lambda: self._pdf_dialog(None))
+
+    def choose_pdf_output(self, suggested_name):
+        return self._on_gui(lambda: self._pdf_dialog(suggested_name))
+
+    def _pdf_dialog(self, suggested_name):
+        from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog
+        from .pdf_io import output_choice
+        saving = suggested_name is not None
+        dialog = SaveFileDialog() if saving else OpenFileDialog()
+        approved = []
+        try:
+            self._active = dialog
+            dialog.Title = 'HybridSign — Save signed PDF' if saving else 'HybridSign — Choose unsigned PDF'
+            dialog.Filter = 'PDF document (*.pdf)|*.pdf'
+            dialog.DefaultExt, dialog.AddExtension = 'pdf', True
+            dialog.RestoreDirectory = dialog.CheckPathExists = True
+            if saving:
+                dialog.FileName, dialog.OverwritePrompt = suggested_name, True
+                def file_ok(_, event):
+                    try:
+                        approved.clear()
+                        approved.append(output_choice(str(dialog.FileName)))
+                    except Exception:
+                        event.Cancel = True
+                dialog.FileOk += file_ok
+            else:
+                dialog.CheckFileExists, dialog.Multiselect = True, False
+            if dialog.ShowDialog(self._window.native) != DialogResult.OK: return None
+            return approved[0] if saving and approved else None if saving else str(dialog.FileName)
+        finally:
+            self._active = None
+            dialog.Dispose()
+
+    def signing_close_notice(self):
+        """GUI closing event only; do not marshal/join from this callback."""
+        from System.Windows.Forms import MessageBox
+        MessageBox.Show(self._window.native,
+                        'Signing is in progress. Wait for its result before closing. Publication cannot be cancelled here.',
+                        'HybridSign — Signing in progress')
+
     def _file_dialog(self, creating):
         from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog
         dialog = SaveFileDialog() if creating else OpenFileDialog()

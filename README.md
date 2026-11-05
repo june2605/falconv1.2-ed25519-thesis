@@ -11,13 +11,15 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
-### Phase 4B.2A Windows desktop and encrypted vault
+### Phase 4B.3A Windows desktop, encrypted vault and real signing
 
 HybridSign opens in a dedicated pywebview/WebView2 window. Key Vault now creates,
 unlocks and locks real encrypted hybrid-key vaults, with file selection and masked
 password entry in native Windows dialogs. Private keys stay in the Python worker;
-React receives public metadata and opaque references only. PDF signing/verification,
-password changes, backups/restores and accounts remain unintegrated.
+React receives public metadata and opaque references only. Sign Document now saves
+a real Ed25519 then Falcon-512 PDF using the authenticated vault on that same worker.
+Standalone verification, password changes, backups/restores and accounts remain
+unintegrated. Browser mode remains a UI preview.
 
 From the existing Python 3.11 x64 environment:
 
@@ -47,15 +49,32 @@ broader/foreign ACLs reject without permission repair. Locking does not guarante
 memory erasure; lost passwords cannot be recovered here.
 
 See [real-vault integration, exact tests and remaining limitations](docs/phase4b2a-real-vault-regression.md).
-Signing and verification screens still run clearly labelled UI rehearsals, separate
-from the real vault. Browser mode remains entirely simulated.
+On **Sign Document**, choose an unsigned PDF through the Windows picker, select
+your unlocked vault, continue to review, then choose **Sign PDF** and a native
+Save location. Source overwrite, vault/sidecar aliases and unsafe paths reject.
+Replacing an existing PDF requires native confirmation; unrelated non-PDF files
+are not accepted as replacement targets. Input is limited to 50 MiB on the
+conservative fixed-local-NTFS profile. This is envelope validation, not complete
+PDF parsing or active-content inspection.
+
+Signing runs as one tracked operation. Leave the application open until it
+settles; active signing prevents normal window close and conflicting vault
+operations. Completion means that the inherited signer verified both layers
+before atomic publication and Python verified the saved bytes again. If the
+status is uncertain, reconcile it and inspect the chosen output location before
+retrying; there is no post-queue cancellation promise. No PDF bytes, paths,
+passwords or private keys are passed through the JavaScript API.
+
+See [real-signing architecture, Windows evidence and exact regression results](docs/phase4b3a-real-signing-regression.md).
+**Verify Signature** still offers a labelled UI rehearsal; the Python verifier
+remains available separately. Browser mode stays entirely simulated.
 
 ### Phase 4A desktop UI preview
 
 The separate [HybridSign frontend](frontend/README.md) is an interactive React
 prototype with Dashboard, Sign Document, Verify Signature, Key Vault and Settings.
 In a regular browser it is **not connected to Python**; all workflow results are
-labelled UI previews. The native desktop above separately integrates local vaults.
+labelled UI previews. The native desktop above separately integrates local vaults and PDF signing.
 
 ```powershell
 Set-Location D:\Final_Thesis_GitHub\frontend

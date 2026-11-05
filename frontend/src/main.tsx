@@ -10,5 +10,6 @@ import App from './App'
 import { WorkspaceProvider } from './state/workspace'
 import { DesktopProvider } from './native/status'
 import { NativeVaultProvider } from './native/vault'
+import { NativeSigningProvider } from './native/signing'
 
-createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><NativeVaultProvider><App /></NativeVaultProvider></WorkspaceProvider></DesktopProvider></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><NativeSigningProvider><NativeVaultProvider><App /></NativeVaultProvider></NativeSigningProvider></WorkspaceProvider></DesktopProvider></StrictMode>)

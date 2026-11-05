@@ -26,6 +26,14 @@ class VaultService:
         if current_thread() is not self._owner:
             raise WorkerError("UNAVAILABLE")
 
+    def require_session(self, vault_id, session_id):
+        self._check_owner()
+        if (self._handle is None or self._public is None
+                or self._public['vaultId'] != vault_id or self._public['sessionId'] != session_id):
+            raise WorkerError('STALE_SESSION')
+        self.state()  # Provenance, ACL, revision and cooperative locking checks.
+        return self._handle  # Private Python caller on the same owner only.
+
     def _select(self, path, metadata, handle=None):
         public = metadata.public_keys
         self._public = {"vaultId": secrets.token_hex(16),

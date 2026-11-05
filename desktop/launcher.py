@@ -4,11 +4,11 @@ from pathlib import Path
 import sys
 
 from .assets import BuildError, capture_build, make_server_type
-from .vault_bridge import VaultBridge
+from .signing_bridge import SigningBridge
 from .dialogs import NativeDialogs
 from .runtime import StartupError, require_runtime
 from .security import NativeGuard, NavigationPolicy
-from .vault_worker import VaultWorker as Worker
+from .signing_worker import SigningWorker as Worker
 
 
 def default_build_path():
@@ -24,7 +24,7 @@ def launch():
                              "OPEN_EXTERNAL_LINKS_IN_BROWSER": False,
                              "OPEN_DEVTOOLS_IN_DEBUG": False, "REMOTE_DEBUGGING_PORT": None})
     worker = Worker()
-    bridge = VaultBridge(worker, trusted=lambda: False)
+    bridge = SigningBridge(worker, trusted=lambda: False)
     server_type = make_server_type(snapshot)
     guard, failures = [], []
     window = webview.create_window("HybridSign — Desktop Preview", str(snapshot.root / "index.html"),
@@ -47,6 +47,9 @@ def launch():
             return False
 
     def closing():
+        if hasattr(worker, 'sign_busy') and worker.sign_busy():
+            bridge._dialogs.signing_close_notice()
+            return False
         bridge._close()
         for item in guard:
             item.close()

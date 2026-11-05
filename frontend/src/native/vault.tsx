@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from 'react'
-import { exact, record, response, vaultMethods } from './desktop'
+import { exact, record, response, vaultApi } from './desktop'
+import { useNativeSigning } from './signing'
 import { useDesktopConnection } from './status'
 import { useWorkspace } from '../state/workspace'
 
@@ -57,7 +58,7 @@ async function request(operation: Operation, refs: string[] = []): Promise<Vault
   let timer: number | undefined
   try {
     const host: unknown = (window as unknown as { pywebview?: unknown }).pywebview
-    if (!record(host) || host.platform !== 'edgechromium' || !exact(host.api, vaultMethods) || typeof host.api[operation] !== 'function') throw new Error()
+    if (!record(host) || host.platform !== 'edgechromium' || !vaultApi(host.api) || typeof host.api[operation] !== 'function') throw new Error()
     const invoked = (host.api[operation] as (...args: string[]) => Promise<unknown>)(...refs)
     reply = operation === 'get_vault_state' ? await Promise.race([invoked, new Promise((_, reject) => {
       timer = window.setTimeout(() => reject(new Error()), 2000)
@@ -96,6 +97,7 @@ interface VaultState {
 const VaultContext = createContext<VaultState | null>(null)
 
 export function NativeVaultProvider({ children }: PropsWithChildren) {
+  const signingBusy = useNativeSigning().busy
   const connection = useDesktopConnection()
   const integrated = connection.mode === 'desktop' && connection.capabilities.vaultOperations
   const [vault, setVault] = useState<PublicVault | null>(null)
@@ -107,7 +109,7 @@ export function NativeVaultProvider({ children }: PropsWithChildren) {
   const toastSnapshot = useRef(toasts)
   toastSnapshot.current = toasts
   const run = useCallback(async (operation: Operation, refs: string[] = []) => {
-    if (!integrated || running.current) return
+    if (!integrated || running.current || signingBusy && operation !== 'get_vault_state') return
     running.current = true
     setBusy(true); setOperation(operation)
     setPhase(operation === 'unlock_vault' ? refs.length ? 'waiting-password' : 'selecting-file' : operation === 'create_vault' ? 'selecting-file' : operation === 'lock_vault' ? 'locking' : 'reading-state')
@@ -158,7 +160,7 @@ export function NativeVaultProvider({ children }: PropsWithChildren) {
       running.current = false
       if (mounted.current) { setBusy(false); setOperation(null); setPhase('idle') }
     }
-  }, [integrated, notify, dismissToast])
+  }, [integrated, notify, dismissToast, signingBusy])
   useEffect(() => {
     mounted.current = true
     if (integrated) void run('get_vault_state')
@@ -170,7 +172,7 @@ export function NativeVaultProvider({ children }: PropsWithChildren) {
     creating: 'Creating vault', locking: 'Locking vault', 'selecting-file': 'Choose a vault in Windows',
     'reading-state': 'Reading native vault state…', idle: operation === 'unlock_vault' ? 'Unlocking vault' : 'Completing vault operation…' }[phase])
     : error?.code === 'vault.unlock' ? 'Unable to unlock' : vault?.state === 'unlocked' ? 'Vault unlocked' : null
-  return <VaultContext.Provider value={{ integrated, vault, busy, known, error, progress, canRetry: !!selectionId,
+  return <VaultContext.Provider value={{ integrated, vault, busy: busy || signingBusy, known, error, progress, canRetry: !!selectionId,
     dismissError: () => setError(null), retry: () => run('unlock_vault', selectionId ? [selectionId] : []),
     create: () => run('create_vault'), unlock: () => run('unlock_vault'),
     lock: () => vault?.sessionId ? run('lock_vault', [vault.vaultId, vault.sessionId]) : Promise.resolve(),

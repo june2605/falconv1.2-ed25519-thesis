@@ -10,8 +10,14 @@ import { Badge, Button, DetailsRow, IconTile, Notice, PageHeader } from '../comp
 import { WorkflowStep } from '../components/WorkflowStep'
 import { TaskFooter } from '../components/TaskFooter'
 import { useDesktopConnection } from '../native/status'
+import { useNativeSigning } from '../native/signing'
+import { NativeSignDocument } from './NativeSignDocument'
 
 export function SignDocument() {
+  return useNativeSigning().integrated ? <NativeSignDocument /> : <DemoSignDocument />
+}
+
+function DemoSignDocument() {
   const [document, setDocument] = useState<DocumentSelection | null>(null)
   const [step, setStep] = useState(1)
   const previousStep = useRef(step)

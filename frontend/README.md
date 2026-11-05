@@ -1,11 +1,12 @@
-# HybridSign UI and Windows vault — Phase 4B.2A
+# HybridSign UI and Windows signing — Phase 4B.3A
 
 The approved Phase 4A.1 UI runs in a browser or in the Phase 4B.1 Windows desktop
 shell. Desktop Key Vault connects real encrypted-vault creation, unlock, lock and
 authenticated public metadata. File selection and masked password entry use
 Python-controlled Windows dialogs; passwords/private keys never enter React.
-PDF signing/verification, password change and backup/restore are **not integrated**.
-The document workflows remain DEMO / EXAMPLE; browser mode remains simulated.
+Desktop **Sign Document** now calls the existing managed Python signer and saves
+a real PDF. Standalone verification, password change and backup/restore remain
+unintegrated. Browser document workflows remain DEMO / EXAMPLE.
 
 Phase 4A.1 refines the existing design with progressive signing steps, persistent
 task actions, compact panels and readable typography. See the
@@ -20,7 +21,9 @@ For a native Windows window, build this frontend with `npm run build`, then run
 Install the pinned `requirements-desktop.txt` packages into that existing Python
 environment first. The launcher uses `dist/` and does not require Vite to run.
 See [the real-vault regression report](../docs/phase4b2a-real-vault-regression.md)
-for Windows prerequisites, the restricted bridge, tests and limitations.
+for Windows prerequisites and vault limitations. See the
+[real-signing report](../docs/phase4b3a-real-signing-regression.md) for the current
+nine-method bridge, operation lifecycle, disk verification and Windows evidence.
 
 The browser development workflow remains:
 
@@ -114,7 +117,7 @@ styles and shared tokens are in `styles.css` and `desktop.css`. No remote fonts 
 are required. Hash routing avoids adding a router dependency and uses a relative
 Vite base for future desktop packaging.
 
-### Future native integration
+### Native integration and preview separation
 
 `NativeBridgeV1` is an illustrative, versioned command boundary, not an existing
 implementation or a change to the Python APIs. It uses opaque document, vault
@@ -125,13 +128,27 @@ bridge or silently fall back from a failed native operation to a demo result.
 
 Phase 4B.2A extends the dedicated Python worker with four fixed vault commands.
 Managed handles are issued/used/locked on that thread; only opaque references and
-authenticated public metadata reach React. A separate six-method bridge accepts
+authenticated public metadata reach React. The original six-method vault profile accepts
 no JavaScript paths or passwords. Native Windows file/password dialogs run on the
 GUI thread. The existing vault filesystem/ACL/locking/atomic-create rules remain.
 Close locks active access; this does not guarantee secure memory erasure.
-Future PDF integration must reuse the existing managed signer, transactions and
-path checks. Frontend state must never authorize signing. Native downloads remain
-blocked; PDF save dialogs/rendering and longer-operation cancellation are future work.
+Phase 4B.3A adds exactly `choose_pdf()`,
+`sign_pdf(documentId, vaultId, sessionId, operationId)` and
+`get_signing_state(operationId?)`. The signing profile has nine allowlisted
+methods; metadata/vault-only profiles remain recognized explicitly. JavaScript
+never supplies paths, PDF bytes, passwords or keys. The Sign Document page uses
+Windows Open/Save dialogs and the currently authenticated native vault. Review
+shows metadata only; there is no PDF renderer.
+
+The same dedicated worker calls `sign_vault_document()`, preserving the original
+transaction and key ownership. One job can be ready, queued or running. Native
+status survives route changes and lost submission responses; reconciliation
+reads the same operation ID without automatically resubmitting. Signing does
+not use the five-second metadata deadline. No cancellation is offered after
+queueing; normal close and conflicting vault operations are refused while active.
+Only a self-verified, saved PDF is reported completed. Unknown outcomes require
+reconciliation and inspection. The in-process record does not survive application
+termination. Native browser downloads remain blocked.
 
 ### Browser-preview data and security limits
 
@@ -179,13 +196,17 @@ tests at 1280×720, 1366×768, 1600×900, 1920×1080 and 1093×614. A separate b
 context at deviceScaleFactor 1.25 approximates the last viewport at 125% scaling;
 it does not test physical Windows DPI configuration. All **80** existing tests
 remain; Phase 4B.1 adds **22** metadata/readiness browser executions. Phase 4B.2A
-adds **20** real-state contract/UI executions for **122** total.
+adds **20** real-state contract/UI executions plus **14** authentication-UX
+executions. Phase 4B.3A adds **16** signing executions for **152** total.
 Real Windows GUI validation is in `tests/test_desktop_native.py` under Python
 pytest, separate from these browser mocks.
 `tests/test_desktop_vault_native.py` additionally drives two actual desktop
 processes, masked native dialogs, wrong-password rejection, locking and original-
 key recovery. Save/Open cancellation is automated; human file-choice acceptance
 and physical multi-monitor/high-DPI behavior still need manual review.
+`tests/test_desktop_signing_native.py` also signs through two real Windows
+application processes with the original recovered keys, independently verifies
+both saved PDFs, rejects tampering and checks that no private-key files appear.
 
 `npm run test:visual` generates 32 current screenshots in `qa/phase4a1/after/`.
 The desktop UX tests add six 1280/1600 captures and two scaling captures, for

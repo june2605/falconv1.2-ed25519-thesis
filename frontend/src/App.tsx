@@ -13,6 +13,7 @@ import { Badge, Toasts } from './components/ui'
 import { useWorkspace } from './state/workspace'
 import { useDesktopConnection } from './native/status'
 import { useNativeVault } from './native/vault'
+import { useNativeSigning } from './native/signing'
 
 const navigation = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,6 +30,7 @@ export default function App() {
   const { setDialog } = useWorkspace()
   const desktop = useDesktopConnection().mode === 'desktop'
   const { integrated } = useNativeVault()
+  const signing = useNativeSigning().integrated
   const main = useRef<HTMLElement>(null)
   const [footerHost, setFooterHost] = useState<HTMLDivElement | null>(null)
   const firstRender = useRef(true)
@@ -45,9 +47,9 @@ export default function App() {
       <a href="#/dashboard" className="brand" aria-label="HybridSign home"><img src="./mark.svg" width="36" height="36" alt="" /><span><strong>HybridSign</strong><small>Hybrid Digital Signature</small></span></a>
       <div className="sidebar-label">WORKSPACE</div>
       <nav aria-label="Main navigation">{navigation.map(({ id, label, icon: Icon }) => <a key={id} href={`#/${id}`} aria-current={page === id ? 'page' : undefined} title={label} className={`nav-item ${page === id ? 'active' : ''}`}><Icon size={19} strokeWidth={1.8} aria-hidden="true" /><span>{label}</span>{page === id && <span className="nav-dot" />}</a>)}</nav>
-      <div className="sidebar-bottom"><div className="sidebar-note"><span className="status-dot" /><span title={integrated ? 'Local vault operations connected. PDF signing and verification remain unavailable.' : desktop ? 'Vault, signing and verification integration is not ready.' : undefined}>{integrated ? 'Vault connected · PDF unavailable' : desktop ? 'Vault / PDF not integrated' : 'Native bridge unavailable'}</span><Badge>{integrated ? '4B.2A' : '4B.1'}</Badge></div><button className="sidebar-about" onClick={() => setDialog('about')}><CircleHelp size={16} aria-hidden="true" /><span>About this prototype</span><ArrowUpRight size={14} aria-hidden="true" /></button></div>
+      <div className="sidebar-bottom"><div className="sidebar-note"><span className="status-dot" /><span title={signing ? 'Local vault and PDF signing connected. Standalone verification is unavailable.' : integrated ? 'Local vault operations connected. PDF signing and verification remain unavailable.' : desktop ? 'Vault, signing and verification integration is not ready.' : undefined}>{signing ? 'Local PDF signing connected' : integrated ? 'Vault connected · PDF unavailable' : desktop ? 'Vault / PDF not integrated' : 'Native bridge unavailable'}</span><Badge>{signing ? '4B.3A' : integrated ? '4B.2A' : '4B.1'}</Badge></div><button className="sidebar-about" onClick={() => setDialog('about')}><CircleHelp size={16} aria-hidden="true" /><span>About this prototype</span><ArrowUpRight size={14} aria-hidden="true" /></button></div>
     </aside>
-    <div className="workspace"><header className="topbar"><div className="breadcrumb"><Layers2 size={18} aria-hidden="true" /><span>Workspace</span><ChevronRight size={13} aria-hidden="true" /><strong>{navigation.find(item => item.id === page)?.label}</strong></div><div className="topbar-actions"><span className="preview-indicator" aria-live="polite" title={integrated ? 'Local encrypted vault operations are connected. PDF signing and verification are not integrated.' : desktop ? 'Desktop shell connected. Vault, signing and verification are not integrated.' : 'Browser UI preview; native connection unavailable.'}><span className="status-dot" />{desktop ? 'Desktop Connected' : 'UI PREVIEW'}</span><span className="topbar-divider" /><button className="icon-button" aria-label="About HybridSign" onClick={() => setDialog('about')}><CircleHelp size={20} strokeWidth={1.7} /></button></div></header>
+    <div className="workspace"><header className="topbar"><div className="breadcrumb"><Layers2 size={18} aria-hidden="true" /><span>Workspace</span><ChevronRight size={13} aria-hidden="true" /><strong>{navigation.find(item => item.id === page)?.label}</strong></div><div className="topbar-actions"><span className="preview-indicator" aria-live="polite" title={signing ? 'Local vault and signing connected. Standalone verification is not integrated.' : integrated ? 'Local encrypted vault operations are connected. PDF signing and verification are not integrated.' : desktop ? 'Desktop shell connected. Vault, signing and verification are not integrated.' : 'Browser UI preview; native connection unavailable.'}><span className="status-dot" />{desktop ? 'Desktop Connected' : 'UI PREVIEW'}</span><span className="topbar-divider" /><button className="icon-button" aria-label="About HybridSign" onClick={() => setDialog('about')}><CircleHelp size={20} strokeWidth={1.7} /></button></div></header>
       <main ref={main} tabIndex={-1} id="main-content"><div className="page-container"><Screen key={page} /></div></main>
       <div className="task-actions-host" ref={setFooterHost} />
     </div><VaultDialogs /><Toasts />

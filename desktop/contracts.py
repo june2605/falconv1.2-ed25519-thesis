@@ -11,9 +11,11 @@ CAPABILITIES = {"nativeShell": True, "vaultOperations": False, "pdfSigning": Fal
 METHODS = frozenset({"get_app_info", "get_capabilities"})
 VAULT_METHODS = frozenset({"get_vault_state", "create_vault", "unlock_vault", "lock_vault"})
 METHODS = METHODS | VAULT_METHODS
+METHODS = METHODS | frozenset({'choose_pdf', 'sign_pdf', 'get_signing_state'})
 VAULT_CAPABILITIES = {**CAPABILITIES, "vaultOperations": True, "vaultCreate": True,
                       "vaultUnlock": True, "vaultLock": True, "vaultPasswordChange": False,
                       "vaultBackupRestore": False}
+SIGNING_CAPABILITIES = {**VAULT_CAPABILITIES, 'pdfSigning': True}
 ERRORS = {"INVALID_REQUEST": "Invalid desktop request.",
           "UNAVAILABLE": "Desktop connection is unavailable.",
           "BUSY": "Desktop worker is busy.",
@@ -38,6 +40,12 @@ ERRORS.update({"CANCELLED": "Operation cancelled.", "STALE_SESSION": "Vault sess
                "vault.conflict": "Vault changed. The session was locked; reopen it explicitly.",
                "vault.verification": "Encrypted vault validation failed.",
                "vault.locked": "Vault is locked.", "vault.handle": "Vault session is not valid."})
+ERRORS.update({'PDF_INVALID': 'Select a supported unsigned PDF, at most 50 MiB.',
+               'STALE_DOCUMENT': 'Select the PDF again.', 'DOCUMENT_CHANGED': 'Selected PDF changed. Select it again.',
+               'STALE_OPERATION': 'Signing operation is not known in this application session.',
+               'SIGN_PATH': 'Output is unsafe or no longer matches native approval.',
+               'SIGN_FAILED': 'Signing did not complete. No new signed output was confirmed.',
+               'SIGN_UNCERTAIN': 'The output may have been published. Inspect the selected location before retrying.'})
 
 
 class PublicError(TypedDict):
@@ -97,7 +105,41 @@ class VaultResult(TypedDict):
     operation: Literal["idle", "reading-state", "selecting-file", "waiting-password", "unlocking", "creating", "locking"]
 
 
-PublicData = AppInfo | Capabilities | VaultCapabilities | VaultResult
+class SigningCapabilities(TypedDict):
+    nativeShell: Literal[True]
+    vaultOperations: Literal[True]
+    vaultCreate: Literal[True]
+    vaultUnlock: Literal[True]
+    vaultLock: Literal[True]
+    vaultPasswordChange: Literal[False]
+    vaultBackupRestore: Literal[False]
+    pdfSigning: Literal[True]
+    pdfVerification: Literal[False]
+    accountRegistry: Literal[False]
+
+
+class PublicDocument(TypedDict):
+    documentId: str
+    displayName: str
+    sizeBytes: int
+
+
+class PdfSelection(TypedDict):
+    document: PublicDocument | None
+    cancelled: bool
+
+
+class SigningResult(TypedDict):
+    operationId: str | None
+    state: Literal['idle', 'ready', 'queued', 'running', 'completed', 'failed', 'outcome-uncertain', 'cancelled']
+    document: PublicDocument | None
+    outputName: str | None
+    hybridKeyId: str | None
+    selfVerified: bool
+    errorCode: str | None
+
+
+PublicData = AppInfo | Capabilities | VaultCapabilities | SigningCapabilities | VaultResult | PdfSelection | SigningResult
 
 
 class SuccessReply(TypedDict):
