@@ -2,3 +2,4 @@ streamlit
 pynacl
 pqcrypto
 pyinstaller
+cryptography==50.0.2
