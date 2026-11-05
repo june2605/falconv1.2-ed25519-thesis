@@ -1,0 +1,93 @@
+[
+  {
+    "route": "dashboard",
+    "viewport": 768,
+    "mainHeight": 708,
+    "mainContentHeight": 708,
+    "dropzoneHeight": 0,
+    "controls": [
+      {
+        "label": "Preview unlock",
+        "top": 532,
+        "bottom": 558
+      }
+    ]
+  },
+  {
+    "route": "sign",
+    "viewport": 768,
+    "mainHeight": 632,
+    "mainContentHeight": 632,
+    "dropzoneHeight": 78,
+    "controls": [
+      {
+        "label": "Choose PDF",
+        "top": 287,
+        "bottom": 328
+      },
+      {
+        "label": "Continue to vault",
+        "top": 710,
+        "bottom": 751
+      }
+    ]
+  },
+  {
+    "route": "verify",
+    "viewport": 768,
+    "mainHeight": 632,
+    "mainContentHeight": 632,
+    "dropzoneHeight": 78,
+    "controls": [
+      {
+        "label": "Choose PDF",
+        "top": 241,
+        "bottom": 282
+      },
+      {
+        "label": "Verify PDF",
+        "top": 710,
+        "bottom": 751
+      }
+    ]
+  },
+  {
+    "route": "vault",
+    "viewport": 768,
+    "mainHeight": 708,
+    "mainContentHeight": 708,
+    "dropzoneHeight": 0,
+    "controls": [
+      {
+        "label": "Preview unlock",
+        "top": 254,
+        "bottom": 295
+      },
+      {
+        "label": "Change password",
+        "top": 515,
+        "bottom": 556
+      },
+      {
+        "label": "Encrypted backup",
+        "top": 564,
+        "bottom": 605
+      }
+    ]
+  },
+  {
+    "route": "settings",
+    "viewport": 768,
+    "mainHeight": 708,
+    "mainContentHeight": 708,
+    "dropzoneHeight": 0,
+    "controls": []
+  },
+  {
+    "route": "sign-review",
+    "label": "Sign PDF",
+    "disabled": true,
+    "top": 710,
+    "bottom": 751
+  }
+]

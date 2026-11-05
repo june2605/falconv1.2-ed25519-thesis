@@ -11,6 +11,23 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
+### Phase 4A desktop UI preview
+
+The separate [HybridSign frontend](frontend/README.md) is an interactive React
+prototype with Dashboard, Sign Document, Verify Signature, Key Vault and Settings.
+It is **not connected to Python**; all workflow results are labelled UI previews.
+
+```powershell
+Set-Location D:\Final_Thesis_GitHub\frontend
+npm ci
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`. Tested with Node 26.13.0 and npm 11.20.0.
+The existing Streamlit application and Python setup below remain separate.
+
+### Existing Python prototype
+
 The regression environment uses Windows x64 and Python **3.11.9**, with
 `pqcrypto==0.3.4` (including `pqcrypto.sign.falcon_512`), `PyNaCl==1.6.2`,
 `streamlit==1.66.1` and `pytest==9.2.0`. These are observed tested versions,

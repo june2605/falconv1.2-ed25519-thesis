@@ -1,0 +1,104 @@
+[
+  {
+    "route": "dashboard",
+    "pageHeight": 909,
+    "viewport": 768,
+    "controls": [
+      {
+        "label": "Preview unlock",
+        "top": 601,
+        "bottom": 623
+      }
+    ],
+    "dropzoneHeight": 0,
+    "textSizes": [
+      "12px",
+      "11px",
+      "10px",
+      "9px"
+    ]
+  },
+  {
+    "route": "sign",
+    "pageHeight": 997,
+    "viewport": 768,
+    "controls": [
+      {
+        "label": "Preview unlock",
+        "top": 677,
+        "bottom": 699
+      },
+      {
+        "label": "Preview signing",
+        "top": 836,
+        "bottom": 877
+      }
+    ],
+    "dropzoneHeight": 207,
+    "textSizes": [
+      "12px",
+      "9px",
+      "11px"
+    ]
+  },
+  {
+    "route": "verify",
+    "pageHeight": 1049,
+    "viewport": 768,
+    "controls": [
+      {
+        "label": "Preview verification",
+        "top": 911,
+        "bottom": 952
+      }
+    ],
+    "dropzoneHeight": 207,
+    "textSizes": [
+      "12px",
+      "9px",
+      "11px"
+    ]
+  },
+  {
+    "route": "vault",
+    "pageHeight": 902,
+    "viewport": 768,
+    "controls": [
+      {
+        "label": "Preview unlock",
+        "top": 655,
+        "bottom": 693
+      },
+      {
+        "label": "Change password",
+        "top": 767,
+        "bottom": 805
+      },
+      {
+        "label": "Encrypted backup",
+        "top": 767,
+        "bottom": 805
+      }
+    ],
+    "dropzoneHeight": 0,
+    "textSizes": [
+      "12px",
+      "11px",
+      "9px",
+      "10px"
+    ]
+  },
+  {
+    "route": "settings",
+    "pageHeight": 849,
+    "viewport": 768,
+    "controls": [],
+    "dropzoneHeight": 0,
+    "textSizes": [
+      "12px",
+      "11px",
+      "10px",
+      "9px"
+    ]
+  }
+]
