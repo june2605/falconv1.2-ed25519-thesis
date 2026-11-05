@@ -88,6 +88,15 @@ def seal_key_pair(pair: HybridKeyPair, password: str) -> bytes:
     Nonce/key collision avoidance relies on the OS RNG; no persistent registry
     or absolute uniqueness guarantee under RNG compromise is claimed.
     """
+    return _seal_key_pair(pair, password)
+
+
+def _reseal_key_pair(pair: HybridKeyPair, password: str, vault_uuid) -> bytes:
+    """Lifecycle-only UUID preservation; no salt/nonce injection or wire change."""
+    return _seal_key_pair(pair, password, vault_uuid=vault_uuid)
+
+
+def _seal_key_pair(pair, password, *, vault_uuid=None):
     encoded_password = _encode_password(password, creating=True)
     try:
         validate_key_pair(pair)
@@ -95,7 +104,8 @@ def seal_key_pair(pair: HybridKeyPair, password: str) -> bytes:
     except Exception:
         raise VaultKeyMaterialError() from None
     backend = _load_backend()
-    metadata = VaultMetadata(uuid4(), pair.public_keys, secrets.token_bytes(16), secrets.token_bytes(12))
+    metadata = VaultMetadata(uuid4() if vault_uuid is None else vault_uuid,
+                             pair.public_keys, secrets.token_bytes(16), secrets.token_bytes(12))
     header = encode_header(metadata)
     if not _KDF_SLOT.acquire(blocking=False):
         raise VaultBusyError()
