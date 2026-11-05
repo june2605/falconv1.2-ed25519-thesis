@@ -9,12 +9,14 @@ import { DocumentPreview } from '../components/DocumentPreview'
 import { Badge, Button, DetailsRow, IconTile, Notice, PageHeader } from '../components/ui'
 import { WorkflowStep } from '../components/WorkflowStep'
 import { TaskFooter } from '../components/TaskFooter'
+import { useDesktopConnection } from '../native/status'
 
 export function SignDocument() {
   const [document, setDocument] = useState<DocumentSelection | null>(null)
   const [step, setStep] = useState(1)
   const previousStep = useRef(step)
   const { vault, setDialog, addActivity } = useWorkspace()
+  const desktop = useDesktopConnection().mode === 'desktop'
   const task = usePreviewTask<SigningPreview>()
   const ready = !!document && vault?.state === 'unlocked'
   useEffect(() => {
@@ -40,7 +42,7 @@ export function SignDocument() {
         <Notice title="Native signing is unavailable">No PDF will be signed. You can preview the interface and download a labelled JSON summary.</Notice>
       </WorkflowStep>
       {task.error && <div className="result-area"><Notice tone="error" title="Preview could not complete">{task.error}</Notice></div>}
-      {task.result && <div className="result-area" role="status"><div className="result-heading"><Info size={20} aria-hidden="true" /><h2>Signing workflow previewed</h2><Badge tone="indigo">DEMO</Badge></div><p>No PDF was signed or changed.</p><Button variant="secondary" onClick={() => downloadPreviewSummary(task.result!)}><Download size={15} aria-hidden="true" />Download preview summary</Button><small>JSON only · not a signed document</small></div>}
+      {task.result && <div className="result-area" role="status"><div className="result-heading"><Info size={20} aria-hidden="true" /><h2>Signing workflow previewed</h2><Badge tone="indigo">DEMO</Badge></div><p>No PDF was signed or changed.</p><Button variant="secondary" disabled={desktop} onClick={() => downloadPreviewSummary(task.result!)}><Download size={15} aria-hidden="true" />Download preview summary</Button><small>{desktop ? 'Native downloads are disabled in this desktop phase.' : 'JSON only · not a signed document'}</small></div>}
     </section><DocumentPreview document={document} /></div>
     <TaskFooter label="Signing actions" title={step === 1 ? 'Choose a PDF to begin' : step === 2 ? 'Next: select your vault' : 'Review complete · demo only'} description={<span id="sign-unavailable">Native signer not connected. No PDF will be signed.</span>}>
       {step > 1 && <Button variant="ghost" disabled={task.busy} onClick={() => setStep(step - 1)}><ArrowLeft size={16} aria-hidden="true" />Back</Button>}

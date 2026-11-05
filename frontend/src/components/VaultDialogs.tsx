@@ -5,6 +5,7 @@ import { usePreviewTask } from '../hooks'
 import { demoService, initialDemoVault } from '../services/demo'
 import { requireNativeBridge } from '../native/contracts'
 import type { VaultDialog } from '../models'
+import { useDesktopConnection } from '../native/status'
 import { Badge, Button, DetailsRow, Modal, Notice } from './ui'
 
 const labels: Record<VaultDialog, { title: string; description: string }> = {
@@ -26,11 +27,12 @@ export function VaultDialogs() {
 
 function VaultDialogContent({ type, onClose }: { type: VaultDialog; onClose: () => void }) {
   const { vault, setVault, notify, addActivity } = useWorkspace()
+  const desktop = useDesktopConnection().mode === 'desktop'
   const [name, setName] = useState('')
   const [nameError, setNameError] = useState('')
   const task = usePreviewTask<void>()
   function nativeRequest() {
-    try { requireNativeBridge() } catch (error) { notify('Native connection unavailable', error instanceof Error ? error.message : 'No operation was performed.', 'info') }
+    try { requireNativeBridge() } catch (error) { notify(desktop ? 'Vault integration unavailable' : 'Native connection unavailable', desktop ? 'Only desktop status is connected. No vault operation was performed.' : error instanceof Error ? error.message : 'No operation was performed.', 'info') }
   }
   function preview(action: 'create' | 'unlock' | 'restore' | 'backup' | 'password') {
     if (action === 'create' && (name.trim().length < 3 || name.trim().length > 40 || /[\x00-\x1f\x7f]/.test(name))) { setNameError('Use 3–40 characters without control characters.'); return }
@@ -52,7 +54,7 @@ function VaultDialogContent({ type, onClose }: { type: VaultDialog; onClose: () 
     {['password', 'backup', 'restore'].includes(type) && <Notice title="Native operation not available">{type === 'password' ? 'No password is collected here. A real change must authenticate and re-encrypt the existing vault.' : type === 'backup' ? 'A usable backup must come from the encrypted vault, not from this interface.' : 'The preview can show a restored vault card, but cannot import or unlock a real backup.'}</Notice>}
     {!infoOnly && type !== 'clear' && <div className="native-request"><span>Try the future native entry point</span><button className="text-button" onClick={nativeRequest}>Request native {type === 'create' ? 'creation' : type}<ArrowRight size={14} aria-hidden="true" /></button></div>}
     {type === 'public' && <dl className="public-details"><DetailsRow label="Vault">{vault?.name ?? 'No demo vault'}</DetailsRow><DetailsRow label="Ed25519">Public-key size: 32 bytes</DetailsRow><DetailsRow label="Falcon-512">Public-key size: 897 bytes</DetailsRow><DetailsRow label="Hybrid key ID"><code>{vault?.keyId ?? 'Not available'}</code></DetailsRow><DetailsRow label="Key material">Not loaded in this UI preview</DetailsRow><DetailsRow label="Trusted identity">Not established</DetailsRow></dl>}
-    {type === 'about' && <><div className="about-dialog-brand"><img src="./mark.svg" alt="" width="42" height="42" /><div><strong>HybridSign</strong><span>v0.1.0 · Phase 4A UI preview</span></div></div><Notice>The Python prototype implements Ed25519 → Falcon-512 signing. This frontend is not connected to it.</Notice><p className="dialog-smallprint">No account system, trusted signer identity, authenticated signing time or production compliance is claimed. No real signing, verification, encryption or vault operation runs in this interface.</p></>}
+    {type === 'about' && <><div className="about-dialog-brand"><img src="./mark.svg" alt="" width="42" height="42" /><div><strong>HybridSign</strong><span>v0.1.0 · {desktop ? 'Phase 4B.1 desktop shell' : 'UI preview'}</span></div></div><Notice>{desktop ? 'Desktop metadata is connected. Vault, signing and verification integration is not ready.' : 'The Python prototype implements Ed25519 → Falcon-512 signing. This frontend is not connected to it.'}</Notice><p className="dialog-smallprint">No account system, trusted signer identity, authenticated signing time or production compliance is claimed. No real signing, verification, encryption or vault operation runs in this interface.</p></>}
     {type === 'language' && <div className="language-choice"><span>English</span><Badge tone="success">Selected</Badge><p>Additional translations are not included in Phase 4A.</p></div>}
     {task.error && <Notice tone="error">{task.error}</Notice>}
   </Modal>

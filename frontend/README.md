@@ -1,9 +1,10 @@
-# HybridSign desktop UI preview — Phase 4A.1
+# HybridSign UI and Windows shell — Phase 4B.1
 
-Phase 4A is an interactive, frontend-only prototype. The existing Python signer,
-verifier and encrypted vault are **not connected** to this interface. Every
-workflow result is marked UI PREVIEW, DEMO or EXAMPLE. No PDF is actually signed
-or verified, and no vault is unlocked, created, backed up or restored.
+The approved Phase 4A.1 UI runs in a browser or in the Phase 4B.1 Windows desktop
+shell. Desktop mode connects public application metadata and capability flags
+only. The Python signer, verifier and encrypted vault are **not integrated**.
+Workflow results remain DEMO or EXAMPLE. No PDF is signed/verified and no real
+vault is unlocked, created, backed up or restored through this interface.
 
 Phase 4A.1 refines the existing design with progressive signing steps, persistent
 task actions, compact panels and readable typography. See the
@@ -12,6 +13,15 @@ task actions, compact panels and readable typography. See the
 [Phase 4A report](../docs/phase4a-ui-regression.md) is retained as historical evidence.
 
 ## Start locally
+
+For a native Windows window, build this frontend with `npm run build`, then run
+`.\.venv\Scripts\python.exe -m desktop.launcher` from the repository root.
+Install the pinned `requirements-desktop.txt` packages into that existing Python
+environment first. The launcher uses `dist/` and does not require Vite to run.
+See [the native regression report](../docs/phase4b1-native-bridge-regression.md)
+for Windows prerequisites, the restricted bridge, tests and limitations.
+
+The browser development workflow remains:
 
 Tested on Windows with Node **26.13.0**, npm **11.20.0** and installed Microsoft
 Edge. Use a Node release supported by the `engines` field in `package.json`.
@@ -25,7 +35,7 @@ npm run dev
 
 Open **http://127.0.0.1:5173**. Dependencies are already installed in the current
 workspace; `npm ci` is for reproducing the installation from the lockfile.
-This frontend does not require Python or Streamlit to be running.
+Browser development does not require Python or Streamlit to be running.
 
 To check and serve the production bundle:
 
@@ -57,9 +67,11 @@ ignored. It is not an installed Windows application or a production server.
 5. In Settings, switch Light/Dark/System, reduce motion, inspect the language
    placeholder and about dialog, or reset the demo vault and activity.
 
-Native-request buttons give an explicit unavailable message. No real vault
+Privileged native-request buttons give an explicit unavailable message. No real vault
 password inputs exist. **Download preview summary** exports labelled JSON,
 never a PDF, encrypted vault or purported cryptographic verification report.
+These JSON downloads remain browser-only; the native shell blocks downloads and
+disables those controls once connected.
 
 ## Structure and boundaries
 
@@ -74,6 +86,7 @@ never a PDF, encrypted vault or purported cryptographic verification report.
 | `src/state/workspace.tsx` | In-memory demo vault, activity, preferences and notifications |
 | `src/services/demo.ts` | Centralized asynchronous UI adapter, lightweight selection checks, JSON summary export |
 | `src/native/contracts.ts` | Future allowlisted native boundary, types only; native requests currently always fail explicitly |
+| `src/native/desktop.ts`, `status.tsx` | Separate metadata-only desktop contract, bounded readiness/validation and runtime status context |
 | `src/hooks.ts` | Hash routing and cancellable preview operations |
 | `tests/` | Production-browser workflow, accessibility and visual capture tests |
 | `qa/screenshots/` | Preserved original Phase 4A captures |
@@ -82,7 +95,7 @@ never a PDF, encrypted vault or purported cryptographic verification report.
 The custom design system uses locally bundled Inter, Lucide icons, slate/white
 surfaces and an indigo accent. Radix supplies dialog focus containment and menu
 keyboard handling. Tailwind is integrated through its Vite plugin; component
-styles and shared tokens are in `styles.css` and `desktop.css`. No remote fonts or runtime APIs
+styles and shared tokens are in `styles.css` and `desktop.css`. No remote fonts or backend HTTP APIs
 are required. Hash routing avoids adding a router dependency and uses a relative
 Vite base for future desktop packaging.
 
@@ -95,13 +108,16 @@ Python execution, arbitrary callable names or general filesystem operations.
 `requireNativeBridge()` deliberately throws; the preview does not probe for a
 bridge or silently fall back from a failed native operation to a demo result.
 
-Actual integration needs a dedicated Python worker that owns process/thread-
-scoped vault handles, validates all commands and lifetimes, prompts for passwords
-natively, and invokes the existing managed-vault signer. The worker must map
+Phase 4B.1 provides a dedicated Python worker foundation with one owned thread
+and a fixed status command. It does not contain vault handles or private keys.
+Future integration must own process/thread-scoped vault handles on that thread,
+validate commands and lifetimes, prompt for passwords natively and invoke the
+existing managed-vault signer. The worker must map
 opaque session IDs to handles within its own context. It must retain the Python
 transaction and path checks. Frontend state must never authorize a signing
-operation. Bridge origin/content restrictions, session cleanup, cancellation,
-download/save dialogs and native PDF rendering need a separate integration phase.
+operation. The current native shell restricts navigation, assets and message
+methods. Managed session cleanup, privileged-operation cancellation, native
+download/save dialogs and PDF rendering remain future work.
 
 ### Data and security limits
 
@@ -147,7 +163,10 @@ Narrower layouts are checked at 900, 768 and 390 px.
 Phase 4A.1 adds action reachability, hit testing, readable metadata and progress
 tests at 1280×720, 1366×768, 1600×900, 1920×1080 and 1093×614. A separate browser
 context at deviceScaleFactor 1.25 approximates the last viewport at 125% scaling;
-it does not test physical Windows DPI configuration. The full suite has **80 tests**.
+it does not test physical Windows DPI configuration. All **80** existing tests
+remain; Phase 4B.1 adds **22** metadata/readiness browser executions for **102** total.
+Real Windows GUI validation is in `tests/test_desktop_native.py` under Python
+pytest, separate from these browser mocks.
 
 `npm run test:visual` generates 32 current screenshots in `qa/phase4a1/after/`.
 The desktop UX tests add six 1280/1600 captures and two scaling captures, for
@@ -159,13 +178,15 @@ No browser download was needed on this workstation. A machine without Edge
 needs a locally available supported browser or an explicit test configuration
 change; browser installation is not performed automatically.
 
-See [the refinement report](../docs/phase4a1-ux-regression.md) for exact results,
-changed files, visual QA and remaining platform limitations.
+See [the native regression report](../docs/phase4b1-native-bridge-regression.md)
+for current results, changed files and platform limitations, and
+[the refinement report](../docs/phase4a1-ux-regression.md) for earlier visual QA.
 
 ## Exact dependencies
 
-All direct versions are pinned; `package-lock.json` records resolved transitive
-packages. No Python dependencies were installed or changed.
+All frontend direct versions are pinned; `package-lock.json` records resolved
+transitive packages. Frontend dependencies are unchanged in Phase 4B.1. Python
+desktop dependencies are separately pinned in `../requirements-desktop.txt`.
 
 | Dependency | Version | Role |
 | --- | --- | --- |

@@ -8,5 +8,6 @@ import './styles.css'
 import './desktop.css'
 import App from './App'
 import { WorkspaceProvider } from './state/workspace'
+import { DesktopProvider } from './native/status'
 
-createRoot(document.getElementById('root')!).render(<StrictMode><WorkspaceProvider><App /></WorkspaceProvider></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><App /></WorkspaceProvider></DesktopProvider></StrictMode>)

@@ -1,0 +1,4 @@
+# Optional desktop infrastructure; install into the existing Python 3.11 .venv.
+# Keep the inherited cryptographic dependency profile unchanged.
+pywebview==6.2.1
+pythonnet==3.2.1; sys_platform == "win32"

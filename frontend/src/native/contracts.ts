@@ -1,4 +1,5 @@
-/** Future allowlisted pywebview boundary. Types only: no bridge is connected.
+/** Future privileged pywebview boundary. These operations remain unimplemented.
+ * Phase 4B.1 desktop metadata/status is separate in desktop.ts.
  * Password entry belongs to a native dialog; passwords/private keys must never
  * be arguments, responses, React state or browser storage. Opaque IDs refer to
  * a future dedicated Python worker, never a serialized Python vault handle.

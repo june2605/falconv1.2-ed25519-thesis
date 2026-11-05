@@ -11,11 +11,36 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
+### Phase 4B.1 Windows desktop shell
+
+HybridSign now opens in a dedicated pywebview/WebView2 window. Only public app
+metadata and capability flags are connected. Vault, PDF signing/verification and
+account operations remain unintegrated; the existing workflow demos stay labelled.
+
+From the existing Python 3.11 x64 environment:
+
+```powershell
+Set-Location D:\Final_Thesis_GitHub
+.\.venv\Scripts\python.exe -m pip install -r requirements-desktop.txt
+Set-Location frontend
+npm run build
+Set-Location ..
+.\.venv\Scripts\python.exe -m desktop.launcher
+```
+
+Use `npm ci` before building on a fresh frontend installation. The current
+workspace already has its dependencies installed. The launcher serves only the
+compiled frontend and requires no Vite server. It never downloads WebView2 or
+falls back to a browser/legacy renderer. Install WebView2 Evergreen 111+ and
+.NET Framework 4.6.2+ separately if missing; current supported updates are recommended.
+See [native architecture, security limits and exact regression results](docs/phase4b1-native-bridge-regression.md).
+
 ### Phase 4A desktop UI preview
 
 The separate [HybridSign frontend](frontend/README.md) is an interactive React
 prototype with Dashboard, Sign Document, Verify Signature, Key Vault and Settings.
-It is **not connected to Python**; all workflow results are labelled UI previews.
+In a regular browser it is **not connected to Python**; all workflow results are
+labelled UI previews. The desktop shell above adds metadata connectivity only.
 
 ```powershell
 Set-Location D:\Final_Thesis_GitHub\frontend
