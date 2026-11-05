@@ -1,10 +1,11 @@
-# HybridSign UI and Windows shell — Phase 4B.1
+# HybridSign UI and Windows vault — Phase 4B.2A
 
 The approved Phase 4A.1 UI runs in a browser or in the Phase 4B.1 Windows desktop
-shell. Desktop mode connects public application metadata and capability flags
-only. The Python signer, verifier and encrypted vault are **not integrated**.
-Workflow results remain DEMO or EXAMPLE. No PDF is signed/verified and no real
-vault is unlocked, created, backed up or restored through this interface.
+shell. Desktop Key Vault connects real encrypted-vault creation, unlock, lock and
+authenticated public metadata. File selection and masked password entry use
+Python-controlled Windows dialogs; passwords/private keys never enter React.
+PDF signing/verification, password change and backup/restore are **not integrated**.
+The document workflows remain DEMO / EXAMPLE; browser mode remains simulated.
 
 Phase 4A.1 refines the existing design with progressive signing steps, persistent
 task actions, compact panels and readable typography. See the
@@ -18,7 +19,7 @@ For a native Windows window, build this frontend with `npm run build`, then run
 `.\.venv\Scripts\python.exe -m desktop.launcher` from the repository root.
 Install the pinned `requirements-desktop.txt` packages into that existing Python
 environment first. The launcher uses `dist/` and does not require Vite to run.
-See [the native regression report](../docs/phase4b1-native-bridge-regression.md)
+See [the real-vault regression report](../docs/phase4b2a-real-vault-regression.md)
 for Windows prerequisites, the restricted bridge, tests and limitations.
 
 The browser development workflow remains:
@@ -49,6 +50,18 @@ The production preview is at **http://127.0.0.1:4173**. `dist/` is generated and
 ignored. It is not an installed Windows application or a production server.
 
 ## Try the interface
+
+In native mode, **Key Vault** and the Dashboard summary show actual Python state,
+not the demo card. Create chooses an absent `.hvault` file on fixed local NTFS
+and confirms a 15+ character password through the native dialog. Creation leaves
+the vault locked. Unlock selects/authenticates an existing file; Lock invalidates
+its session. Only one selection is active per window. Close/reopen and select
+the same file to recover its original public keys/ID. No inventory is persisted.
+Existing destination files, unsafe storage and unsuitable ACLs reject without
+overwrite or permission repair. Password change, backup and restore are disabled.
+
+The following browser-preview steps remain available. The signing demo uses a
+separate simulated vault even in native mode and cannot use/authorize real keys.
 
 1. Start on Dashboard. Both action cards navigate to their workflows. Activity
    is initially empty and records only actions actually previewed this session.
@@ -86,7 +99,9 @@ disables those controls once connected.
 | `src/state/workspace.tsx` | In-memory demo vault, activity, preferences and notifications |
 | `src/services/demo.ts` | Centralized asynchronous UI adapter, lightweight selection checks, JSON summary export |
 | `src/native/contracts.ts` | Future allowlisted native boundary, types only; native requests currently always fail explicitly |
-| `src/native/desktop.ts`, `status.tsx` | Separate metadata-only desktop contract, bounded readiness/validation and runtime status context |
+| `src/native/desktop.ts`, `status.tsx` | Exact metadata/vault capability profiles, bounded readiness/validation and runtime status context |
+| `src/native/vault.tsx` | Exact public-only native vault contract, error handling and real state separate from the demo |
+| `src/components/NativeVault.tsx` | Native vault card, Dashboard summary and public-key details using the existing design |
 | `src/hooks.ts` | Hash routing and cancellable preview operations |
 | `tests/` | Production-browser workflow, accessibility and visual capture tests |
 | `qa/screenshots/` | Preserved original Phase 4A captures |
@@ -108,18 +123,17 @@ Python execution, arbitrary callable names or general filesystem operations.
 `requireNativeBridge()` deliberately throws; the preview does not probe for a
 bridge or silently fall back from a failed native operation to a demo result.
 
-Phase 4B.1 provides a dedicated Python worker foundation with one owned thread
-and a fixed status command. It does not contain vault handles or private keys.
-Future integration must own process/thread-scoped vault handles on that thread,
-validate commands and lifetimes, prompt for passwords natively and invoke the
-existing managed-vault signer. The worker must map
-opaque session IDs to handles within its own context. It must retain the Python
-transaction and path checks. Frontend state must never authorize a signing
-operation. The current native shell restricts navigation, assets and message
-methods. Managed session cleanup, privileged-operation cancellation, native
-download/save dialogs and PDF rendering remain future work.
+Phase 4B.2A extends the dedicated Python worker with four fixed vault commands.
+Managed handles are issued/used/locked on that thread; only opaque references and
+authenticated public metadata reach React. A separate six-method bridge accepts
+no JavaScript paths or passwords. Native Windows file/password dialogs run on the
+GUI thread. The existing vault filesystem/ACL/locking/atomic-create rules remain.
+Close locks active access; this does not guarantee secure memory erasure.
+Future PDF integration must reuse the existing managed signer, transactions and
+path checks. Frontend state must never authorize signing. Native downloads remain
+blocked; PDF save dialogs/rendering and longer-operation cancellation are future work.
 
-### Data and security limits
+### Browser-preview data and security limits
 
 - Demo data and preferences exist only in React memory. No `localStorage`,
   `sessionStorage`, IndexedDB, cookies or service worker are used by this app.
@@ -133,7 +147,7 @@ download/save dialogs and PDF rendering remain future work.
 - The `demo:` key identifier is visibly a placeholder, not a generated hybrid-v1
   identifier. No real public or private key material is generated or displayed.
 - No authentication, identity registry, trusted signing time, key lifecycle,
-  cryptographic algorithm, vault format or signature format is implemented here.
+  cryptographic algorithm, vault format or signature format is implemented in React.
 - This browser preview makes no production security or compliance claim.
   Browser behavior does not validate a pywebview installation or native worker.
 
@@ -164,9 +178,14 @@ Phase 4A.1 adds action reachability, hit testing, readable metadata and progress
 tests at 1280×720, 1366×768, 1600×900, 1920×1080 and 1093×614. A separate browser
 context at deviceScaleFactor 1.25 approximates the last viewport at 125% scaling;
 it does not test physical Windows DPI configuration. All **80** existing tests
-remain; Phase 4B.1 adds **22** metadata/readiness browser executions for **102** total.
+remain; Phase 4B.1 adds **22** metadata/readiness browser executions. Phase 4B.2A
+adds **20** real-state contract/UI executions for **122** total.
 Real Windows GUI validation is in `tests/test_desktop_native.py` under Python
 pytest, separate from these browser mocks.
+`tests/test_desktop_vault_native.py` additionally drives two actual desktop
+processes, masked native dialogs, wrong-password rejection, locking and original-
+key recovery. Save/Open cancellation is automated; human file-choice acceptance
+and physical multi-monitor/high-DPI behavior still need manual review.
 
 `npm run test:visual` generates 32 current screenshots in `qa/phase4a1/after/`.
 The desktop UX tests add six 1280/1600 captures and two scaling captures, for
@@ -178,7 +197,7 @@ No browser download was needed on this workstation. A machine without Edge
 needs a locally available supported browser or an explicit test configuration
 change; browser installation is not performed automatically.
 
-See [the native regression report](../docs/phase4b1-native-bridge-regression.md)
+See [the real-vault regression report](../docs/phase4b2a-real-vault-regression.md)
 for current results, changed files and platform limitations, and
 [the refinement report](../docs/phase4a1-ux-regression.md) for earlier visual QA.
 

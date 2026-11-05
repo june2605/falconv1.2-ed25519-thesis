@@ -21,8 +21,10 @@ def test_native_windows_shell_bridge_navigation_and_shutdown():
     report = json.loads(line.removeprefix("NATIVE_PROBE="))
     assert report["passed"] and report["exitCode"] == 0
     assert report["windowVisible"] and report["ownedThreadsStopped"]
-    assert not report["cryptoModulesImported"]
-    assert set(report["checks"]) == {"desktop_connected", "only_two_metadata_methods",
+    # Phase 4B.2A intentionally adds four vault methods and imports vault crypto.
+    # The strict allowlist and absence of PDF integration remain required.
+    assert not report["pdfModulesImported"]
+    assert set(report["checks"]) == {"desktop_connected", "only_six_allowlisted_methods",
         "correct_metadata_and_capability_flags", "all_five_routes", "light_dark_themes",
         "crypto_actions_disabled_no_password_inputs", "untrusted_navigation_and_popup_blocked",
         "unapproved_raw_messages_ignored"}

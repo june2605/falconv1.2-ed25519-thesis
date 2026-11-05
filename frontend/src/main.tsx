@@ -9,5 +9,6 @@ import './desktop.css'
 import App from './App'
 import { WorkspaceProvider } from './state/workspace'
 import { DesktopProvider } from './native/status'
+import { NativeVaultProvider } from './native/vault'
 
-createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><App /></WorkspaceProvider></DesktopProvider></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><NativeVaultProvider><App /></NativeVaultProvider></WorkspaceProvider></DesktopProvider></StrictMode>)

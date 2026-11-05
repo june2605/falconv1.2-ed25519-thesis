@@ -4,8 +4,15 @@ import { useWorkspace } from '../state/workspace'
 import { usePreviewTask } from '../hooks'
 import { demoService } from '../services/demo'
 import { Badge, Button, IconTile, Notice, PageHeader } from '../components/ui'
+import { NativeKeyVault } from '../components/NativeVault'
+import { useNativeVault } from '../native/vault'
 
 export function KeyVault() {
+  const { integrated } = useNativeVault()
+  return integrated ? <NativeKeyVault /> : <DemoKeyVault />
+}
+
+function DemoKeyVault() {
   const { vault, setVault, setDialog, notify, addActivity } = useWorkspace()
   const task = usePreviewTask<void>()
   async function copyId() {

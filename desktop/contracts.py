@@ -9,11 +9,35 @@ APP_INFO = {"applicationName": APP_NAME, "applicationVersion": APP_VERSION,
 CAPABILITIES = {"nativeShell": True, "vaultOperations": False, "pdfSigning": False,
                 "pdfVerification": False, "accountRegistry": False}
 METHODS = frozenset({"get_app_info", "get_capabilities"})
+VAULT_METHODS = frozenset({"get_vault_state", "create_vault", "unlock_vault", "lock_vault"})
+METHODS = METHODS | VAULT_METHODS
+VAULT_CAPABILITIES = {**CAPABILITIES, "vaultOperations": True, "vaultCreate": True,
+                      "vaultUnlock": True, "vaultLock": True, "vaultPasswordChange": False,
+                      "vaultBackupRestore": False}
 ERRORS = {"INVALID_REQUEST": "Invalid desktop request.",
           "UNAVAILABLE": "Desktop connection is unavailable.",
           "BUSY": "Desktop worker is busy.",
           "TIMEOUT": "Desktop request timed out.",
           "INTERNAL_ERROR": "Desktop request could not complete."}
+ERRORS.update({"CANCELLED": "Operation cancelled.", "STALE_SESSION": "Vault session is no longer valid.",
+               "STALE_SELECTION": "Selected vault is no longer available. Select it again.",
+               "VAULT_ACTIVE": "Lock the current vault before opening or creating another.",
+               "vault.unlock": "Incorrect password or damaged vault.",
+               "vault.password": "Use 15 or more characters for a new password, at most 1024 UTF-8 bytes.",
+               "vault.format": "The selected file is not a supported encrypted vault.",
+               "vault.profile": "The selected vault profile is not supported.",
+               "vault.key_material": "Vault key validation failed.",
+               "vault.backend": "The required cryptographic backend is unavailable.",
+               "vault.busy": "Another vault encryption operation is running.",
+               "vault.exists": "Destination already exists. Choose a new filename.",
+               "vault.path": "Select a safe local vault path without links or aliases.",
+               "vault.security": "Vault requires a fixed local NTFS drive and the approved Windows permissions.",
+               "vault.permission": "Windows denied vault access. Permissions were not changed.",
+               "vault.io": "Vault operation failed. Inspect the selected location before retrying; publication or cleanup may have completed.",
+               "vault.file_locked": "Vault is in use by another operation. Try again explicitly.",
+               "vault.conflict": "Vault changed. The session was locked; reopen it explicitly.",
+               "vault.verification": "Encrypted vault validation failed.",
+               "vault.locked": "Vault is locked.", "vault.handle": "Vault session is not valid."})
 
 
 class PublicError(TypedDict):
@@ -36,10 +60,50 @@ class Capabilities(TypedDict):
     accountRegistry: Literal[False]
 
 
+class VaultCapabilities(TypedDict):
+    nativeShell: Literal[True]
+    vaultOperations: Literal[True]
+    vaultCreate: Literal[True]
+    vaultUnlock: Literal[True]
+    vaultLock: Literal[True]
+    vaultPasswordChange: Literal[False]
+    vaultBackupRestore: Literal[False]
+    pdfSigning: Literal[False]
+    pdfVerification: Literal[False]
+    accountRegistry: Literal[False]
+
+
+class PublicAlgorithms(TypedDict):
+    ed25519: Literal["Ed25519"]
+    falcon512: Literal["Falcon-512"]
+
+
+class PublicVault(TypedDict):
+    vaultId: str
+    sessionId: str | None
+    displayName: str
+    state: Literal["locked", "unlocked"]
+    hybridKeyId: str
+    ed25519PublicKey: str
+    falconPublicKey: str
+    formatVersion: Literal[1]
+    algorithms: PublicAlgorithms
+
+
+class VaultResult(TypedDict):
+    vault: PublicVault | None
+    cancelled: bool
+    selectionId: str | None
+    operation: Literal["idle", "reading-state", "selecting-file", "waiting-password", "unlocking", "creating", "locking"]
+
+
+PublicData = AppInfo | Capabilities | VaultCapabilities | VaultResult
+
+
 class SuccessReply(TypedDict):
     ok: Literal[True]
     protocolVersion: Literal[1]
-    data: AppInfo | Capabilities
+    data: PublicData
 
 
 class ErrorReply(TypedDict):
@@ -48,7 +112,7 @@ class ErrorReply(TypedDict):
     error: PublicError
 
 
-def success(data: AppInfo | Capabilities) -> SuccessReply:
+def success(data: PublicData) -> SuccessReply:
     return {"ok": True, "protocolVersion": PROTOCOL_VERSION, "data": dict(data)}
 
 

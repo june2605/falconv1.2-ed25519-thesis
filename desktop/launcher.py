@@ -4,10 +4,11 @@ from pathlib import Path
 import sys
 
 from .assets import BuildError, capture_build, make_server_type
-from .bridge import DesktopBridge
+from .vault_bridge import VaultBridge
+from .dialogs import NativeDialogs
 from .runtime import StartupError, require_runtime
 from .security import NativeGuard, NavigationPolicy
-from .worker import Worker
+from .vault_worker import VaultWorker as Worker
 
 
 def default_build_path():
@@ -23,12 +24,13 @@ def launch():
                              "OPEN_EXTERNAL_LINKS_IN_BROWSER": False,
                              "OPEN_DEVTOOLS_IN_DEBUG": False, "REMOTE_DEBUGGING_PORT": None})
     worker = Worker()
-    bridge = DesktopBridge(worker, trusted=lambda: False)
+    bridge = VaultBridge(worker, trusted=lambda: False)
     server_type = make_server_type(snapshot)
     guard, failures = [], []
     window = webview.create_window("HybridSign — Desktop Preview", str(snapshot.root / "index.html"),
                                    js_api=bridge, width=1280, height=800, min_size=(960, 600),
                                    resizable=True, background_color="#f7f8fb", text_select=True)
+    bridge._dialogs = NativeDialogs(window)
 
     def initialized(renderer):
         if renderer != "edgechromium":
@@ -45,6 +47,7 @@ def launch():
             return False
 
     def closing():
+        bridge._close()
         for item in guard:
             item.close()
 
@@ -59,6 +62,7 @@ def launch():
             raise StartupError("Desktop security initialization failed; no fallback was used.")
     finally:
         try:
+            bridge._close()
             for item in guard:
                 item.close()
         finally:
@@ -66,7 +70,7 @@ def launch():
                 server_type.close_all()
             finally:
                 if not worker.shutdown():
-                    raise StartupError("Desktop worker did not stop within its shutdown deadline.")
+                    raise StartupError("Desktop worker shutdown or vault cleanup could not be confirmed.")
 
 
 def main():

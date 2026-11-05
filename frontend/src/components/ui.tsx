@@ -31,8 +31,8 @@ export function Notice({ tone = 'info', title, children }: PropsWithChildren<{ t
   return <div className={`notice notice-${tone}`} role={tone === 'error' ? 'alert' : undefined}><Icon size={18} aria-hidden="true" /><div>{title && <strong>{title}</strong>}<div>{children}</div></div></div>
 }
 
-export function Modal({ open, onOpenChange, title, description, children, footer, icon: Icon = Info }: PropsWithChildren<{
-  open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; footer?: ReactNode; icon?: LucideIcon;
+export function Modal({ open, onOpenChange, title, description, children, footer, icon: Icon = Info, label = 'UI PREVIEW' }: PropsWithChildren<{
+  open: boolean; onOpenChange: (open: boolean) => void; title: string; description: string; footer?: ReactNode; icon?: LucideIcon; label?: string;
 }>) {
   const returnFocus = useRef<HTMLElement | null>(null)
   return <Dialog.Root open={open} onOpenChange={onOpenChange}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" />
@@ -41,7 +41,7 @@ export function Modal({ open, onOpenChange, title, description, children, footer
       // A successful demo unlock replaces its opener with the next-step action.
       const target = returnFocus.current?.isConnected ? returnFocus.current : document.querySelector<HTMLElement>('.task-action-buttons .button-primary:not(:disabled)')
       target?.focus({ preventScroll: true })
-    }}><div className="dialog-top"><IconTile icon={Icon} tone="indigo" /><Badge tone="indigo">UI PREVIEW</Badge></div>
+    }}><div className="dialog-top"><IconTile icon={Icon} tone="indigo" /><Badge tone="indigo">{label}</Badge></div>
       <Dialog.Title className="dialog-title">{title}</Dialog.Title><Dialog.Description className="dialog-description">{description}</Dialog.Description>
       <div className="dialog-body">{children}</div>{footer && <div className="dialog-footer">{footer}</div>}
       <Dialog.Close className="icon-button dialog-close" aria-label="Close dialog"><X size={18} /></Dialog.Close>

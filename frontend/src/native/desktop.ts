@@ -1,4 +1,4 @@
-/** Phase 4B.1 metadata only. This does not implement NativeBridgeV1 operations. */
+/** Metadata v1 plus the explicit Phase 4B.2A local-vault profile. */
 export interface DesktopInfo {
   applicationName: 'HybridSign'
   applicationVersion: '0.1.0'
@@ -8,7 +8,12 @@ export interface DesktopInfo {
 
 export interface DesktopCapabilities {
   nativeShell: true
-  vaultOperations: false
+  vaultOperations: boolean
+  vaultCreate?: true
+  vaultUnlock?: true
+  vaultLock?: true
+  vaultPasswordChange?: false
+  vaultBackupRestore?: false
   pdfSigning: false
   pdfVerification: false
   accountRegistry: false
@@ -22,21 +27,25 @@ interface MetadataApi {
   get_capabilities: () => Promise<unknown>
 }
 
-function record(value: unknown): value is Record<string, unknown> {
+export function record(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function exact(value: unknown, keys: string[]): value is Record<string, unknown> {
+export function exact(value: unknown, keys: string[]): value is Record<string, unknown> {
   return record(value) && Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key))
 }
 
-function response(value: unknown): Record<string, unknown> | null {
+export function response(value: unknown): Record<string, unknown> | null {
   return exact(value, ['ok', 'protocolVersion', 'data']) && value.ok === true && value.protocolVersion === 1 && record(value.data) ? value.data : null
 }
 
+const metadataMethods = ['get_app_info', 'get_capabilities']
+export const vaultMethods = [...metadataMethods, 'get_vault_state', 'create_vault', 'unlock_vault', 'lock_vault']
+
 function metadataApi(): MetadataApi | null {
   const host: unknown = (window as unknown as { pywebview?: unknown }).pywebview
-  if (!record(host) || host.platform !== 'edgechromium' || !exact(host.api, ['get_app_info', 'get_capabilities'])) return null
+  if (!record(host) || host.platform !== 'edgechromium' || !(exact(host.api, metadataMethods) || exact(host.api, vaultMethods))) return null
+  if (!Object.values(host.api).every(value => typeof value === 'function')) return null
   return typeof host.api.get_app_info === 'function' && typeof host.api.get_capabilities === 'function' ? host.api as unknown as MetadataApi : null
 }
 
@@ -61,8 +70,13 @@ export function connectDesktop(signal: AbortSignal, timeoutMs = 3000): Promise<D
       started = true
       Promise.all([Promise.resolve().then(() => api.get_app_info()), Promise.resolve().then(() => api.get_capabilities())]).then(([infoReply, capsReply]) => {
         const info = response(infoReply), caps = response(capsReply)
+        const baseCaps = ['nativeShell', 'vaultOperations', 'pdfSigning', 'pdfVerification', 'accountRegistry']
+        const legacy = exact(caps, baseCaps) && caps.vaultOperations === false && Object.keys(api).length === 2
+        const integrated = exact(caps, [...baseCaps, 'vaultCreate', 'vaultUnlock', 'vaultLock', 'vaultPasswordChange', 'vaultBackupRestore'])
+          && caps.vaultOperations === true && caps.vaultCreate === true && caps.vaultUnlock === true && caps.vaultLock === true
+          && caps.vaultPasswordChange === false && caps.vaultBackupRestore === false && Object.keys(api).length === vaultMethods.length
         if (!exact(info, ['applicationName', 'applicationVersion', 'runtime', 'desktopStatus']) || info.applicationName !== 'HybridSign' || info.applicationVersion !== '0.1.0' || info.runtime !== 'pywebview-edgechromium' || info.desktopStatus !== 'connected'
-          || !exact(caps, ['nativeShell', 'vaultOperations', 'pdfSigning', 'pdfVerification', 'accountRegistry']) || caps.nativeShell !== true || caps.vaultOperations !== false || caps.pdfSigning !== false || caps.pdfVerification !== false || caps.accountRegistry !== false) {
+          || !(legacy || integrated) || !caps || caps.nativeShell !== true || caps.pdfSigning !== false || caps.pdfVerification !== false || caps.accountRegistry !== false) {
           finish({ mode: 'preview', reason: 'invalid-response' }); return
         }
         finish({ mode: 'desktop', info: info as unknown as DesktopInfo, capabilities: caps as unknown as DesktopCapabilities })

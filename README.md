@@ -11,11 +11,13 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
-### Phase 4B.1 Windows desktop shell
+### Phase 4B.2A Windows desktop and encrypted vault
 
-HybridSign now opens in a dedicated pywebview/WebView2 window. Only public app
-metadata and capability flags are connected. Vault, PDF signing/verification and
-account operations remain unintegrated; the existing workflow demos stay labelled.
+HybridSign opens in a dedicated pywebview/WebView2 window. Key Vault now creates,
+unlocks and locks real encrypted hybrid-key vaults, with file selection and masked
+password entry in native Windows dialogs. Private keys stay in the Python worker;
+React receives public metadata and opaque references only. PDF signing/verification,
+password changes, backups/restores and accounts remain unintegrated.
 
 From the existing Python 3.11 x64 environment:
 
@@ -35,12 +37,25 @@ falls back to a browser/legacy renderer. Install WebView2 Evergreen 111+ and
 .NET Framework 4.6.2+ separately if missing; current supported updates are recommended.
 See [native architecture, security limits and exact regression results](docs/phase4b1-native-bridge-regression.md).
 
+On **Key Vault**, choose **Create Vault** and a new filename in an existing
+trusted folder on a fixed local NTFS drive. Enter and confirm a password of at
+least 15 characters in the Windows dialog. The encrypted vault is created locked.
+Choose **Unlock Vault** to select and authenticate it; **Lock Vault** drops managed
+access. Close/reopen the application and select the same file to recover the
+original keys. Existing filenames are never overwritten. Unsupported storage or
+broader/foreign ACLs reject without permission repair. Locking does not guarantee
+memory erasure; lost passwords cannot be recovered here.
+
+See [real-vault integration, exact tests and remaining limitations](docs/phase4b2a-real-vault-regression.md).
+Signing and verification screens still run clearly labelled UI rehearsals, separate
+from the real vault. Browser mode remains entirely simulated.
+
 ### Phase 4A desktop UI preview
 
 The separate [HybridSign frontend](frontend/README.md) is an interactive React
 prototype with Dashboard, Sign Document, Verify Signature, Key Vault and Settings.
 In a regular browser it is **not connected to Python**; all workflow results are
-labelled UI previews. The desktop shell above adds metadata connectivity only.
+labelled UI previews. The native desktop above separately integrates local vaults.
 
 ```powershell
 Set-Location D:\Final_Thesis_GitHub\frontend
