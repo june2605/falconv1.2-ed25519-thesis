@@ -33,6 +33,11 @@ class Command(Enum):
     PDF_SELECT = "pdf_select"
     PDF_CHECK = "pdf_check"
     PDF_SIGN = "pdf_sign"
+    VERIFY_SELECT_PDF = 'verify_select_pdf'
+    VERIFY_SELECT_KEYS = 'verify_select_keys'
+    VERIFY_AUTH_KEYS = 'verify_auth_keys'
+    VERIFY_CHECK = 'verify_check'
+    PDF_VERIFY = 'pdf_verify'
 
 
 class WorkerError(Exception):

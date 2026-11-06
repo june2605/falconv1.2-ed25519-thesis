@@ -66,7 +66,10 @@ class NativeDialogs:
     def choose_pdf_output(self, suggested_name):
         return self._on_gui(lambda: self._pdf_dialog(suggested_name))
 
-    def _pdf_dialog(self, suggested_name):
+    def choose_verification_pdf(self):
+        return self._on_gui(lambda: self._pdf_dialog(None, verification=True))
+
+    def _pdf_dialog(self, suggested_name, *, verification=False):
         from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog
         from .pdf_io import output_choice
         saving = suggested_name is not None
@@ -75,6 +78,7 @@ class NativeDialogs:
         try:
             self._active = dialog
             dialog.Title = 'HybridSign — Save signed PDF' if saving else 'HybridSign — Choose unsigned PDF'
+            if verification: dialog.Title = 'HybridSign — Choose signed PDF'
             dialog.Filter = 'PDF document (*.pdf)|*.pdf'
             dialog.DefaultExt, dialog.AddExtension = 'pdf', True
             dialog.RestoreDirectory = dialog.CheckPathExists = True
@@ -99,8 +103,8 @@ class NativeDialogs:
         """GUI closing event only; do not marshal/join from this callback."""
         from System.Windows.Forms import MessageBox
         MessageBox.Show(self._window.native,
-                        'Signing is in progress. Wait for its result before closing. Publication cannot be cancelled here.',
-                        'HybridSign — Signing in progress')
+                        'A cryptographic operation is in progress. Wait for its result before closing. Signing publication cannot be cancelled here.',
+                        'HybridSign — Operation in progress')
 
     def _file_dialog(self, creating):
         from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog

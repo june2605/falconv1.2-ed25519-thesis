@@ -1,0 +1,80 @@
+/* Phase 4B.3B.1: preserve theme/type; size grids to the usable workspace. */
+.page-container { container: page / inline-size; }
+.page-container :is(.workflow-grid, .vault-grid, .settings-layout, .dashboard-actions, .dashboard-info) > * { min-width: 0; }
+.page-container :is(.card, .workflow-step, .step-body, .step-heading-copy, .notice > div, .identity-note > div, .verification-overview > div, .key-source-note > div) { min-width: 0; }
+.page-container :is(p, h1, h2, h3, strong, dt, dd) { overflow-wrap: anywhere; }
+.details-row dd { min-width: 0; }
+.details-row:has(.hybrid-key-id) { display: block; }
+.details-row:has(.hybrid-key-id) dt { margin-bottom: 8px; }
+.details-row:has(.hybrid-key-id) dd { text-align: left; max-width: none; }
+.hybrid-key-id { min-width: 0; text-align: left; }
+/* Expanding ID details must not let scroll anchoring move their control row. */
+.workspace main:has(.hybrid-key-id) { overflow-anchor: none; scrollbar-gutter: stable; }
+.key-id-line { display: flex; align-items: center; justify-content: space-between; gap: 4px 12px; flex-wrap: wrap; }
+.key-id-controls { display: inline-flex; align-items: center; gap: 12px; flex-wrap: nowrap; margin-left: auto; }
+.key-id-compact { font-size: 12px; white-space: nowrap; }
+.key-id-copy.button { min-height: 36px; font-size: 12px; padding: 6px 8px; margin: 0; flex-shrink: 0; }
+.key-id-copy-label { display: grid; }
+.key-id-copy-label > span, .key-id-copy-label::after { grid-area: 1 / 1; }
+.key-id-copy-label::after { content: attr(data-confirmation); visibility: hidden; }
+.key-id-disclosure { margin-top: 8px; }
+.key-id-disclosure[hidden] { display: none; }
+.key-id-toggle.button { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; width: 102px; flex-shrink: 0; min-height: 36px; padding: 6px 0; margin: 0; font-size: 12px; white-space: nowrap; }
+.key-id-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.key-id-full { display: block; padding: 12px; background: var(--surface-muted); border: 1px solid var(--border); border-radius: 6px; overflow-wrap: anywhere; user-select: all; }
+.page-container .key-id-error { margin-top: 8px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.page-container .button-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); align-items: stretch; gap: 10px; }
+.page-container .button-row .button { white-space: normal; min-height: 40px; }
+.sidebar { overflow-y: auto; overscroll-behavior: contain; }
+.sidebar nav { flex-shrink: 0; }
+.sidebar .brand, .sidebar .sidebar-bottom { flex-shrink: 0; }
+.switch, .switch[aria-checked="true"] { width: 44px; height: 32px; background: transparent; }
+.switch::before { content: ''; position: absolute; width: 32px; height: 19px; left: 6px; top: 6.5px; border-radius: 99px; background: var(--border-strong); }
+.switch[aria-checked="true"]::before { background: var(--accent); }
+.switch > span { left: 9px; top: 9.5px; }
+.task-actions-host { container: actions / inline-size; }
+.task-actions { padding-block: 12px; gap: 16px; }
+.task-action-copy { flex: 1 1 12rem; }
+.task-action-copy strong { white-space: normal; overflow-wrap: anywhere; }
+.task-action-copy p { max-width: 70ch; }
+.task-action-buttons { flex-wrap: nowrap; flex-shrink: 0; gap: 8px; }
+.task-actions .button { min-height: 40px; font-size: 14px; }
+.workspace main { scroll-padding-block: 16px 24px; }
+.workspace .page-container { padding-bottom: calc(var(--page-inset) + 12px); }
+.workspace main :is(button, summary, input, select, [tabindex]) { scroll-margin-block: 12px; }
+@container page (max-width: 959.98px) {
+  .page-container :is(.workflow-grid, .vault-grid, .settings-layout, .dashboard-actions, .dashboard-info) { grid-template-columns: minmax(0, 1fr); }
+  .page-container .hero-document { right: 24px; opacity: .7; }
+  .page-container .action-card p { max-width: calc(100% - 155px); }
+  .page-container .action-card-copy { max-width: 100%; }
+  .key-source-note { flex-wrap: wrap; }
+  .key-source-note > div { flex: 1; }
+  .key-source-note .badge { margin-left: auto; }
+}
+@container page (max-width: 500px) {
+  .page-container .hero-document { display: none; }
+  .page-container .action-card p { max-width: none; }
+  .page-container .action-card { padding: 20px; }
+  .page-container .algorithm-flow, .page-container .vault-overview { flex-wrap: wrap; }
+  .page-container .vault-tool-actions { grid-template-columns: minmax(0, 1fr); }
+  .page-container .theme-options { gap: 8px; }
+  .page-container .theme-mini { height: 48px; }
+  .page-container .setting-row { flex-wrap: wrap; }
+  .page-container .theme-options + .setting-row { flex-wrap: nowrap; }
+}
+@container actions (max-width: 900px) {
+  .task-actions { flex-wrap: nowrap; }
+  .task-action-copy { width: auto; }
+  .task-action-copy p { display: none; }
+  .task-action-buttons { width: auto; }
+}
+@container actions (max-width: 520px) {
+  .task-actions { flex-wrap: wrap; gap: 8px; }
+  .task-action-copy { flex-basis: 100%; }
+  .task-action-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr)); width: 100%; }
+  .task-action-buttons .button { margin: 0; white-space: normal; }
+}
+@media (max-height: 700px) and (min-width: 581px) {
+  .task-actions { padding-block: 8px; }
+  .task-action-copy p { display: none; }
+}

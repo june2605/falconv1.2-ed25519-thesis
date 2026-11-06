@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "results": [
+    "valid",
+    "invalid",
+    "invalid",
+    "cancelled"
+  ],
+  "noPasswordPrompt": true,
+  "realNativePickers": true,
+  "fileAcceptance": "Python-only GUI-thread seam",
+  "hybridKeyId": "hybrid-v1:56e9d2929b9a691618b50ad7638cbfa13a83cfc3eb6877d0a627f71f232126ad",
+  "realNativeCancellation": true,
+  "lockedPublicVerification": true,
+  "inputsUnchanged": true,
+  "noArtifactsCreated": true,
+  "files": {
+    "signed": {
+      "name": "Le nouveau Taxi! 1-signed.pdf",
+      "sizeBytes": 34004166
+    },
+    "tampered": {
+      "name": "Le nouveau Taxi! 1-tampered.pdf",
+      "sizeBytes": 34004166
+    },
+    "vault": {
+      "name": "thesis-demo-01.hvault",
+      "sizeBytes": 2416
+    },
+    "wrong": {
+      "name": "wrong.hvault",
+      "sizeBytes": 2416
+    }
+  },
+  "ownedThreadsStopped": true
+}

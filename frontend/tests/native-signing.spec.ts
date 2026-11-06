@@ -58,6 +58,7 @@ test('native signing uses the real workflow and reports only confirmed completio
   expect(calls[0].slice(0, 3)).toEqual(['d'.repeat(32), 'a'.repeat(32), 'c'.repeat(32)])
   await page.getByRole('link', { name: 'Verify Signature', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Verify PDF', exact: true })).toBeDisabled()
+  await expect(page.getByText('Explore example results')).toHaveCount(0)
 })
 
 test('lost submission response reconciles the same job without retrying', async ({ page }) => {

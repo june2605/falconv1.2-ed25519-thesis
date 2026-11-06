@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "results": [
+    "valid",
+    "invalid",
+    "invalid",
+    "cancelled"
+  ],
+  "noPasswordPrompt": true,
+  "realNativePickers": true,
+  "fileAcceptance": "Python-only GUI-thread seam",
+  "hybridKeyId": "hybrid-v1:94ba63c5ae9485e6c093be22f97ab85bf674c07f0b6d2693ba5f11bba9bacb41",
+  "realNativeCancellation": true,
+  "lockedPublicVerification": true,
+  "inputsUnchanged": true,
+  "noArtifactsCreated": true,
+  "files": {
+    "signed": {
+      "name": "signed.pdf",
+      "sizeBytes": 5233
+    },
+    "tampered": {
+      "name": "tampered.pdf",
+      "sizeBytes": 5233
+    },
+    "vault": {
+      "name": "native.hvault",
+      "sizeBytes": 2416
+    },
+    "wrong": {
+      "name": "wrong.hvault",
+      "sizeBytes": 2416
+    }
+  },
+  "ownedThreadsStopped": true
+}

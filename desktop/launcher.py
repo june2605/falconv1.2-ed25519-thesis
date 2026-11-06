@@ -4,11 +4,11 @@ from pathlib import Path
 import sys
 
 from .assets import BuildError, capture_build, make_server_type
-from .signing_bridge import SigningBridge
+from .verification_bridge import VerificationBridge
 from .dialogs import NativeDialogs
 from .runtime import StartupError, require_runtime
 from .security import NativeGuard, NavigationPolicy
-from .signing_worker import SigningWorker as Worker
+from .verification_worker import VerificationWorker as Worker
 
 
 def default_build_path():
@@ -24,7 +24,7 @@ def launch():
                              "OPEN_EXTERNAL_LINKS_IN_BROWSER": False,
                              "OPEN_DEVTOOLS_IN_DEBUG": False, "REMOTE_DEBUGGING_PORT": None})
     worker = Worker()
-    bridge = SigningBridge(worker, trusted=lambda: False)
+    bridge = VerificationBridge(worker, trusted=lambda: False)
     server_type = make_server_type(snapshot)
     guard, failures = [], []
     window = webview.create_window("HybridSign — Desktop Preview", str(snapshot.root / "index.html"),

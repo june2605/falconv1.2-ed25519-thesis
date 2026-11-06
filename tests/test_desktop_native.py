@@ -21,10 +21,10 @@ def test_native_windows_shell_bridge_navigation_and_shutdown():
     report = json.loads(line.removeprefix("NATIVE_PROBE="))
     assert report["passed"] and report["exitCode"] == 0
     assert report["windowVisible"] and report["ownedThreadsStopped"]
-    # Phase 4B.3A adds three signing methods. PDF modules remain lazy until
+    # Phase 4B.3B adds five verification methods. PDF modules remain lazy until
     # native file selection; an empty shell must not perform PDF operations.
     assert not report["pdfModulesImported"]
-    assert set(report["checks"]) == {"desktop_connected", "only_nine_allowlisted_methods",
+    assert set(report["checks"]) == {"desktop_connected", "only_fourteen_allowlisted_methods",
         "correct_metadata_and_capability_flags", "all_five_routes", "light_dark_themes",
         "signing_prerequisites_and_no_password_inputs", "untrusted_navigation_and_popup_blocked",
         "unapproved_raw_messages_ignored"}

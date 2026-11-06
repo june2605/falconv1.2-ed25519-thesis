@@ -15,7 +15,7 @@ export interface DesktopCapabilities {
   vaultPasswordChange?: false
   vaultBackupRestore?: false
   pdfSigning: boolean
-  pdfVerification: false
+  pdfVerification: boolean
   accountRegistry: false
 }
 
@@ -42,7 +42,9 @@ export function response(value: unknown): Record<string, unknown> | null {
 const metadataMethods = ['get_app_info', 'get_capabilities']
 export const vaultMethods = [...metadataMethods, 'get_vault_state', 'create_vault', 'unlock_vault', 'lock_vault']
 export const signingMethods = [...vaultMethods, 'choose_pdf', 'sign_pdf', 'get_signing_state']
-export function vaultApi(value: unknown): value is Record<string, unknown> { return exact(value, vaultMethods) || exact(value, signingMethods) }
+export const verificationMethods = [...signingMethods, 'choose_verification_pdf', 'choose_verification_keys', 'use_authenticated_vault_keys', 'verify_pdf', 'get_verification_state']
+export function signingApi(value: unknown): value is Record<string, unknown> { return exact(value, signingMethods) || exact(value, verificationMethods) }
+export function vaultApi(value: unknown): value is Record<string, unknown> { return exact(value, vaultMethods) || signingApi(value) }
 
 function metadataApi(): MetadataApi | null {
   const host: unknown = (window as unknown as { pywebview?: unknown }).pywebview
@@ -77,9 +79,11 @@ export function connectDesktop(signal: AbortSignal, timeoutMs = 3000): Promise<D
         const integrated = exact(caps, [...baseCaps, 'vaultCreate', 'vaultUnlock', 'vaultLock', 'vaultPasswordChange', 'vaultBackupRestore'])
           && caps.vaultOperations === true && caps.vaultCreate === true && caps.vaultUnlock === true && caps.vaultLock === true
           && caps.vaultPasswordChange === false && caps.vaultBackupRestore === false
-          && (caps.pdfSigning === false && Object.keys(api).length === vaultMethods.length || caps.pdfSigning === true && Object.keys(api).length === signingMethods.length)
+          && (caps.pdfSigning === false && caps.pdfVerification === false && Object.keys(api).length === vaultMethods.length
+            || caps.pdfSigning === true && caps.pdfVerification === false && Object.keys(api).length === signingMethods.length
+            || caps.pdfSigning === true && caps.pdfVerification === true && Object.keys(api).length === verificationMethods.length)
         if (!exact(info, ['applicationName', 'applicationVersion', 'runtime', 'desktopStatus']) || info.applicationName !== 'HybridSign' || info.applicationVersion !== '0.1.0' || info.runtime !== 'pywebview-edgechromium' || info.desktopStatus !== 'connected'
-          || !(legacy || integrated) || !caps || caps.nativeShell !== true || caps.pdfVerification !== false || caps.accountRegistry !== false || legacy && caps.pdfSigning !== false) {
+          || !(legacy || integrated) || !caps || caps.nativeShell !== true || caps.accountRegistry !== false || legacy && (caps.pdfSigning !== false || caps.pdfVerification !== false)) {
           finish({ mode: 'preview', reason: 'invalid-response' }); return
         }
         finish({ mode: 'desktop', info: info as unknown as DesktopInfo, capabilities: caps as unknown as DesktopCapabilities })

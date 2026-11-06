@@ -8,6 +8,8 @@ import { DocumentPicker } from '../components/DocumentPicker'
 import { Badge, Button, DetailsRow, IconTile, Notice, PageHeader, StepHeading } from '../components/ui'
 import { TaskFooter } from '../components/TaskFooter'
 import { useDesktopConnection } from '../native/status'
+import { useNativeVerification } from '../native/verification'
+import { NativeVerifySignature } from './NativeVerifySignature'
 
 const scenarios: { id: VerificationScenario; label: string }[] = [
   { id: 'both-valid', label: 'Both layers pass (example)' }, { id: 'altered', label: 'Document altered (example)' },
@@ -20,6 +22,14 @@ function Layer({ name, subtitle, state }: { name: string; subtitle: string; stat
 }
 
 export function VerifySignature() {
+  const native = useNativeVerification().integrated
+  const desktop = useDesktopConnection().mode === 'desktop'
+  if (native) return <NativeVerifySignature />
+  if (desktop) return <><PageHeader title="Verify a signature" description="Native verification is unavailable in this capability profile." /><Notice>No cryptographic result can be established. Rebuild or reconnect the matching desktop application. Example results are available only in browser UI Preview.</Notice><TaskFooter label="Verification actions" title="Native verification unavailable" description="No verification has been performed."><Button disabled>Verify PDF</Button></TaskFooter></>
+  return <DemoVerifySignature />
+}
+
+function DemoVerifySignature() {
   const [document, setDocument] = useState<DocumentSelection | null>(null)
   const [scenario, setScenario] = useState<VerificationScenario>('both-valid')
   const [keySource, setKeySource] = useState('demo')

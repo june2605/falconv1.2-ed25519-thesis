@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "results": [
+    "valid",
+    "invalid",
+    "invalid",
+    "cancelled"
+  ],
+  "noPasswordPrompt": true,
+  "realNativePickers": true,
+  "fileAcceptance": "Python-only GUI-thread seam",
+  "hybridKeyId": "hybrid-v1:87b3b53672d1ee463e29d6b3497add44cbd7b56ec817bd4af19eeb239c6d7f3b",
+  "responsive": {
+    "default": {
+      "width": 1266,
+      "height": 763,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": false,
+      "columns": 2,
+      "native": {
+        "width": 1600,
+        "height": 1000,
+        "dpi": 96
+      }
+    },
+    "maximized": {
+      "width": 1536,
+      "height": 794,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": false,
+      "columns": 2,
+      "native": {
+        "width": 1938,
+        "height": 1038,
+        "dpi": 96
+      }
+    },
+    "restored": {
+      "width": 1266,
+      "height": 763,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": false,
+      "columns": 2,
+      "native": {
+        "width": 1600,
+        "height": 1000,
+        "dpi": 96
+      }
+    },
+    "minimum": {
+      "width": 946,
+      "height": 563,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": true,
+      "columns": 1,
+      "native": {
+        "width": 1200,
+        "height": 750,
+        "dpi": 96
+      }
+    }
+  },
+  "realNativeCancellation": true,
+  "lockedPublicVerification": true,
+  "inputsUnchanged": true,
+  "noArtifactsCreated": true,
+  "files": {
+    "signed": {
+      "name": "signed.pdf",
+      "sizeBytes": 5237
+    },
+    "tampered": {
+      "name": "tampered.pdf",
+      "sizeBytes": 5237
+    },
+    "vault": {
+      "name": "responsive.hvault",
+      "sizeBytes": 2416
+    },
+    "wrong": {
+      "name": "wrong.hvault",
+      "sizeBytes": 2416
+    }
+  },
+  "ownedThreadsStopped": true
+}

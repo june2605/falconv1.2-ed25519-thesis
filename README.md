@@ -11,15 +11,15 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
-### Phase 4B.3A Windows desktop, encrypted vault and real signing
+### Phase 4B.3B Windows desktop, vault, signing and verification
 
 HybridSign opens in a dedicated pywebview/WebView2 window. Key Vault now creates,
 unlocks and locks real encrypted hybrid-key vaults, with file selection and masked
 password entry in native Windows dialogs. Private keys stay in the Python worker;
 React receives public metadata and opaque references only. Sign Document now saves
 a real Ed25519 then Falcon-512 PDF using the authenticated vault on that same worker.
-Standalone verification, password changes, backups/restores and accounts remain
-unintegrated. Browser mode remains a UI preview.
+Standalone hybrid verification is connected as well. Password changes,
+backups/restores and accounts remain unintegrated. Browser mode remains a UI preview.
 
 From the existing Python 3.11 x64 environment:
 
@@ -66,8 +66,19 @@ retrying; there is no post-queue cancellation promise. No PDF bytes, paths,
 passwords or private keys are passed through the JavaScript API.
 
 See [real-signing architecture, Windows evidence and exact regression results](docs/phase4b3a-real-signing-regression.md).
-**Verify Signature** still offers a labelled UI rehearsal; the Python verifier
-remains available separately. Browser mode stays entirely simulated.
+On **Verify Signature**, choose a signed PDF and an encrypted `.hvault` through
+Windows dialogs. Public metadata can be read without a password or private key.
+It is shown as **UNAUTHENTICATED**. Alternatively, choose **Use authenticated vault**
+after unlocking on Key Vault; that public snapshot stays usable after locking.
+Authentication of a vault does not certify signer identity. Verify PDF reports
+only **HYBRID VALID / HYBRID INVALID** for the complete pair under selected keys;
+exceptions and changed inputs are failures, not invented layer results. A wrong
+key pair also causes INVALID. Verification never rewrites the PDF or key source.
+
+See [real-verification architecture, evidence and exact results](docs/phase4b3b-real-verification-regression.md).
+Human Windows picker acceptance, physical DPI and screen-reader checks remain
+manual. Browser mode stays entirely simulated; desktop verification has no example
+results. Existing Python verifier APIs remain available separately.
 
 ### Phase 4A desktop UI preview
 

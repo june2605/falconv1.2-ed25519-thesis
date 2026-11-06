@@ -1,12 +1,13 @@
-# HybridSign UI and Windows signing — Phase 4B.3A
+# HybridSign UI and Windows signing — Phase 4B.3B
 
 The approved Phase 4A.1 UI runs in a browser or in the Phase 4B.1 Windows desktop
 shell. Desktop Key Vault connects real encrypted-vault creation, unlock, lock and
 authenticated public metadata. File selection and masked password entry use
 Python-controlled Windows dialogs; passwords/private keys never enter React.
 Desktop **Sign Document** now calls the existing managed Python signer and saves
-a real PDF. Standalone verification, password change and backup/restore remain
-unintegrated. Browser document workflows remain DEMO / EXAMPLE.
+a real PDF. **Verify Signature** checks the actual complete signature pair with
+selected public keys. Password change and backup/restore remain unintegrated.
+Browser document workflows remain DEMO / EXAMPLE.
 
 Phase 4A.1 refines the existing design with progressive signing steps, persistent
 task actions, compact panels and readable typography. See the
@@ -23,7 +24,9 @@ environment first. The launcher uses `dist/` and does not require Vite to run.
 See [the real-vault regression report](../docs/phase4b2a-real-vault-regression.md)
 for Windows prerequisites and vault limitations. See the
 [real-signing report](../docs/phase4b3a-real-signing-regression.md) for the current
-nine-method bridge, operation lifecycle, disk verification and Windows evidence.
+signing lifecycle, disk verification and Windows evidence. The
+[current verification report](../docs/phase4b3b-real-verification-regression.md)
+describes the fourteen-method profile and public-source trust model.
 
 The browser development workflow remains:
 
@@ -150,6 +153,18 @@ Only a self-verified, saved PDF is reported completed. Unknown outcomes require
 reconciliation and inspection. The in-process record does not survive application
 termination. Native browser downloads remain blocked.
 
+Phase 4B.3B adds five explicit verification methods. Choose a signed PDF and
+an encrypted vault through native Windows dialogs, or use the currently
+authenticated vault public snapshot. Password-free metadata is UNAUTHENTICATED;
+locally authenticated metadata is labelled Authenticated at selection. Neither
+certifies signer identity. Verification needs no private key or unlocked vault.
+Its result is only HYBRID VALID / HYBRID INVALID under the selected public pair;
+no individual-layer result is inferred from timing slots. Read-only verification
+shares the operation gate, owner thread, bounded admission and reconciliation
+model with signing. A failed/unknown operation never becomes a mathematical result.
+Legacy desktop profiles lacking verification show an unavailable view; examples
+are confined to regular browser UI Preview.
+
 ### Browser-preview data and security limits
 
 - Demo data and preferences exist only in React memory. No `localStorage`,
@@ -197,7 +212,8 @@ context at deviceScaleFactor 1.25 approximates the last viewport at 125% scaling
 it does not test physical Windows DPI configuration. All **80** existing tests
 remain; Phase 4B.1 adds **22** metadata/readiness browser executions. Phase 4B.2A
 adds **20** real-state contract/UI executions plus **14** authentication-UX
-executions. Phase 4B.3A adds **16** signing executions for **152** total.
+executions. Phase 4B.3A adds **16** signing executions for **152** total. Phase 4B.3B adds **14** verification
+executions for **166** total.
 Real Windows GUI validation is in `tests/test_desktop_native.py` under Python
 pytest, separate from these browser mocks.
 `tests/test_desktop_vault_native.py` additionally drives two actual desktop

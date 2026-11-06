@@ -48,8 +48,9 @@ def create(*args, **kwargs):
             assert ctypes.windll.user32.IsWindowVisible(int(window.native.Handle.ToInt64()))
             results["windowDpi"] = int(window.native.DeviceDpi)
             methods = window.evaluate_js("Object.keys(window.pywebview.api).sort()")
-            assert methods == ["choose_pdf", "create_vault", "get_app_info", "get_capabilities", "get_signing_state", "get_vault_state", "lock_vault", "sign_pdf", "unlock_vault"], methods
-            results["checks"].append("only_nine_allowlisted_methods")
+            assert methods == sorted(["choose_pdf", "create_vault", "get_app_info", "get_capabilities", "get_signing_state", "get_vault_state", "lock_vault", "sign_pdf", "unlock_vault",
+                "choose_verification_pdf", "choose_verification_keys", "use_authenticated_vault_keys", "verify_pdf", "get_verification_state"]), methods
+            results["checks"].append("only_fourteen_allowlisted_methods")
             window.evaluate_js("window.__probe = {}; window.pywebview.api.get_app_info().then(x => window.__probe.info=x); window.pywebview.api.get_capabilities().then(x=>window.__probe.caps=x); window.pywebview.api.get_app_info('invalid').then(x=>window.__probe.invalid=x); void 0")
             deadline = time.monotonic() + 3
             while time.monotonic() < deadline:
@@ -62,7 +63,7 @@ def create(*args, **kwargs):
             assert response["caps"]["data"] == {"nativeShell": True, "vaultOperations": True,
                                                 "vaultCreate": True, "vaultUnlock": True, "vaultLock": True,
                                                 "vaultPasswordChange": False, "vaultBackupRestore": False,
-                                                "pdfSigning": True, "pdfVerification": False,
+                                                "pdfSigning": True, "pdfVerification": True,
                                                 "accountRegistry": False}, response
             results["metadata"] = response
             results["checks"].append("correct_metadata_and_capability_flags")
@@ -125,7 +126,7 @@ def create(*args, **kwargs):
             rect = wintypes.RECT()
             hwnd = int(window.native.Handle.ToInt64())
             assert ctypes.windll.dwmapi.DwmGetWindowAttribute(hwnd, 9, ctypes.byref(rect), ctypes.sizeof(rect)) == 0
-            directory = Path("frontend/qa/phase4b3a")
+            directory = Path("frontend/qa/phase4b3b")
             directory.mkdir(parents=True, exist_ok=True)
             ImageGrab.grab(bbox=(rect.left, rect.top, rect.right, rect.bottom), all_screens=True).save(directory / "native-dashboard.png")
             results["windowVisible"] = True
@@ -145,6 +146,6 @@ results["exitCode"] = exit_code
 results["ownedThreadsStopped"] = not any(thread.name.startswith("HybridSign-") for thread in threading.enumerate())
 results["pdfModulesImported"] = any(name in __import__('sys').modules for name in ("sign", "verify"))
 if results["passed"] and exit_code == 0:
-    Path("frontend/qa/phase4b3a/native-checks.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    Path("frontend/qa/phase4b3b/native-checks.json").write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
 print("NATIVE_PROBE=" + json.dumps(results), flush=True)
 raise SystemExit(0 if results["passed"] and exit_code == 0 else 1)

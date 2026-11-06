@@ -47,6 +47,16 @@ class VaultService:
                         "algorithms": {"ed25519": "Ed25519", "falcon512": "Falcon-512"}}
         self._handle = handle
 
+    def authenticated_public_snapshot(self, vault_id, session_id):
+        handle = self.require_session(vault_id, session_id)
+        with _managed_key_access(handle) as (binding, _):
+            with cooperative_locks([binding.snapshot.checked]):
+                recheck_snapshot(binding.snapshot)
+                snapshot = capture_vault(binding.snapshot.checked)
+                if snapshot.data != binding.snapshot.data or snapshot.fingerprint != binding.snapshot.fingerprint:
+                    raise VaultConflictError()
+                return snapshot  # Encrypted bytes/public metadata only; never a handle or private keys.
+
     def state(self):
         self._check_owner()
         if self._handle is not None:

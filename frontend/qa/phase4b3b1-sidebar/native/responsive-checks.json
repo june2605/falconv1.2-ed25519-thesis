@@ -1,0 +1,128 @@
+{
+  "passed": true,
+  "results": [
+    "valid",
+    "invalid",
+    "invalid",
+    "cancelled"
+  ],
+  "noPasswordPrompt": true,
+  "realNativePickers": true,
+  "fileAcceptance": "Python-only GUI-thread seam",
+  "hybridKeyId": "hybrid-v1:35630f8eb5d91d1cd886205687f385c277178b5f2aa45eb2464730b72d8b044a",
+  "responsive": {
+    "default": {
+      "width": 1266,
+      "height": 763,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": true,
+      "columns": 2,
+      "native": {
+        "width": 1600,
+        "height": 1000,
+        "dpi": 96
+      }
+    },
+    "maximized": {
+      "width": 1536,
+      "height": 794,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": false,
+      "columns": 2,
+      "native": {
+        "width": 1938,
+        "height": 1038,
+        "dpi": 96
+      }
+    },
+    "restored": {
+      "width": 1266,
+      "height": 763,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": true,
+      "columns": 2,
+      "native": {
+        "width": 1600,
+        "height": 1000,
+        "dpi": 96
+      }
+    },
+    "minimum": {
+      "width": 946,
+      "height": 563,
+      "noOverflow": true,
+      "footerSafe": true,
+      "resultPreserved": true,
+      "focusVisible": true,
+      "sidebarCollapsed": true,
+      "columns": 1,
+      "native": {
+        "width": 1200,
+        "height": 750,
+        "dpi": 96
+      }
+    }
+  },
+  "sidebar": {
+    "default": {
+      "docked": false,
+      "manualSpaceReserved": true,
+      "hoverSpaceReserved": true,
+      "resultPreserved": true,
+      "devicePixelRatio": 1.25
+    },
+    "maximized": {
+      "docked": true,
+      "manualSpaceReserved": true,
+      "hoverSpaceReserved": true,
+      "resultPreserved": true,
+      "devicePixelRatio": 1.25
+    },
+    "restored": {
+      "docked": false,
+      "manualSpaceReserved": true,
+      "hoverSpaceReserved": true,
+      "resultPreserved": true,
+      "devicePixelRatio": 1.25
+    },
+    "minimum": {
+      "docked": false,
+      "manualSpaceReserved": true,
+      "hoverSpaceReserved": true,
+      "resultPreserved": true,
+      "devicePixelRatio": 1.25
+    }
+  },
+  "realNativeCancellation": true,
+  "lockedPublicVerification": true,
+  "inputsUnchanged": true,
+  "noArtifactsCreated": true,
+  "files": {
+    "signed": {
+      "name": "signed.pdf",
+      "sizeBytes": 5237
+    },
+    "tampered": {
+      "name": "tampered.pdf",
+      "sizeBytes": 5237
+    },
+    "vault": {
+      "name": "responsive.hvault",
+      "sizeBytes": 2416
+    },
+    "wrong": {
+      "name": "wrong.hvault",
+      "sizeBytes": 2416
+    }
+  },
+  "ownedThreadsStopped": true
+}

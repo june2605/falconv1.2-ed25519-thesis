@@ -6,6 +6,7 @@ import { Badge, Button, DetailsRow, IconTile, Notice, PageHeader } from '../comp
 import { WorkflowStep } from '../components/WorkflowStep'
 import { TaskFooter } from '../components/TaskFooter'
 import { fileSize } from '../components/DocumentPicker'
+import { HybridKeyId } from '../components/HybridKeyId'
 
 export function NativeSignDocument() {
   const signing = useNativeSigning()
@@ -35,17 +36,17 @@ export function NativeSignDocument() {
         {!ready && <Button variant="secondary" disabled={signing.busy || vaultBusy} onClick={() => void unlock()}>Unlock Vault</Button>}
       </WorkflowStep>
       <WorkflowStep number={3} title="Review and sign" active={step === 3 && !completed} complete={completed} disabled={!ready || signing.busy} onSelect={() => setStep(3)}>
-        <dl><DetailsRow label="Document">{signing.document?.displayName}</DetailsRow><DetailsRow label="Vault">{vault?.displayName}</DetailsRow><DetailsRow label="Hybrid key ID"><code style={{ overflowWrap: 'anywhere' }}>{vault?.hybridKeyId}</code></DetailsRow><DetailsRow label="Sequence">Ed25519 → Falcon-512</DetailsRow></dl>
+        <dl><DetailsRow label="Document">{signing.document?.displayName}</DetailsRow><DetailsRow label="Vault">{vault?.displayName}</DetailsRow><DetailsRow label="Hybrid key ID">{vault && <HybridKeyId value={vault.hybridKeyId} />}</DetailsRow><DetailsRow label="Sequence">Ed25519 → Falcon-512</DetailsRow></dl>
         <Notice>Sign PDF opens the native Save dialog. Existing PDF replacement requires Windows confirmation. Once queued, publication cannot be cancelled here.</Notice>
       </WorkflowStep>
       {label && <p className="field-hint" aria-live="polite">{label}</p>}
       {signing.error && <Notice tone="warning">{signing.error}</Notice>}
       {completed && <section ref={result} className="result-area" role="status"><div className="result-heading"><FilePenLine size={20} /><h2>Signed PDF saved</h2><Badge tone="success">COMPLETED</Badge></div><dl>
-        <DetailsRow label="Output document">{signing.job?.outputName}</DetailsRow><DetailsRow label="Signature pair">Ed25519 + Falcon-512</DetailsRow><DetailsRow label="Self-verification">Completed self-verification</DetailsRow><DetailsRow label="Hybrid key ID"><code style={{ overflowWrap: 'anywhere' }}>{signing.job?.hybridKeyId}</code></DetailsRow></dl></section>}
+        <DetailsRow label="Output document">{signing.job?.outputName}</DetailsRow><DetailsRow label="Signature pair">Ed25519 + Falcon-512</DetailsRow><DetailsRow label="Self-verification">Completed self-verification</DetailsRow><DetailsRow label="Hybrid key ID">{signing.job?.hybridKeyId && <HybridKeyId value={signing.job.hybridKeyId} />}</DetailsRow></dl></section>}
       {(signing.uncertain || signing.job?.state === 'outcome-uncertain') && <Button variant="secondary" onClick={() => void signing.reconcile()}>Reconcile native status</Button>}
       {terminal && !signing.busy && <Button variant="secondary" onClick={signing.reset}>Start another signing operation</Button>}
     </section><aside className="card preview-panel"><div className="panel-header"><h2>Document workspace</h2><Badge>LOCAL FILE</Badge></div><div className="preview-empty"><FileText size={30} /><h3>{signing.document?.displayName ?? 'No PDF selected'}</h3><p>{signing.document ? fileSize(signing.document.sizeBytes) : 'Choose an unsigned PDF to begin.'}</p><p>Confirmed file metadata · PDF content is not rendered or sent to React.</p></div><Notice>Trusted signer identity and trusted signing time are not established. The PDF uses the inherited custom signature format; no CMS, PAdES or production compliance claim.</Notice></aside></div>
-    <TaskFooter label="Signing actions" title={signing.busy ? 'Native signing operation active' : 'Local hybrid signing'} description="The completed pair is self-verified before atomic publication.">
+    <TaskFooter label="Signing actions" title={signing.busy ? 'Native cryptographic operation active' : 'Local hybrid signing'} description="The completed pair is self-verified before atomic publication.">
       {step > 1 && <Button variant="ghost" disabled={signing.busy} onClick={() => setStep(step - 1)}><ArrowLeft size={16} />Back</Button>}
       {step === 2 && <Button disabled={!ready || signing.busy} onClick={() => setStep(3)}>Continue to review<ArrowRight size={16} /></Button>}
       <Button disabled={!ready || step !== 3 || signing.busy || terminal} onClick={() => vault?.sessionId && void signing.sign(vault.vaultId, vault.sessionId)}><FilePenLine size={16} />Sign PDF</Button>

@@ -1,0 +1,45 @@
+/* The sidebar and workspace share one width, including temporary expansion. */
+.app-shell { --sidebar-width: 72px; }
+.app-shell:has(.smart-sidebar[data-expanded="true"]) { --sidebar-width: 250px; }
+.app-shell > .workspace { transition: margin-left 200ms ease; }
+.smart-sidebar.sidebar { width: var(--sidebar-width); padding: 20px 12px 16px; overflow: visible; z-index: 20; transition: width 200ms ease, box-shadow 200ms ease; }
+.smart-sidebar[data-temporary="true"] { box-shadow: 3px 0 12px #11192d14; }
+.smart-sidebar .sidebar-header { flex-shrink: 0; }
+.smart-sidebar .brand { padding: 0 6px; margin: 0 0 12px; gap: 10px; height: 44px; overflow: hidden; justify-content: flex-start; }
+.smart-sidebar .brand img { width: 36px; height: 36px; }
+.smart-sidebar .brand strong { font-size: 20px; }
+.smart-sidebar .brand small { font-size: 12px; white-space: nowrap; }
+.smart-sidebar .sidebar-brand-copy { display: block; white-space: nowrap; }
+.smart-sidebar .sidebar-controls { display: flex; align-items: center; gap: 12px; min-height: 40px; margin-bottom: 12px; }
+.smart-sidebar .sidebar-controls .icon-button { min-width: 44px; min-height: 40px; flex-shrink: 0; }
+.smart-sidebar .sidebar-auto { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; width: 102px; flex-shrink: 0; padding: 4px 8px; border: 1px solid var(--border-strong); border-radius: 6px; color: var(--muted); white-space: nowrap; }
+.smart-sidebar .sidebar-auto[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); border-color: var(--accent); }
+.smart-sidebar .sidebar-pin[aria-pressed="true"] { color: var(--accent-text); background: var(--accent-soft); }
+.smart-sidebar .sidebar-pin-hint { font-size: 12px; line-height: 1.5; margin: 0; color: var(--muted); }
+.smart-sidebar .sidebar-scroll { min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.smart-sidebar .sidebar-label { display: block; padding: 2px 12px 12px; }
+.smart-sidebar nav { display: flex; gap: 6px; }
+.smart-sidebar .nav-item { height: 44px; min-height: 44px; padding: 10px 14px; gap: 12px; font-size: 14px; justify-content: flex-start; white-space: nowrap; }
+.smart-sidebar .nav-item svg { flex-shrink: 0; }
+.smart-sidebar .nav-item .nav-label { display: inline; }
+.smart-sidebar .nav-item .nav-dot { display: block; }
+.smart-sidebar .nav-item.active { background: var(--accent-soft); color: var(--accent-text); }
+.smart-sidebar .sidebar-bottom { display: flex; flex-direction: column; padding: 12px 2px 0; margin-top: 12px; flex-shrink: 0; gap: 4px; }
+.smart-sidebar .sidebar-note { min-height: 36px; margin: 0; white-space: nowrap; border-radius: 5px; }
+.smart-sidebar .sidebar-note .status-dot { flex-shrink: 0; }
+.smart-sidebar .sidebar-note[data-connected="false"] .status-dot { background: transparent; border: 1px solid var(--accent-text); }
+.smart-sidebar .sidebar-phase { display: none; }
+.smart-sidebar .sidebar-about { min-height: 40px; padding: 10px 0 0; margin: 4px 0 0; white-space: nowrap; }
+.smart-sidebar .sidebar-about svg { flex-shrink: 0; }
+.smart-sidebar[data-expanded="false"] .sidebar-brand-copy,
+.smart-sidebar[data-expanded="false"] .nav-label,
+.smart-sidebar[data-expanded="false"] [data-expanded-only],
+.smart-sidebar[data-expanded="false"] .sidebar-status-copy,
+.smart-sidebar[data-expanded="false"] .sidebar-about > span,
+.smart-sidebar[data-expanded="false"] .sidebar-about > svg:last-child { display: none; }
+.smart-sidebar[data-expanded="false"] .sidebar-label { visibility: hidden; }
+.smart-sidebar[data-expanded="false"] .sidebar-note,
+.smart-sidebar[data-expanded="false"] .sidebar-about { justify-content: center; }
+.smart-sidebar[data-expanded="false"] .nav-item .nav-dot { right: 3px; }
+.sidebar-tooltip { position: fixed; transform: translateY(-50%); z-index: 40; max-width: 240px; padding: 8px 12px; font-size: 12px; line-height: 1.5; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 6px; box-shadow: var(--shadow); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .smart-sidebar.sidebar, .app-shell > .workspace { transition: none; } }

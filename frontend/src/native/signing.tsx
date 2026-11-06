@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type PropsWithChildren } from 'react'
-import { exact, record, response, signingMethods } from './desktop'
+import { exact, record, response, signingApi } from './desktop'
+import { useNativeVerification } from './verification'
 import { useDesktopConnection } from './status'
 
 export interface NativePdf { documentId: string; displayName: string; sizeBytes: number }
@@ -41,7 +42,7 @@ async function invoke(method: string, args: string[] = [], bounded = false): Pro
   let timer: number | undefined
   try {
     const host: unknown = (window as unknown as { pywebview?: unknown }).pywebview
-    if (!record(host) || host.platform !== 'edgechromium' || !exact(host.api, signingMethods) || typeof host.api[method] !== 'function') throw new Error()
+    if (!record(host) || host.platform !== 'edgechromium' || !signingApi(host.api) || typeof host.api[method] !== 'function') throw new Error()
     const call = (host.api[method] as (...args: string[]) => Promise<unknown>)(...args)
     const reply = bounded ? await Promise.race([call, new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error()), 2000) })]) : await call
     if (exact(reply, ['ok', 'protocolVersion', 'error']) && reply.ok === false && reply.protocolVersion === 1 && exact(reply.error, ['code', 'message'])) {
@@ -63,6 +64,7 @@ interface SigningState {
 const Context = createContext<SigningState | null>(null)
 
 export function NativeSigningProvider({ children }: PropsWithChildren) {
+  const verificationBusy = useNativeVerification().busy
   const connection = useDesktopConnection()
   const integrated = connection.mode === 'desktop' && connection.capabilities.pdfSigning
   const [document, setDocument] = useState<NativePdf | null>(null), [current, setJob] = useState<SigningJob | null>(null)
@@ -97,7 +99,7 @@ export function NativeSigningProvider({ children }: PropsWithChildren) {
     const interval = window.setInterval(() => void read(), 200)
     return () => window.clearInterval(interval)
   }, [integrated, submitting, current?.state, uncertain])
-  const busy = pending || active(current) || uncertain
+  const busy = pending || active(current) || uncertain || verificationBusy
   async function choose() {
     if (!integrated || inflight.current || busy) return
     generation.current += 1

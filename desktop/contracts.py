@@ -16,6 +16,9 @@ VAULT_CAPABILITIES = {**CAPABILITIES, "vaultOperations": True, "vaultCreate": Tr
                       "vaultUnlock": True, "vaultLock": True, "vaultPasswordChange": False,
                       "vaultBackupRestore": False}
 SIGNING_CAPABILITIES = {**VAULT_CAPABILITIES, 'pdfSigning': True}
+VERIFICATION_CAPABILITIES = {**SIGNING_CAPABILITIES, 'pdfVerification': True}
+METHODS = METHODS | frozenset({'choose_verification_pdf', 'choose_verification_keys',
+    'use_authenticated_vault_keys', 'verify_pdf', 'get_verification_state'})
 ERRORS = {"INVALID_REQUEST": "Invalid desktop request.",
           "UNAVAILABLE": "Desktop connection is unavailable.",
           "BUSY": "Desktop worker is busy.",
@@ -46,6 +49,10 @@ ERRORS.update({'PDF_INVALID': 'Select a supported unsigned PDF, at most 50 MiB.'
                'SIGN_PATH': 'Output is unsafe or no longer matches native approval.',
                'SIGN_FAILED': 'Signing did not complete. No new signed output was confirmed.',
                'SIGN_UNCERTAIN': 'The output may have been published. Inspect the selected location before retrying.'})
+ERRORS.update({'STALE_KEY_SOURCE': 'Choose the public-key source again.',
+               'VERIFY_FAILED': 'Verification could not complete. No cryptographic result was established.',
+               'VERIFY_IO': 'The selected verification file could not be read safely. Check access and select it again.',
+               'VERIFY_UNCERTAIN': 'Verification outcome is not confirmed. Reconcile native status without resubmitting.'})
 
 
 class PublicError(TypedDict):
@@ -124,6 +131,40 @@ class PublicDocument(TypedDict):
     sizeBytes: int
 
 
+class VerificationCapabilities(TypedDict):
+    nativeShell: Literal[True]
+    vaultOperations: Literal[True]
+    vaultCreate: Literal[True]
+    vaultUnlock: Literal[True]
+    vaultLock: Literal[True]
+    vaultPasswordChange: Literal[False]
+    vaultBackupRestore: Literal[False]
+    pdfSigning: Literal[True]
+    pdfVerification: Literal[True]
+    accountRegistry: Literal[False]
+
+
+class PublicKeySource(TypedDict):
+    keySourceId: str
+    displayName: str
+    hybridKeyId: str
+    trust: Literal['vault-authenticated', 'unauthenticated-metadata']
+
+
+class KeySourceSelection(TypedDict):
+    keySource: PublicKeySource | None
+    cancelled: bool
+
+
+class VerificationResult(TypedDict):
+    operationId: str | None
+    state: Literal['idle', 'ready', 'queued', 'running', 'valid', 'invalid', 'failed']
+    document: PublicDocument | None
+    keySource: PublicKeySource | None
+    hybridValid: bool | None
+    errorCode: str | None
+
+
 class PdfSelection(TypedDict):
     document: PublicDocument | None
     cancelled: bool
@@ -139,7 +180,7 @@ class SigningResult(TypedDict):
     errorCode: str | None
 
 
-PublicData = AppInfo | Capabilities | VaultCapabilities | SigningCapabilities | VaultResult | PdfSelection | SigningResult
+PublicData = AppInfo | Capabilities | VaultCapabilities | SigningCapabilities | VerificationCapabilities | VaultResult | PdfSelection | SigningResult | KeySourceSelection | VerificationResult
 
 
 class SuccessReply(TypedDict):

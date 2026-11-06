@@ -6,10 +6,13 @@ import '@fontsource/inter/latin-600.css'
 import '@fontsource/inter/latin-700.css'
 import './styles.css'
 import './desktop.css'
+import './responsive.css'
+import './sidebar.css'
 import App from './App'
 import { WorkspaceProvider } from './state/workspace'
 import { DesktopProvider } from './native/status'
 import { NativeVaultProvider } from './native/vault'
 import { NativeSigningProvider } from './native/signing'
+import { NativeVerificationProvider } from './native/verification'
 
-createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><NativeSigningProvider><NativeVaultProvider><App /></NativeVaultProvider></NativeSigningProvider></WorkspaceProvider></DesktopProvider></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><DesktopProvider><WorkspaceProvider><NativeVerificationProvider><NativeSigningProvider><NativeVaultProvider><App /></NativeVaultProvider></NativeSigningProvider></NativeVerificationProvider></WorkspaceProvider></DesktopProvider></StrictMode>)
