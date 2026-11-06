@@ -4,6 +4,7 @@ import { go } from './helpers'
 async function host(page: Page, fault = '') {
   await page.addInitScript(({ fault }) => {
     const calls: unknown[] = []
+    const selection = { outcome: '', finish: null as null | (() => void) }
     const document = { documentId: 'd'.repeat(32), displayName: 'Original.pdf', sizeBytes: 700 }
     const vault = { vaultId: 'a'.repeat(32), sessionId: fault === 'locked' ? null : 'c'.repeat(32), displayName: 'Native vault',
       state: fault === 'locked' ? 'locked' : 'unlocked', hybridKeyId: 'hybrid-v1:' + 'b'.repeat(64),
@@ -12,14 +13,20 @@ async function host(page: Page, fault = '') {
     let job = { operationId: null as string | null, state: 'idle', document: null as typeof document | null,
       outputName: null as string | null, hybridKeyId: null as string | null, selfVerified: false, errorCode: null as string | null }
     const reply = (data: unknown) => ({ ok: true, protocolVersion: 1, data })
-    Object.assign(window, { __signCalls: calls, pywebview: { platform: 'edgechromium', api: {
+    Object.assign(window, { __signCalls: calls, __pdfSelection: selection, pywebview: { platform: 'edgechromium', api: {
       get_app_info: async () => reply({ applicationName: 'HybridSign', applicationVersion: '0.1.0', runtime: 'pywebview-edgechromium', desktopStatus: 'connected' }),
       get_capabilities: async () => reply({ nativeShell: true, vaultOperations: true, vaultCreate: true, vaultUnlock: true, vaultLock: true,
         vaultPasswordChange: false, vaultBackupRestore: false, pdfSigning: true, pdfVerification: false, accountRegistry: false }),
       get_vault_state: async () => reply({ vault, cancelled: false }),
       create_vault: async () => reply({ vault, cancelled: false }), unlock_vault: async () => reply({ vault, cancelled: false }),
       lock_vault: async () => reply({ vault, cancelled: false }),
-      choose_pdf: async () => reply({ document: fault === 'cancel' ? null : document, cancelled: fault === 'cancel' }),
+      choose_pdf: async () => {
+        if (selection.outcome === 'reject') return { ok: false, protocolVersion: 1, error: { code: 'PDF_INVALID', message: 'private native diagnostics' } }
+        if (selection.outcome === 'malformed') return reply({ document: { documentId: 'invalid' }, cancelled: false })
+        if (selection.outcome === 'pending') await new Promise<void>(resolve => { selection.finish = resolve })
+        const cancelled = fault === 'cancel' || selection.outcome === 'cancel'
+        return reply({ document: cancelled ? null : document, cancelled })
+      },
       get_signing_state: async () => reply(job),
       sign_pdf: async (...args: string[]) => {
         calls.push(args)
@@ -128,4 +135,22 @@ test('malformed completion without literal self-verification never shows success
   await expect(page.getByText('Signing outcome not confirmed', { exact: true })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Signed PDF saved', exact: true })).toHaveCount(0)
   await expect(page.getByRole('button', { name: 'Sign PDF', exact: true })).toBeDisabled()
+})
+
+for (const outcome of ['reject', 'cancel', 'malformed', 'pending']) test(`new PDF selection ${outcome} clears the old signing-success display`, async ({ page }) => {
+  await host(page); await go(page, 'sign'); await review(page)
+  await page.getByRole('button', { name: 'Sign PDF', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Signed PDF saved', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Choose PDF step', exact: true }).click()
+  await page.evaluate(outcome => { (window as unknown as { __pdfSelection: { outcome: string } }).__pdfSelection.outcome = outcome }, outcome)
+  await page.getByRole('button', { name: 'Choose PDF', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Signed PDF saved', exact: true })).toHaveCount(0)
+  await expect(page.locator('main')).not.toContainText('Original-signed.pdf')
+  if (outcome === 'pending') {
+    await expect(page.getByRole('button', { name: 'Sign PDF', exact: true })).toBeDisabled()
+    await page.evaluate(() => (window as unknown as { __pdfSelection: { finish: () => void } }).__pdfSelection.finish())
+  }
+  if (outcome === 'reject' || outcome === 'malformed') await expect(page.getByRole('button', { name: 'Sign PDF', exact: true })).toBeDisabled()
+  expect(await page.evaluate(() => (window as unknown as { __signCalls: unknown[] }).__signCalls.length)).toBe(1)
+  await expect(page.locator('body')).not.toContainText('private native diagnostics')
 })

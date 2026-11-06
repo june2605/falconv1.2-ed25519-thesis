@@ -25,6 +25,9 @@ htmlcov/
 key/
 keys/
 secrets/
+*.hvault
+.hybrid-vault-*
+demo-work/
 
 # Generated data
 *.db

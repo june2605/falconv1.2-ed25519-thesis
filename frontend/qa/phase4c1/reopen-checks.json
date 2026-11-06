@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "mode": "reopen",
+  "generatedPairs": 0,
+  "nativePasswordsMasked": true,
+  "nativeDialogsAccepted": true,
+  "noPlaintextKeyWrites": true,
+  "workerOwnership": true,
+  "dialogs": [
+    {
+      "kind": "vault-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "demo.hvault",
+      "finalName": "demo.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    }
+  ],
+  "lockedOnRestart": true,
+  "fileEditClass": "Edit",
+  "hybridKeyId": "hybrid-v1:6365fce70730ec60f465c6d21f481714180c7b6d6158e7d2b5d30c09d20ca255",
+  "publicKeySha256": "9b9ca2228f09dbf9def77d601a8597babd0a7fdd35bc6eedcda289a59096c228",
+  "originalSignatureStillValid": true,
+  "vaultSha256": "e32a5be7c2a0adb271d175f89787614f996eacbcc6c4b4a5b0d982e72e47d1e9",
+  "ownedThreadsStopped": true
+}

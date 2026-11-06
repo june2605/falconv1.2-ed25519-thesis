@@ -11,6 +11,19 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
+### Phase 4C.1 thesis demonstration
+
+See the [desktop demo readiness report and 3–5 minute script](docs/phase4c1-demo-readiness.md).
+Use the generated, public [sample PDF](demo_assets/sample-unsigned.pdf), not a personal
+document. Prepare an existing trusted folder on fixed local NTFS outside the
+repository for disposable vaults and outputs. A Windows shortcut can launch the
+existing desktop module without PowerShell during the presentation; setup and
+manual acceptance steps are in the report. No EXE packaging is provided.
+
+Vault files, known sidecars and `demo-work/` are ignored as an additional guard
+against accidental Git inclusion. This is not secret discovery or a substitute
+for keeping credentials and generated artifacts outside the repository.
+
 ### Phase 4B.3B Windows desktop, vault, signing and verification
 
 HybridSign opens in a dedicated pywebview/WebView2 window. Key Vault now creates,

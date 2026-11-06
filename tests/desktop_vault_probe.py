@@ -175,7 +175,21 @@ def create(*args, **kwargs):
                     time.sleep(0.04)
                 raise AssertionError("Native UI condition did not complete")
             def click(label):
-                wait(f"(()=>{{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==={json.dumps(label)} && !b.disabled); if(!b)return false; b.click(); return true;}})()")
+                # Native modal focus-return can start a state refresh before
+                # React commits its disabled buttons. Require a stable enabled
+                # control rather than clicking that old frame and losing the
+                # synthetic click to the provider's existing admission gate.
+                wait(f"""(()=>{{
+                  const label={json.dumps(label)};
+                  const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===label && !b.disabled);
+                  if(!b){{window.__probeButtonReady=null; return false;}}
+                  const ready=window.__probeButtonReady;
+                  if(!ready || ready.button!==b || ready.label!==label){{
+                    window.__probeButtonReady={{button:b,label,at:performance.now()}}; return false;
+                  }}
+                  if(performance.now()-ready.at<200)return false;
+                  window.__probeButtonReady=null; b.click(); return true;
+                }})()""")
             wait("document.querySelector('.preview-indicator')?.textContent.trim()==='Desktop Connected'")
             window.evaluate_js("window.location.hash='/vault'; void 0")
             wait("!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Create Vault' && !b.disabled)")

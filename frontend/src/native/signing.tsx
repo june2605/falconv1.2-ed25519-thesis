@@ -104,6 +104,7 @@ export function NativeSigningProvider({ children }: PropsWithChildren) {
     if (!integrated || inflight.current || busy) return
     generation.current += 1
     inflight.current = true; setPending(true); setError(null)
+    setJob(null); operation.current = null // A new selection attempt supersedes the visible old result.
     try {
       const value = await invoke('choose_pdf')
       if (!exact(value, ['document', 'cancelled']) || typeof value.cancelled !== 'boolean' || !(value.document === null || pdf(value.document))) throw new Error()

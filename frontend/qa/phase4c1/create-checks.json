@@ -1,0 +1,192 @@
+{
+  "passed": true,
+  "mode": "create",
+  "generatedPairs": 1,
+  "nativePasswordsMasked": true,
+  "nativeDialogsAccepted": true,
+  "noPlaintextKeyWrites": true,
+  "workerOwnership": true,
+  "dialogs": [
+    {
+      "kind": "vault-save",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "demo.hvault",
+      "finalName": "demo.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "vault-save",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "demo.hvault",
+      "finalName": "demo.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "vault-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "demo.hvault",
+      "finalName": "demo.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "pdf-open",
+      "accepted": false,
+      "matchedRequested": false,
+      "selectedName": null,
+      "finalName": null,
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "pdf-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "sample-unsigned.pdf",
+      "finalName": "sample-unsigned.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "pdf-save",
+      "accepted": false,
+      "matchedRequested": false,
+      "selectedName": null,
+      "finalName": "sample-unsigned-signed.pdf",
+      "filenameControlMatched": true,
+      "overwrite": false
+    },
+    {
+      "kind": "pdf-save",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "signed.pdf",
+      "finalName": "signed.pdf",
+      "filenameControlMatched": true,
+      "overwrite": true
+    },
+    {
+      "kind": "notice",
+      "accepted": false,
+      "matchedRequested": false,
+      "selectedName": null,
+      "finalName": null,
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "pdf-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "corrupted.pdf",
+      "finalName": "corrupted.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "verify-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "signed.pdf",
+      "finalName": "signed.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "verify-open",
+      "accepted": false,
+      "matchedRequested": false,
+      "selectedName": null,
+      "finalName": null,
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "verify-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "tampered.pdf",
+      "finalName": "tampered.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "verify-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "corrupted.pdf",
+      "finalName": "corrupted.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "verify-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "signed.pdf",
+      "finalName": "signed.pdf",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "vault-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "other.hvault",
+      "finalName": "other.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "vault-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "invalid.hvault",
+      "finalName": "invalid.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    },
+    {
+      "kind": "vault-open",
+      "accepted": true,
+      "matchedRequested": true,
+      "selectedName": "demo.hvault",
+      "finalName": "demo.hvault",
+      "filenameControlMatched": true,
+      "overwrite": null
+    }
+  ],
+  "lockedOnRestart": false,
+  "fileEditClass": "Edit",
+  "wrongPasswordRetry": true,
+  "hybridKeyId": "hybrid-v1:6365fce70730ec60f465c6d21f481714180c7b6d6158e7d2b5d30c09d20ca255",
+  "publicKeySha256": "9b9ca2228f09dbf9def77d601a8597babd0a7fdd35bc6eedcda289a59096c228",
+  "existingOutputPreservedOnCancel": true,
+  "signingCalls": 1,
+  "lockDuringSigningRejected": true,
+  "activeCloseRefused": true,
+  "validSignedOnDisk": true,
+  "oneSigningOperation": true,
+  "overwriteConfirmed": true,
+  "noStaleSigningSuccess": true,
+  "noStaleValid": true,
+  "tamperRejected": true,
+  "corruptedPdfRejected": true,
+  "wrongKeysRejected": true,
+  "invalidVaultRejected": true,
+  "staleSessionRejected": true,
+  "cancelledDialogsPreservedState": true,
+  "lockedPublicVerification": true,
+  "files": {
+    "signedBytes": 5368,
+    "vaultBytes": 2416,
+    "vaultSha256": "e32a5be7c2a0adb271d175f89787614f996eacbcc6c4b4a5b0d982e72e47d1e9",
+    "sourceSha256": "2d94ba434bbbfda3ffcd78731f2e94146352e5dc7680dcd566d2ca0614a20639"
+  },
+  "ownedThreadsStopped": true
+}
