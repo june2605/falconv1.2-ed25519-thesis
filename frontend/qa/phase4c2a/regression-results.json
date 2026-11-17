@@ -1,0 +1,43 @@
+{
+  "python": {
+    "passed": 1661,
+    "failed": 0,
+    "skipped": 8,
+    "xfailed": 0,
+    "xpassed": 0,
+    "seconds": 231.63
+  },
+  "playwright": {
+    "passed": 266,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed": "3.8m",
+    "exitCode": 0
+  },
+  "typecheck": "passed",
+  "productionBuild": "passed",
+  "packagedWorkflow": {
+    "passed": true,
+    "processes": 2,
+    "checkpoints": 25
+  },
+  "frozenStartupNegatives": {
+    "passed": 3,
+    "unexpectedFailures": 0
+  },
+  "shellOpenFromExtractedZip": "passed",
+  "originalBenchmarkHashes": {
+    "matched": 15,
+    "changed": 0,
+    "missing": 0
+  },
+  "initialConcurrentPythonRun": {
+    "passed": 1659,
+    "failed": 2,
+    "skipped": 8
+  },
+  "isolatedNativeFollowup": {
+    "passed": 2,
+    "seconds": 52.18
+  }
+}

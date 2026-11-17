@@ -1,18 +1,17 @@
 """Launch with: .venv/Scripts/python.exe -m desktop.launcher"""
 import logging
-from pathlib import Path
 import sys
 
 from .assets import BuildError, capture_build, make_server_type
 from .verification_bridge import VerificationBridge
 from .dialogs import NativeDialogs
-from .runtime import StartupError, require_runtime
+from .runtime import StartupError, require_runtime, resource_root, report_startup_error
 from .security import NativeGuard, NavigationPolicy
 from .verification_worker import VerificationWorker as Worker
 
 
 def default_build_path():
-    return Path(__file__).resolve().parent.parent / "frontend" / "dist"
+    return resource_root() / "frontend" / "dist"
 
 
 def launch():
@@ -58,7 +57,7 @@ def launch():
     window.events.closing += closing
     try:
         worker.start()
-        icon = Path(__file__).resolve().parent.parent / "logobig.ico"
+        icon = resource_root() / "logobig.ico"
         webview.start(gui="edgechromium", debug=False, http_server=True,
                       server=server_type, private_mode=True, icon=str(icon) if icon.is_file() else None)
         if failures or any(item.failed for item in guard) or not guard:
@@ -81,9 +80,11 @@ def main():
         launch()
         return 0
     except (BuildError, StartupError) as error:
-        print(f"HybridSign: {error}", file=sys.stderr)
+        message = ('Bundled application assets are missing or unsafe. Extract the complete portable distribution again.'
+                   if isinstance(error, BuildError) and getattr(sys, 'frozen', False) else str(error))
+        report_startup_error(message)
     except Exception:
-        print("HybridSign: Desktop startup failed. Check the documented Windows prerequisites.", file=sys.stderr)
+        report_startup_error('Desktop startup failed. Check the documented Windows prerequisites.')
     return 1
 
 

@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "assets",
+      "passed": true,
+      "nativeErrorShown": true,
+      "exitCode": 1
+    },
+    {
+      "case": "metadata",
+      "passed": true,
+      "nativeErrorShown": true,
+      "exitCode": 1
+    },
+    {
+      "case": "version",
+      "passed": true,
+      "nativeErrorShown": true,
+      "exitCode": 1
+    }
+  ]
+}

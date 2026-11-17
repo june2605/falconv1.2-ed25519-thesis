@@ -69,6 +69,18 @@ class NativeDialogs:
     def choose_verification_pdf(self):
         return self._on_gui(lambda: self._pdf_dialog(None, verification=True))
 
+    def _allow_user_output(self, path):
+        from .runtime import validate_user_destination
+        try:
+            validate_user_destination(path)
+            return True
+        except (ValueError, OSError):
+            from System.Windows.Forms import MessageBox
+            MessageBox.Show(self._window.native,
+                            'Store encrypted vaults and signed PDFs outside the HybridSign application folder. Choose a separate trusted local NTFS folder.',
+                            'HybridSign \u2014 Choose another location')
+            return False
+
     def _pdf_dialog(self, suggested_name, *, verification=False):
         from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog
         from .pdf_io import output_choice
@@ -87,6 +99,9 @@ class NativeDialogs:
                 def file_ok(_, event):
                     try:
                         approved.clear()
+                        if not self._allow_user_output(str(dialog.FileName)):
+                            event.Cancel = True
+                            return
                         approved.append(output_choice(str(dialog.FileName)))
                     except Exception:
                         event.Cancel = True
@@ -119,6 +134,10 @@ class NativeDialogs:
             dialog.CheckPathExists = True
             if creating:
                 dialog.OverwritePrompt = False  # Existing destinations always reject in the worker.
+                def file_ok(_, event):
+                    if not self._allow_user_output(str(dialog.FileName)):
+                        event.Cancel = True
+                dialog.FileOk += file_ok
             else:
                 dialog.CheckFileExists = True
                 dialog.Multiselect = False

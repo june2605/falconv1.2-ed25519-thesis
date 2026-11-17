@@ -1,0 +1,12 @@
+{
+  "amd64": true,
+  "guiSubsystem": true,
+  "asInvoker": true,
+  "iconResource": true,
+  "exeSha256": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc",
+  "nativeCryptoBytesUnchanged": {
+    "cryptography/hazmat/bindings/_rust.pyd": true,
+    "nacl/_sodium.pyd": true,
+    "pqcrypto/_sign/falcon_512.cp311-win_amd64.pyd": true
+  }
+}

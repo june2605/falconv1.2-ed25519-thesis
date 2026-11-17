@@ -1,0 +1,75 @@
+{
+  "passed": true,
+  "driver": "external Windows UI Automation",
+  "noBundledTestHooks": true,
+  "noRemoteDebugging": true,
+  "checks": [
+    "locked-on-startup",
+    "sidebar-auto-and-navigation:default",
+    "sidebar-manual-and-auto-toggle",
+    "sidebar-auto-and-navigation:maximized",
+    "sidebar-auto-and-navigation:restored",
+    "sidebar-auto-and-navigation:minimum",
+    "five-packaged-screens-dark-and-light",
+    "application-folder-output-rejected:.hvault",
+    "copied-exact-public-hybrid-id",
+    "duplicate-sign-action-during-save-disabled",
+    "application-folder-output-rejected:.pdf",
+    "busy-close-refused-during-signing-save",
+    "original-vault-generated-by-exe",
+    "real-signing-self-verified",
+    "saved-pdf-valid",
+    "modified-copy-invalid",
+    "locked-public-verification",
+    "password-free-public-metadata-verification",
+    "wrong-keys-invalid",
+    "clean-exe-exit",
+    "locked-on-startup",
+    "original-id-survives-exe-restart",
+    "sign-and-verify-after-restart",
+    "loaded-python-and-crypto-from-copied-folder",
+    "clean-exe-exit"
+  ],
+  "windowStates": {
+    "default": {
+      "physicalWidth": 1600.0,
+      "physicalHeight": 1000.0
+    },
+    "maximized": {
+      "physicalWidth": 1938.0,
+      "physicalHeight": 1038.0
+    },
+    "restored": {
+      "physicalWidth": 1600.0,
+      "physicalHeight": 1000.0
+    },
+    "minimum": {
+      "physicalWidth": 1200.0,
+      "physicalHeight": 750.0
+    }
+  },
+  "pids": [
+    12216,
+    7740
+  ],
+  "nativePasswordControlsMasked": true,
+  "hybridKeyId": "hybrid-v1:519ded7346a36883cd1fe3594e306e565f468d0ffb96360f56d0ac6444114d9c",
+  "sourceSha256": "2d94ba434bbbfda3ffcd78731f2e94146352e5dc7680dcd566d2ca0614a20639",
+  "signedBytes": 5368,
+  "vaultBytes": 2416,
+  "loadedNativeComponents": {
+    "python311.dll": [
+      "_internal/python311.dll"
+    ],
+    "falcon_512": [
+      "_internal/pqcrypto/_sign/falcon_512.cp311-win_amd64.pyd"
+    ],
+    "_sodium": [
+      "_internal/nacl/_sodium.pyd"
+    ],
+    "_rust": [
+      "_internal/cryptography/hazmat/bindings/_rust.pyd"
+    ]
+  },
+  "applicationFolderUnchanged": true
+}

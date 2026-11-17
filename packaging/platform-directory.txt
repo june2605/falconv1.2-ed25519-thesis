@@ -1,0 +1,2 @@
+Directory marker required by pywebview 6.2.1's Windows adapter path enumeration.
+Only the win-x64 WebView2Loader.dll is included. This is not an ARM64/x86 loader.

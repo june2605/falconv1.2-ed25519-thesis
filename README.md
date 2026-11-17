@@ -11,6 +11,18 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
+### Phase 4C.2A portable Windows desktop
+
+The local one-folder release launches by double-clicking **HybridSign.exe**.
+Keep the complete folder together. The target computer needs Microsoft Edge
+WebView2 Evergreen and .NET Framework; Python, Node.js and npm are build tools,
+not target-machine prerequisites. Store vaults and PDFs outside the application
+folder. No installer, single-file EXE, auto-updater or elevation is included.
+
+See [portable build commands, prerequisites, checksums and actual EXE acceptance](docs/phase4c2a-portable-packaging.md).
+The executable and release archives are local generated artifacts, not committed
+source files. Clean-machine/SmartScreen acceptance remains a separate check.
+
 ### Phase 4C.1 thesis demonstration
 
 See the [desktop demo readiness report and 3–5 minute script](docs/phase4c1-demo-readiness.md).
@@ -18,7 +30,7 @@ Use the generated, public [sample PDF](demo_assets/sample-unsigned.pdf), not a p
 document. Prepare an existing trusted folder on fixed local NTFS outside the
 repository for disposable vaults and outputs. A Windows shortcut can launch the
 existing desktop module without PowerShell during the presentation; setup and
-manual acceptance steps are in the report. No EXE packaging is provided.
+manual acceptance steps are in the report. Portable packaging is covered above.
 
 Vault files, known sidecars and `demo-work/` are ignored as an additional guard
 against accidental Git inclusion. This is not secret discovery or a substitute
@@ -133,9 +145,9 @@ py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install pqcrypto==0.3.4 PyNaCl==1.6.2 streamlit==1.66.1 pytest==9.2.0
 ```
 
-PyInstaller is listed for inherited packaging but is unnecessary for the local
-Streamlit workflow. Desktop packaging and the inherited browser watcher are not
-validated by the regression suite; start Streamlit directly as above.
+PyInstaller is unnecessary for the local Streamlit workflow. The portable desktop
+build is separate; the inherited browser watcher is not part of that release.
+Start Streamlit directly as above when using the legacy application.
 
 ## Generate, sign and verify
 
