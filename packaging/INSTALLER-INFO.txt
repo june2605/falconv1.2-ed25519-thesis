@@ -1,0 +1,18 @@
+HybridSign 0.1.0
+Falcon-512 + Ed25519 thesis research prototype
+
+Setup installs HybridSign for the current Windows user. It creates a Start Menu
+shortcut, with an optional Desktop shortcut. Close any running HybridSign windows
+after their signing operations finish before installing or uninstalling.
+
+Requirements: Windows x64, Microsoft Edge WebView2 Evergreen Runtime 111 or later,
+and Microsoft .NET Framework 4.6.2 or later. Obtain missing runtimes from Microsoft.
+Setup does not download or install them. The installer and application are unsigned.
+
+Choose a dedicated application folder. Keep encrypted vaults and PDFs in a
+separate trusted local NTFS folder. Uninstall removes the installed application
+and its shortcuts. It leaves unrelated files and user storage in place.
+
+The application uses a custom signature format. A valid signature pair verifies
+under the selected public keys. Trusted signer identity, trusted timestamps and
+CMS/PAdES/FIPS compliance have not been established.

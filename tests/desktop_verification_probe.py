@@ -3,6 +3,7 @@ import ctypes
 from ctypes import wintypes
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import threading
@@ -97,21 +98,50 @@ def create(*args, **kwargs):
                     value = window.evaluate_js(expression)
                     if value: return value
                     time.sleep(.04)
-                raise AssertionError('Visible native verification condition did not settle')
+                raise AssertionError('Visible native verification condition did not settle: ' + expression)
             def click(label):
                 wait(f"(()=>{{const b=[...document.querySelectorAll('button')].find(x=>x.textContent.trim()==={json.dumps(label)}&&!x.disabled);if(!b)return false;b.click();return true;}})()")
+            pointer_listener = """window.addEventListener('pointermove', event => {
+                window.__nativePointer = [event.clientX, event.clientY];
+            }, {capture: true, passive: true}); void 0"""
             def move_pointer(x, y):
-                # Drive actual WebView2 pointer events in CSS coordinates.
+                # Move the real cursor in the WebView's physical client area.
+                # Wait for the renderer to observe the event before advancing.
                 user = ctypes.windll.user32
                 user.GetClientRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
                 user.ClientToScreen.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.POINT)]
+                user.SetThreadDpiAwarenessContext.argtypes = [ctypes.c_void_p]
+                user.SetThreadDpiAwarenessContext.restype = ctypes.c_void_p
+                user.SetPhysicalCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
+                user.GetForegroundWindow.restype = wintypes.HWND
+                user.SetForegroundWindow.argtypes = [wintypes.HWND]
+                user.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
                 hwnd = int(window.native.Handle.ToInt64())
+                view = provider._on_gui(lambda: int(window.native.webview.Handle.ToInt64()))
                 rect, origin = wintypes.RECT(), wintypes.POINT(0, 0)
-                assert user.GetClientRect(hwnd, ctypes.byref(rect))
-                assert user.ClientToScreen(hwnd, ctypes.byref(origin))
                 viewport = window.evaluate_js('({width:innerWidth,height:innerHeight})')
-                assert user.SetCursorPos(round(origin.x + x * rect.right / viewport['width']),
-                                         round(origin.y + y * rect.bottom / viewport['height']))
+                previous = user.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4))  # Per-monitor aware v2.
+                assert previous, 'Cannot read physical window coordinates'
+                try:
+                    assert user.GetClientRect(view, ctypes.byref(rect))
+                    assert user.ClientToScreen(view, ctypes.byref(origin))
+                finally:
+                    user.SetThreadDpiAwarenessContext(previous)
+                if user.GetForegroundWindow() != hwnd:
+                    user.SetForegroundWindow(hwnd)
+                until = time.monotonic() + 2
+                while user.GetForegroundWindow() != hwnd and time.monotonic() < until:
+                    time.sleep(.02)
+                foreground = user.GetForegroundWindow()
+                process = wintypes.DWORD()
+                user.GetWindowThreadProcessId(foreground, ctypes.byref(process))
+                report['pointer'] = {'cssTarget': [x, y], 'windowForeground': foreground == hwnd,
+                                     'ownedForeground': process.value == os.getpid()}
+                assert foreground == hwnd, 'Owned WebView2 window did not receive foreground'
+                assert user.SetPhysicalCursorPos(round(origin.x + x * rect.right / viewport['width']),
+                                                 round(origin.y + y * rect.bottom / viewport['height']))
+                wait(f"window.__nativePointer && Math.abs(window.__nativePointer[0]-{x})<=2 && "
+                     f"Math.abs(window.__nativePointer[1]-{y})<=2 && document.elementFromPoint({x},{y})?.matches(':hover')")
             def click_pointer(selector):
                 encoded = json.dumps(selector)
                 point = wait(f"(()=>{{const n=document.querySelector({encoded});if(!n||n.disabled)return false;const r=n.getBoundingClientRect();return {{x:r.left+r.width/2,y:r.top+r.height/2}};}})()")
@@ -149,7 +179,6 @@ def create(*args, **kwargs):
                 capture(window, 'sidebar-' + mode + '-expanded.png')
                 escape_panel()
                 move_pointer(600, 170)
-                time.sleep(.25)
                 move_pointer(30, 170)
                 wait("document.querySelector('.smart-sidebar').dataset.expanded==='true'")
                 settled(True)
@@ -167,7 +196,7 @@ def create(*args, **kwargs):
                 settled(False)
                 move_pointer(30, 170)
                 wait("document.querySelector('.smart-sidebar').dataset.expanded==='true'")
-                move_pointer(600, 170); time.sleep(.08)
+                move_pointer(600, 170)
                 move_pointer(30, 170); time.sleep(.3)
                 reentry = window.evaluate_js("document.querySelector('.smart-sidebar').dataset.expanded==='true'")
                 assert reentry
@@ -260,6 +289,7 @@ def create(*args, **kwargs):
                     from System.Drawing import Size
                     from System.Windows.Forms import FormWindowState
                     provider = NativeDialogs(window)
+                    window.evaluate_js(pointer_listener)
                     default_size = provider._on_gui(lambda: (window.native.Width, window.native.Height))
                     report['responsive'] = {}
                     def resize_native(mode):
@@ -276,7 +306,8 @@ def create(*args, **kwargs):
                             # A resized window can move under the parked cursor.
                             # Measure its resting state after an actual leave.
                             move_pointer(600, 170)
-                            time.sleep(.5)
+                            wait("document.querySelector('.smart-sidebar').dataset.resizing==='false' && "
+                                 "document.querySelector('.smart-sidebar').dataset.expanded==='false'")
                         metrics = wait("""(()=>{
                             const main=document.querySelector('main'), content=document.querySelector('.page-container'), footer=document.querySelector('.task-actions-host');
                             const m=main.getBoundingClientRect(), f=footer.getBoundingClientRect(), active=document.activeElement, r=active.getBoundingClientRect();

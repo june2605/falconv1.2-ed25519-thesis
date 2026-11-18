@@ -6,7 +6,7 @@ import sys
 import tempfile
 
 
-def test_real_native_password_and_vault_reopen_across_processes(tmp_path):
+def test_real_native_password_and_vault_reopen_across_processes(tmp_path, interactive_desktop):
     root = Path(__file__).resolve().parent.parent
     path = tmp_path / "native-test.hvault"
     reports = []

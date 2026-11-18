@@ -155,8 +155,8 @@ test('keyboard focus holds the temporary panel and Escape returns hidden-control
 })
 
 test('rapid pointer transitions and resizing do not leave a stale hover panel', async ({ page }) => {
-  await responsiveHost(page); await compact(page)
   await page.clock.install()
+  await responsiveHost(page); await compact(page)
   await page.clock.pauseAt(new Date(Date.now()+60000))
   for(let index=0;index<4;index++) {
     await page.mouse.move(30,180); await page.clock.runFor(60)
@@ -166,7 +166,12 @@ test('rapid pointer transitions and resizing do not leave a stale hover panel', 
   await expect(sidebar(page)).toHaveAttribute('data-expanded','false')
   await page.mouse.move(30,180)
   await page.setViewportSize({width:1177,height:740})
+  // Setting the viewport can return before Chromium dispatches window.resize.
+  // Keep the clock paused until React has handled that event and cleared the
+  // pending hover timer. Advancing sooner races the event we intend to test.
+  await expect(sidebar(page)).toHaveAttribute('data-resizing','true')
   await page.clock.runFor(500)
+  await expect(sidebar(page)).toHaveAttribute('data-resizing','false')
   await expect(sidebar(page)).toHaveAttribute('data-expanded','false')
   expect((await metrics(page)).overflow).toBe(false)
 })

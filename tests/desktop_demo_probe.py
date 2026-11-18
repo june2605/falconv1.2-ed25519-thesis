@@ -7,6 +7,7 @@ password is injected into JavaScript and no private key is exported.
 from collections import deque
 import ctypes
 from ctypes import wintypes
+import faulthandler
 import hashlib
 import json
 import os
@@ -40,9 +41,12 @@ diagnostics_done = threading.Event()
 
 
 def diagnostics():
+    last = None
     while not diagnostics_done.wait(.5):
-        Path('tmp/phase4c1-progress.json').write_text(json.dumps({'mode': mode, 'stage': stage,
-            'completedDialogs': len(report['dialogs']), 'pid': os.getpid()}), encoding='utf-8')
+        if stage != last:
+            print('DEMO_STAGE=' + json.dumps({'mode': mode, 'stage': stage,
+                  'completedDialogs': len(report['dialogs'])}), flush=True)
+            last = stage
 
 
 diagnostic_thread = threading.Thread(target=diagnostics, name='DemoDiagnostics', daemon=True)
@@ -56,6 +60,7 @@ user.GetWindowTextW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
 user.GetClassNameW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
 user.GetDlgItem.argtypes, user.GetDlgItem.restype = [wintypes.HWND, ctypes.c_int], wintypes.HWND
 user.GetFocus.restype = user.GetForegroundWindow.restype = wintypes.HWND
+user.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
 user.IsChild.argtypes = [wintypes.HWND, wintypes.HWND]
 user.IsWindowVisible.argtypes = [wintypes.HWND]
 user.SetForegroundWindow.argtypes = [wintypes.HWND]
@@ -109,6 +114,15 @@ def windows_on_thread():
     return found
 
 
+def dialog_input_state(hwnd):
+    foreground = user.GetForegroundWindow()
+    process = wintypes.DWORD()
+    user.GetWindowThreadProcessId(foreground, ctypes.byref(process))
+    focus = user.GetFocus()
+    return {'dialogForeground': foreground == hwnd, 'ownedForeground': process.value == os.getpid(),
+            'focusedEdit': bool(focus and user.IsChild(hwnd, focus) and 'Edit' in text_of(focus, classname=True))}
+
+
 def labelled_button(parent, label):
     found = []
     def visit(hwnd, _):
@@ -139,28 +153,36 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
     deadline = time.monotonic() + 10
     saw_confirmation = []
     shown_dialog, filename_matched = [], []
+    owner_handle = 0
+    previous_confirmation = 0
     def tick(*_):
+        nonlocal owner_handle, previous_confirmation
         try:
             owned = windows_on_thread()
-            if kind == 'pdf-save':
+            if time.monotonic() > deadline:
+                errors.append({'phase': status[0], 'error': 'native dialog deadline',
+                               **dialog_input_state(owner_handle)})
+                for hwnd, title in owned:
+                    if title in (titles[kind], 'Confirm Save As') or text_of(hwnd, classname=True) == '#32770':
+                        user.PostMessageW(hwnd, 0x10, 0, 0)
+                return
+            if kind == 'pdf-save' and status[0] == 'submitted':
                 for hwnd, _ in owned:
+                    if previous_confirmation == hwnd:
+                        continue
                     yes, no = labelled_button(hwnd, 'Yes'), labelled_button(hwnd, 'No')
                     if yes and no and user.IsWindowVisible(yes) and user.IsWindowVisible(no):
                         if 'Yes' not in text_of(yes) or 'No' not in text_of(no):
                             continue
                         saw_confirmation.append(bool(approval))
-                        user.PostMessageW(yes if approval else no, 0xF5, 0, 0)
+                        previous_confirmation = hwnd
+                        assert user.PostMessageW(yes if approval else no, 0xF5, 0, 0)
                         status[0] = 'submitted' if approval else 'rejected-overwrite'
                         return
-            if time.monotonic() > deadline:
-                errors.append('native dialog deadline')
-                for hwnd, title in owned:
-                    if title in (titles[kind], 'Confirm Save As') or text_of(hwnd, classname=True) == '#32770':
-                        user.PostMessageW(hwnd, 0x10, 0, 0)
-                return
             for hwnd, title in owned:
                 if title != titles[kind]:
                     continue
+                owner_handle = hwnd
                 if kind == 'notice':
                     button = labelled_button(hwnd, 'OK') or user.GetDlgItem(hwnd, 1)
                     if button:
@@ -172,15 +194,17 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
                     return
                 if status[0] not in ('waiting', 'focused', 'typing'):
                     return
-                user.SetForegroundWindow(hwnd)
-                assert user.GetForegroundWindow() == hwnd
+                if user.GetForegroundWindow() != hwnd:
+                    user.SetForegroundWindow(hwnd)
+                    return  # Wait for Windows to activate the intended modal before typing.
                 if status[0] == 'waiting':
                     chord(0x12, ord('N'))  # Native Alt+N; do not block the modal GUI thread.
                     status[0] = 'focused'
                     return
                 focus = user.GetFocus()
                 report['fileEditClass'] = text_of(focus, classname=True)
-                assert focus and user.IsChild(hwnd, focus) and 'Edit' in report['fileEditClass']
+                if not (focus and user.IsChild(hwnd, focus) and 'Edit' in report['fileEditClass']):
+                    return  # Alt+N posts input. Its focus change can arrive on a later tick.
                 if status[0] == 'focused':
                     chord(0x11, ord('A'))
                     units = str(destination).encode('utf-16-le')
@@ -197,14 +221,12 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
                 shown_dialog.append(provider._active)
                 status[0] = 'submitted'
                 submit = user.GetDlgItem(hwnd, 1)
-                assert submit
-                rect = wintypes.RECT()
-                assert user.GetWindowRect(submit, ctypes.byref(rect))
-                assert user.SetCursorPos((rect.left + rect.right) // 2, (rect.top + rect.bottom) // 2)
-                user.mouse_event(2, 0, 0, 0, 0); user.mouse_event(4, 0, 0, 0, 0)
+                assert submit and user.IsChild(hwnd, submit)
+                assert user.PostMessageW(submit, 0xF5, 0, 0)  # Activate the actual native button once.
                 return
-        except Exception:
-            errors.append('native control interaction')
+        except Exception as error:
+            errors.append({'phase': status[0], 'error': type(error).__name__,
+                           **dialog_input_state(owner_handle)})
             for hwnd, title in windows_on_thread():
                 if title in (titles[kind], 'Confirm Save As'):
                     user.PostMessageW(hwnd, 0x10, 0, 0)
@@ -219,7 +241,8 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
                               'matchedRequested': result is not None and kind != 'notice' and Path(accepted_path) == destination,
                               'selectedName': Path(accepted_path).name if result is not None and kind != 'notice' else None,
                               'finalName': Path(str(shown_dialog[-1].FileName)).name if shown_dialog else None,
-                              'filenameControlMatched': all(filename_matched),
+                              'filenameControlMatched': bool(filename_matched) and all(filename_matched),
+                              'automationErrors': errors,
                               'overwrite': saw_confirmation[-1] if saw_confirmation else None})
     assert not errors, 'Native dialog automation failed: ' + kind
     if kind == 'notice':
@@ -228,7 +251,7 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
         assert result is None
     else:
         accepted = result.path if kind == 'pdf-save' else result
-        assert Path(accepted) == destination
+        assert accepted is not None and Path(accepted) == destination
         report['nativeDialogsAccepted'] = True
     return result
 
@@ -365,6 +388,12 @@ def create(*args, **kwargs):
                 while len(report['dialogs']) == completed_before and time.monotonic() < deadline:
                     time.sleep(.025)
                 assert len(report['dialogs']) > completed_before, 'Native picker did not complete'
+                result = report['dialogs'][completed_before]
+                assert not result['automationErrors'], f'Native picker automation failed: {result}'
+                if path is not None and approval:
+                    assert result['accepted'] and result['matchedRequested'] and result['filenameControlMatched'], result
+                else:
+                    assert not result['accepted'], result
                 wait("!![...document.querySelectorAll('button')].find(n=>(n.getAttribute('aria-label')||n.textContent.trim())===" + json.dumps(label) + "&&!n.disabled)"
                      + ("||document.querySelector('.vault-status-line')?.textContent.includes('Unlocked')" if label == 'Unlock Vault' else ''))
                 # Returning focus from a modal also refreshes native vault state.
@@ -556,9 +585,11 @@ def create(*args, **kwargs):
 
 
 webview.create_window = create
+faulthandler.dump_traceback_later(135)
 try:
     exit_code = launcher.main()
 finally:
+    faulthandler.cancel_dump_traceback_later()
     diagnostics_done.set(); diagnostic_thread.join(2)
 assert not diagnostic_thread.is_alive()
 report['ownedThreadsStopped'] = not any(thread.name.startswith('HybridSign-') for thread in threading.enumerate())

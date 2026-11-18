@@ -8,6 +8,8 @@ import subprocess
 import sys
 import tempfile
 
+import pytest
+
 from keygen import generate_hybrid_key_pair
 from vault import create_vault
 from vault_io import lock_file_path
@@ -38,10 +40,14 @@ def test_public_demo_pdf_has_reproducible_ascii_content_and_correct_xref():
 
 def _run(control):
     with tempfile.TemporaryFile() as output:
-        completed = subprocess.run([sys.executable, '-B', '-c',
-            "import runpy; runpy.run_path('tests/desktop_demo_probe.py', run_name='__main__')"],
-            input=json.dumps(control).encode(), stdout=output, stderr=output,
-            cwd=ROOT, timeout=150)
+        try:
+            completed = subprocess.run([sys.executable, '-B', '-c',
+                "import runpy; runpy.run_path('tests/desktop_demo_probe.py', run_name='__main__')"],
+                input=json.dumps(control).encode(), stdout=output, stderr=output,
+                cwd=ROOT, timeout=150)
+        except subprocess.TimeoutExpired as error:
+            output.seek(0)
+            pytest.fail(f'{error}\n{output.read().decode("utf-8", errors="replace")}', pytrace=False)
         output.seek(0)
         captured = output.read().decode('utf-8', errors='replace')
     assert completed.returncode == 0, captured
@@ -52,7 +58,7 @@ def _run(control):
     return report
 
 
-def test_real_desktop_create_sign_verify_tamper_lock_and_restart(tmp_path):
+def test_real_desktop_create_sign_verify_tamper_lock_and_restart(tmp_path, interactive_desktop):
     source, output, tampered, corrupted = (tmp_path / name for name in ('sample-unsigned.pdf', 'signed.pdf', 'tampered.pdf', 'corrupted.pdf'))
     vault, wrong, invalid = (tmp_path / name for name in ('demo.hvault', 'other.hvault', 'invalid.hvault'))
     source.write_bytes(SAMPLE.read_bytes())

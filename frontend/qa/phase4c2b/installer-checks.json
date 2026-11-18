@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "setupSha256": "7e1dc008c8238a8df93ca8c5cbc75db11a5b8fe77b09ed708ab0daf7ab89d8ae",
+  "checks": {
+    "freshInstallCode": 0,
+    "installTokenElevated": false,
+    "installedPayloadHashesMatched": 138,
+    "busySetupRefusalCode": 7,
+    "busyUninstallRefusalCode": 1,
+    "desktopShortcutLaunch": true,
+    "changedManagedFilePreservedOnRefusal": true,
+    "inPlaceSameVersionCode": 0,
+    "firstUninstallCode": 0,
+    "outsideUserFilesPreserved": 6,
+    "unknownFilesInsidePreserved": 2,
+    "occupiedDirectoryRefused": true,
+    "reinstallSameVaultAndId": true,
+    "optionalDesktopUnchecked": true,
+    "finalUninstallCode": 0
+  },
+  "installedGui": {
+    "passed": true,
+    "driver": "external Windows UI Automation",
+    "noBundledTestHooks": true,
+    "noRemoteDebugging": true,
+    "checks": [
+      "locked-on-startup",
+      "sidebar-auto-and-navigation:default",
+      "sidebar-manual-and-auto-toggle",
+      "sidebar-auto-and-navigation:maximized",
+      "sidebar-auto-and-navigation:restored",
+      "sidebar-auto-and-navigation:minimum",
+      "five-packaged-screens-dark-and-light",
+      "application-folder-output-rejected:.hvault",
+      "copied-exact-public-hybrid-id",
+      "duplicate-sign-action-during-save-disabled",
+      "application-folder-output-rejected:.pdf",
+      "busy-close-refused-during-signing-save",
+      "original-vault-generated-by-exe",
+      "real-signing-self-verified",
+      "saved-pdf-valid",
+      "modified-copy-invalid",
+      "locked-public-verification",
+      "password-free-public-metadata-verification",
+      "wrong-keys-invalid",
+      "clean-exe-exit",
+      "locked-on-startup-through-start-menu",
+      "original-id-survives-exe-restart",
+      "sign-and-verify-after-restart",
+      "loaded-python-and-crypto-from-copied-folder",
+      "clean-exe-exit",
+      "locked-on-startup-through-desktop-shortcut",
+      "clean-exe-exit",
+      "locked-on-startup-through-start-menu",
+      "clean-exe-exit"
+    ],
+    "windowStates": {
+      "default": {
+        "physicalWidth": 1600.0,
+        "physicalHeight": 1000.0
+      },
+      "maximized": {
+        "physicalWidth": 1938.0,
+        "physicalHeight": 1038.0
+      },
+      "restored": {
+        "physicalWidth": 1600.0,
+        "physicalHeight": 1000.0
+      },
+      "minimum": {
+        "physicalWidth": 1200.0,
+        "physicalHeight": 750.0
+      }
+    },
+    "pids": [
+      15536,
+      21464,
+      2492,
+      3232
+    ],
+    "nativePasswordControlsMasked": true,
+    "hybridKeyId": "hybrid-v1:891c7080aa196d79b00d535e893c824803aa3a64a1b144807a83410c8264d5d9",
+    "sourceSha256": "2d94ba434bbbfda3ffcd78731f2e94146352e5dc7680dcd566d2ca0614a20639",
+    "signedBytes": 5368,
+    "vaultBytes": 2416,
+    "loadedNativeComponents": {
+      "python311.dll": [
+        "_internal/python311.dll"
+      ],
+      "falcon_512": [
+        "_internal/pqcrypto/_sign/falcon_512.cp311-win_amd64.pyd"
+      ],
+      "_sodium": [
+        "_internal/nacl/_sodium.pyd"
+      ],
+      "_rust": [
+        "_internal/cryptography/hazmat/bindings/_rust.pyd"
+      ]
+    }
+  }
+}

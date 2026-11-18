@@ -11,6 +11,17 @@ not contain the hardening in this source tree.
 
 ## Local Windows setup
 
+### Phase 4C.2B Windows installer
+
+Run `HybridSign-Setup-Phase4C2B-win-x64.exe` for a per-user installation.
+Open **HybridSign** from the Start Menu. Use **Settings → Apps → Installed apps**
+to uninstall after closing the application. Keep vaults and PDFs in a separate
+trusted local NTFS folder. Setup requires WebView2 Evergreen 111+ and .NET
+Framework 4.6.2+. The release is unsigned.
+
+See the [installer release report](docs/phase4c2b-installer-release.md) for the
+approved payload, build command, checksums, and tested Windows configuration.
+
 ### Phase 4C.2A portable Windows desktop
 
 The local one-folder release launches by double-clicking **HybridSign.exe**.

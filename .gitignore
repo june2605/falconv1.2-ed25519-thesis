@@ -6,6 +6,7 @@ __pycache__/
 !packaging/HybridSign.spec
 *.key
 *.iss
+!packaging/HybridSign.iss
 # Python environment
 .venv/
 venv/

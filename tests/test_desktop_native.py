@@ -6,7 +6,7 @@ import sys
 import tempfile
 
 
-def test_native_windows_shell_bridge_navigation_and_shutdown():
+def test_native_windows_shell_bridge_navigation_and_shutdown(interactive_desktop):
     root = Path(__file__).resolve().parent.parent
     # WebView2 subprocesses can inherit standard handles. File-backed output
     # avoids waiting for pipe EOF from descendants after the GUI owner exits.

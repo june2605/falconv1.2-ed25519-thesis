@@ -1,0 +1,154 @@
+{
+  "files": [
+    {
+      "file": "artifact-checks.json",
+      "bytes": 562,
+      "sha256": "58f7115ca15f0bdcd9af37b8e1407c95a4f2150d746e01b2c7e1b579d97cdf4d"
+    },
+    {
+      "file": "benchmark-checks.json",
+      "bytes": 57,
+      "sha256": "2addb63f5d1c8395ecf61d14173b28e2a10407072ca5bc17ebd6e9dbb4928d1f"
+    },
+    {
+      "file": "installed-desktop-shortcut-launch.png",
+      "bytes": 162464,
+      "sha256": "c6d9ef02b75106532107599cc17d3a81a567652eccca4f9e9aeb69af170a35f5"
+    },
+    {
+      "file": "installer-checks.json",
+      "bytes": 3199,
+      "sha256": "34a70249406864df6626961bb718cab9f7230a2d4750fba4179c6607b40a2708"
+    },
+    {
+      "file": "packaged-dark-dashboard.png",
+      "bytes": 162028,
+      "sha256": "5b1b223373790b27d3d06cee781fafa8eec7768b9e6c9ce07963b0bf164f56a3"
+    },
+    {
+      "file": "packaged-dark-key-vault.png",
+      "bytes": 130109,
+      "sha256": "2f221e953f35da36e986481466120521eaa3b48c1b6cb6947af0ede1e62f8fa3"
+    },
+    {
+      "file": "packaged-dark-settings.png",
+      "bytes": 108653,
+      "sha256": "b042bddb7f1acb2fb860e91e315358b606e9310a1796c5d69664138473f684de"
+    },
+    {
+      "file": "packaged-dark-sign-document.png",
+      "bytes": 116151,
+      "sha256": "098300f303a6c614cfaf6250ea9ccc7cc9bd075714afadb7ff1698a5812da90d"
+    },
+    {
+      "file": "packaged-dark-verify-signature.png",
+      "bytes": 170588,
+      "sha256": "ef476969cec39e5d9236a12e8902829d1bae34b93a76db77b00c788f01191796"
+    },
+    {
+      "file": "packaged-dashboard.png",
+      "bytes": 162464,
+      "sha256": "c6d9ef02b75106532107599cc17d3a81a567652eccca4f9e9aeb69af170a35f5"
+    },
+    {
+      "file": "packaged-reopened-valid.png",
+      "bytes": 176957,
+      "sha256": "d41f1139d32f70d8b83647d728531802c99853abdaa0352158d1cef6a9b4ace6"
+    },
+    {
+      "file": "packaged-restart-locked.png",
+      "bytes": 165672,
+      "sha256": "d93c7bcac0ddaa2c0245fb8aa780239be81f590c5a9716a13af76806f55ac004"
+    },
+    {
+      "file": "packaged-sidebar-default.png",
+      "bytes": 195922,
+      "sha256": "edec187f823e8efe389aeffa48bc169546b780cbfdcfda2df547a7c48c86a887"
+    },
+    {
+      "file": "packaged-sidebar-maximized.png",
+      "bytes": 192291,
+      "sha256": "e2149edcfe843aebf5ca2e21eff0e94b5c3ed5242c023cfc4b2188934cc59e21"
+    },
+    {
+      "file": "packaged-sidebar-minimum.png",
+      "bytes": 121607,
+      "sha256": "bf0d5714b83ec93ca49c1724135f904768e946566edaa01804bb0e944645c7fd"
+    },
+    {
+      "file": "packaged-sidebar-restored.png",
+      "bytes": 195227,
+      "sha256": "6751360751c6a45f200c848fa7fdd32d1eef51d85041a954159e72edb6937867"
+    },
+    {
+      "file": "packaged-signed.png",
+      "bytes": 128887,
+      "sha256": "81176f1f3146025bd07d6c06d4a95bad5ee7fe9475555fa2ad6ebec09142bf69"
+    },
+    {
+      "file": "packaged-tampered.png",
+      "bytes": 179051,
+      "sha256": "f3a69c48a1a15b8f93d280ec42ba8a25e3af83e4e398d3d923206b06e779682b"
+    },
+    {
+      "file": "packaged-unlocked.png",
+      "bytes": 174540,
+      "sha256": "a66915c417d7b99e1ca9afcf42dcef3b10f32bcee0a375acaf3c9537bbb22fc5"
+    },
+    {
+      "file": "packaged-valid.png",
+      "bytes": 173975,
+      "sha256": "b0bbebaa9c9006d4547aec7b7403a324b4bdab86357e920b8c923ba7405ef0ea"
+    },
+    {
+      "file": "packaged-wrong-keys.png",
+      "bytes": 178449,
+      "sha256": "a1e2b8a77b07ecd8315bc4278a3fef1504b268036a848b8117d763d7f5de751e"
+    },
+    {
+      "file": "regression-results.json",
+      "bytes": 1029,
+      "sha256": "dfb8ec6d7d3c21d497cc9b72b62adc4ed39faf0ea4783399f304bdaa2180d954"
+    },
+    {
+      "file": "reinstalled-original-signature-valid.png",
+      "bytes": 173975,
+      "sha256": "b0bbebaa9c9006d4547aec7b7403a324b4bdab86357e920b8c923ba7405ef0ea"
+    },
+    {
+      "file": "reinstalled-original-vault.png",
+      "bytes": 174560,
+      "sha256": "f0c91268d0fa52f291545f7bfb42c72431e9879977de48614e04ccd306c88e2e"
+    },
+    {
+      "file": "setup-complete.png",
+      "bytes": 37330,
+      "sha256": "a6f6130461d300926748d5343e85156da43aa718e12290c4f0f2187370f011d8"
+    },
+    {
+      "file": "setup-information.png",
+      "bytes": 42242,
+      "sha256": "346a94decaae0de9fa50645e95d1284cc9ea83c253dc5da7163794faad221677"
+    },
+    {
+      "file": "setup-optional-desktop.png",
+      "bytes": 21252,
+      "sha256": "e84d6a6095e5522c19084a889b71ac32c4d650351f9a1017212087a15a0f6b97"
+    },
+    {
+      "file": "windows-installed-apps-checks.json",
+      "bytes": 202,
+      "sha256": "3ade5d1ac2ebb6d185ca88db7fc83207ff05a358a546ef0f9c6b74847e929e26"
+    },
+    {
+      "file": "windows-uninstall-complete.png",
+      "bytes": 7365,
+      "sha256": "2f722c75d0171b940f3d1d7e71005c25e150242a4e26c2161b5cd968877a91eb"
+    },
+    {
+      "file": "windows-uninstall-confirmation.png",
+      "bytes": 8335,
+      "sha256": "e94b53bb0d5951c85c367640b1c30b5e83fd4adf2844ef889850679b60f54aeb"
+    }
+  ]
+}

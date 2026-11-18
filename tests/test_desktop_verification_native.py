@@ -11,7 +11,7 @@ from vault import create_vault, unlock_vault
 from vault_signing import sign_vault_document
 
 
-def test_real_windows_valid_tampered_wrong_keys_cancel_and_locked_verification(tmp_path):
+def test_real_windows_valid_tampered_wrong_keys_cancel_and_locked_verification(tmp_path, interactive_desktop):
     vault, wrong = tmp_path / 'native.hvault', tmp_path / 'wrong.hvault'
     source, signed, tampered = (tmp_path / name for name in ('source.pdf', 'signed.pdf', 'tampered.pdf'))
     source.write_bytes(make_pdf('Actual native verification'))

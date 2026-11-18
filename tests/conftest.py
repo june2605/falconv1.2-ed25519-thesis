@@ -9,6 +9,36 @@ from keygen import generate_keys
 from sign import sign_file
 
 
+@pytest.fixture
+def interactive_desktop():
+    """Serialize native input across pytest processes in this Windows session."""
+    import ctypes
+    from ctypes import wintypes
+
+    kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+    kernel.CreateMutexW.argtypes = [ctypes.c_void_p, wintypes.BOOL, wintypes.LPCWSTR]
+    kernel.CreateMutexW.restype = wintypes.HANDLE
+    kernel.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel.WaitForSingleObject.restype = wintypes.DWORD
+    kernel.ReleaseMutex.argtypes = kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    handle = kernel.CreateMutexW(None, False, r'Local\HybridSignRegressionDesktop')
+    if not handle:
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        # The longest owning test runs two subprocesses with 150-second limits.
+        result = kernel.WaitForSingleObject(handle, 310_000)
+        if result not in (0, 0x80):
+            pytest.fail(f'Could not acquire the interactive desktop for native QA (wait result {result}).')
+        try:
+            if result == 0x80:
+                pytest.fail('A native QA owner exited unexpectedly. Check for an orphan test window.')
+            yield
+        finally:
+            assert kernel.ReleaseMutex(handle)
+    finally:
+        kernel.CloseHandle(handle)
+
+
 @dataclass(frozen=True)
 class HybridKeys:
     pk_ed: Path

@@ -1,0 +1,49 @@
+{
+  "fullPython": {
+    "passed": 1664,
+    "failed": 2,
+    "skipped": 8,
+    "xfailed": 0,
+    "xpassed": 0,
+    "seconds": 216.79
+  },
+  "initialFullPython": {
+    "passed": 1665,
+    "failed": 1,
+    "skipped": 8,
+    "seconds": 358.89
+  },
+  "initialIsolatedDemo": {
+    "passed": 1,
+    "failed": 1,
+    "skipped": 0,
+    "seconds": 20.96
+  },
+  "finalIsolatedNative": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 61.92
+  },
+  "fullPlaywright": {
+    "passed": 265,
+    "failed": 1,
+    "skipped": 0,
+    "minutes": 4.1
+  },
+  "isolatedPlaywrightSidebar": {
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 6.0
+  },
+  "typecheckExitCode": 0,
+  "productionBuildExitCode": 0,
+  "approvedCompiledAssetsMatched": 12,
+  "installerBuildExitCode": 0,
+  "installedWorkflowPassed": true,
+  "windowsSettingsUninstallPassed": true,
+  "portableHashesMatched": 138,
+  "benchmarkHashesMatched": 15,
+  "manualAndCleanMachineScenariosNotRun": 11
+}

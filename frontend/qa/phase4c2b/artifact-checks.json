@@ -1,0 +1,21 @@
+{
+  "installer": {
+    "machine": "0x14c",
+    "guiSubsystem": true,
+    "asInvoker": true,
+    "signed": false,
+    "bytes": 13483887,
+    "sha256": "7e1dc008c8238a8df93ca8c5cbc75db11a5b8fe77b09ed708ab0daf7ab89d8ae"
+  },
+  "app": {
+    "machine": "0x8664",
+    "guiSubsystem": true,
+    "asInvoker": true,
+    "signed": false,
+    "bytes": 4267288,
+    "sha256": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc"
+  },
+  "approvedPayloadFiles": 138,
+  "noticesMatchApproved": true,
+  "installerMetadataVersion": "0.1.0.0"
+}

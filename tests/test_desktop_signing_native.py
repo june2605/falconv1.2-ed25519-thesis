@@ -8,7 +8,7 @@ import tempfile
 from conftest import make_pdf
 
 
-def test_real_windows_signing_and_reopened_original_vault(tmp_path):
+def test_real_windows_signing_and_reopened_original_vault(tmp_path, interactive_desktop):
     root = Path(__file__).resolve().parent.parent
     source, vault = tmp_path / 'unsigned.pdf', tmp_path / 'desktop.hvault'
     source.write_bytes(make_pdf('Disposable desktop signing evidence'))
