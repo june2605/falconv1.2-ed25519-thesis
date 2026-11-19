@@ -352,6 +352,8 @@ original_create = webview.create_window
 
 
 def create(*args, **kwargs):
+    # Set TopMost during WinForms construction on the owning GUI thread.
+    kwargs['on_top'] = True
     window = original_create(*args, **kwargs)
     def shown():
         from System.Threading import Thread
@@ -420,7 +422,6 @@ def create(*args, **kwargs):
                 assert reply['ok'] and reply['data']['hybridValid'] is (expected == 'VALID')
 
             wait("document.querySelector('.preview-indicator')?.textContent==='Desktop Connected'")
-            window.on_top = True
             initial = api('get_vault_state')
             assert initial['ok'] and initial['data']['vault'] is None
             assert not window.evaluate_js("!!document.querySelector('input[type=password],input[type=file]')")
