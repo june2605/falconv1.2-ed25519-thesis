@@ -1,0 +1,190 @@
+name: Phase 5.5C main research
+run-name: Phase 5.5C main / ${{ inputs.measurement_source }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      approved:
+        description: "Run the approved nine-job main campaign"
+        type: boolean
+        required: true
+        default: false
+      measurement_source:
+        description: "Frozen measurement commit accepted by pilot and C8"
+        type: string
+        required: true
+        default: 613a46d06930ffd9224afa557fa90992e3a56a2a
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: hybridsign-phase55a-research
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: pwsh
+
+env:
+  P55_PILOT: "44701642390"
+  P55_ATTEMPT: "1"
+  P55_SOURCE: 613a46d06930ffd9224afa557fa90992e3a56a2a
+
+jobs:
+  main:
+    if: inputs.approved && github.ref == 'refs/heads/main' && github.repository == 'june2605/falconv1.2-ed25519-thesis'
+    name: ${{ matrix.environment }}-s${{ matrix.slot }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 25
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        include:
+          - {environment: CI-WIN, runner: windows-2022, slot: 1}
+          - {environment: CI-WIN, runner: windows-2022, slot: 2}
+          - {environment: CI-WIN, runner: windows-2022, slot: 3}
+          - {environment: CI-LINUX, runner: ubuntu-24.04, slot: 1}
+          - {environment: CI-LINUX, runner: ubuntu-24.04, slot: 2}
+          - {environment: CI-LINUX, runner: ubuntu-24.04, slot: 3}
+          - {environment: CI-MAC, runner: macos-15-intel, slot: 1}
+          - {environment: CI-MAC, runner: macos-15-intel, slot: 2}
+          - {environment: CI-MAC, runner: macos-15-intel, slot: 3}
+    env:
+      P55_ENV: ${{ matrix.environment }}
+      P55_SLOT: ${{ matrix.slot }}
+    steps:
+      - name: Initialize unique main evidence directory
+        env:
+          REQUESTED_SOURCE: ${{ inputs.measurement_source }}
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP "p55c-$env:P55_ENV-s$env:P55_SLOT"
+          $evidence = Join-Path $root 'evidence'
+          $stamps = Join-Path $root 'stamps'
+          New-Item -ItemType Directory $root, $evidence, $stamps | Out-Null
+          "P55C_ROOT=$root" >> $env:GITHUB_ENV
+          "P55C_EVIDENCE=$evidence" >> $env:GITHUB_ENV
+          @{utc=[DateTimeOffset]::UtcNow.ToString('o')} | ConvertTo-Json -Compress |
+            Set-Content -LiteralPath (Join-Path $stamps 'job_start.json') -Encoding utf8
+          if ($env:REQUESTED_SOURCE -cne $env:P55_SOURCE -or $env:RUNNER_ARCH -cne 'X64') {
+            throw 'The main campaign requires the approved SHA and x64 runners.'
+          }
+      - name: Check out the registered orchestration revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: orchestration
+          persist-credentials: false
+      - name: Check out the frozen measurement revision
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: 613a46d06930ffd9224afa557fa90992e3a56a2a
+          path: measurement
+          persist-credentials: false
+      - name: Record both exact revisions and the job identity
+        run: |
+          $orchestration = git -C orchestration rev-parse HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $measurement = git -C measurement rev-parse HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($orchestration -cne $env:GITHUB_WORKFLOW_SHA -or $measurement -cne $env:P55_SOURCE) {
+            throw 'Unexpected execution checkout.'
+          }
+          @{
+            workflow_sha=$env:GITHUB_WORKFLOW_SHA; workflow_ref=$env:GITHUB_WORKFLOW_REF
+            orchestration_sha=$orchestration; source_sha=$measurement; environment=$env:P55_ENV
+            slot=[int]$env:P55_SLOT; run_id=$env:GITHUB_RUN_ID; attempt=$env:GITHUB_RUN_ATTEMPT
+            runner_os=$env:RUNNER_OS; runner_arch=$env:RUNNER_ARCH
+            image_os=$env:ImageOS; image_version=$env:ImageVersion
+          } | ConvertTo-Json -Compress | Set-Content -LiteralPath (Join-Path $env:P55C_EVIDENCE 'workflow.json') -Encoding utf8
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.11.9"
+          architecture: x64
+      - name: Validate accepted pilot and C8 evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -B orchestration/research/orchestration/phase55c.py --environment $env:P55_ENV --slot $env:P55_SLOT --checkout measurement --destination (Join-Path $env:P55C_ROOT 'pilot-session') --evidence (Join-Path $env:P55C_EVIDENCE 'acceptance.json')
+          exit $LASTEXITCODE
+      - name: Install exact profile wheels in a fresh venv
+        working-directory: measurement
+        run: |
+          $stamps = Join-Path $env:P55C_ROOT 'stamps'
+          python -B -m research.benchmarks.p55.ci stamp --directory $stamps --stage setup_end
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $venv = Join-Path $env:P55C_ROOT 'venv'
+          $wheels = Join-Path $env:P55C_ROOT 'wheels'
+          python -B -m venv $venv
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $exe = if ($IsWindows) {'Scripts/python.exe'} else {'bin/python'}
+          $p55 = Join-Path $venv $exe
+          "P55_PYTHON=$p55" >> $env:GITHUB_ENV
+          "P55_WHEELS=$wheels" >> $env:GITHUB_ENV
+          & $p55 -B -m research.benchmarks.p55 install-wheels --wheelhouse $wheels
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $p55 -B -m research.benchmarks.p55.ci stamp --directory $stamps --stage install_end
+          exit $LASTEXITCODE
+      - name: Check the local pilot inventory and derive the slot seed
+        working-directory: measurement
+        run: |
+          & $env:P55_PYTHON -B -m research.benchmarks.p55 check-inventory --campaign (Join-Path $env:P55C_ROOT 'pilot-session')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $seed = & $env:P55_PYTHON -B -m research.benchmarks.p55.ci seed --environment $env:P55_ENV --slot $env:P55_SLOT
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "P55C_SEED=$seed" >> $env:GITHUB_ENV
+          & $env:P55_PYTHON -B -m research.benchmarks.p55.ci stamp --directory (Join-Path $env:P55C_ROOT 'stamps') --stage test_end
+          exit $LASTEXITCODE
+      - name: Run one frozen main measurement session with built-in smoke
+        working-directory: measurement
+        run: |
+          $pilot = Join-Path $env:P55C_ROOT 'pilot-session'
+          $session = Join-Path $env:P55C_EVIDENCE 'session'
+          & $env:P55_PYTHON -B -m research.benchmarks.p55 run --mode main --seed $env:P55C_SEED --environment $env:P55_ENV --wheelhouse $env:P55_WHEELS --accepted-pilot $pilot --output $session
+          $measureExit = $LASTEXITCODE
+          & $env:P55_PYTHON -B -m research.benchmarks.p55.ci stamp --directory (Join-Path $env:P55C_ROOT 'stamps') --stage benchmark_end
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          exit $measureExit
+      - name: Verify and summarize available measurement evidence
+        if: always() && env.P55_PYTHON != ''
+        working-directory: measurement
+        run: |
+          $session = Join-Path $env:P55C_EVIDENCE 'session'
+          if (Test-Path -LiteralPath (Join-Path $session 'checksums.sha256')) {
+            & $env:P55_PYTHON -B -m research.benchmarks.p55 check-inventory --campaign $session
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            & $env:P55_PYTHON -B -m research.benchmarks.p55 summarize --campaign $session --output (Join-Path $env:P55C_EVIDENCE 'summary.json')
+            exit $LASTEXITCODE
+          }
+          Write-Output 'Session inventory unavailable. Preserve partial evidence and job log.'
+      - name: Record job stage durations
+        if: always() && env.P55_PYTHON != ''
+        working-directory: measurement
+        run: |
+          $stamps = Join-Path $env:P55C_ROOT 'stamps'
+          & $env:P55_PYTHON -B -m research.benchmarks.p55.ci stamp --directory $stamps --stage job_local_end
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $env:P55_PYTHON -B -m research.benchmarks.p55.ci job-times --directory $stamps --output (Join-Path $env:P55C_EVIDENCE 'job-timings.json')
+          exit $LASTEXITCODE
+      - name: Preserve allowlisted main evidence
+        if: always() && env.P55C_EVIDENCE != ''
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: p55c-${{ env.P55_SOURCE }}-${{ github.run_id }}-a${{ github.run_attempt }}-${{ matrix.environment }}-s${{ matrix.slot }}
+          path: |
+            ${{ env.P55C_EVIDENCE }}/workflow.json
+            ${{ env.P55C_EVIDENCE }}/acceptance.json
+            ${{ env.P55C_EVIDENCE }}/job-timings.json
+            ${{ env.P55C_EVIDENCE }}/summary.json
+            ${{ env.P55C_EVIDENCE }}/session/session.json
+            ${{ env.P55C_EVIDENCE }}/session/schedule.json
+            ${{ env.P55C_EVIDENCE }}/session/outcome.json
+            ${{ env.P55C_EVIDENCE }}/session/raw.csv
+            ${{ env.P55C_EVIDENCE }}/session/controls.jsonl
+            ${{ env.P55C_EVIDENCE }}/session/progress.jsonl
+            ${{ env.P55C_EVIDENCE }}/session/smoke.json
+            ${{ env.P55C_EVIDENCE }}/session/checksums.sha256
+          retention-days: 30
+          if-no-files-found: warn
