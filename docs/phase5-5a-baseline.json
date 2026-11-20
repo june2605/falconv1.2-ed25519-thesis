@@ -1,0 +1,1013 @@
+{
+  "utc": "2026-11-20T07:18:00.775511+00:00",
+  "branch": "thesis/ui-demo",
+  "commit": "6cb9b903caa6ef93728b8133449e2d9f513881e7",
+  "worktree": [],
+  "staged": [],
+  "source_sha256": {
+    "AGENTS.md": "155f35b75a42078d679ba3edda6c943a5e8f5126a40523dc146aa35e2072552e",
+    "app.py": "7733dd7afe188b1c73bf4cc3b26dfa96b4e850c37e4b03fd4dd050ed75fcd202",
+    "demo.py": "817833c80b94a6636f821c9ac4967095fb0790c74c17c2dcdb2143df650d5861",
+    "desktop/pdf_io.py": "8a907e5252187db31c628ce41c69d2989f37d2a318f8852780e69c33ec39b377",
+    "hybrid_keys.py": "39ca25937d5a222cbd80ce6e07a6349509ae340b09837729bc68990ecb202085",
+    "keygen.py": "6d81b5e2db80e4d6cd0306f45b45bb0c04ffc14782d9378a700049038dc9d76a",
+    "sign.py": "619347b6876e7d2225f35f0d0ae9cfc6597fc8fd9d4376e6f1a7e535b2adc93f",
+    "signing_io.py": "14308c0da557255e9d1c1736481d7a19b56b13a3a27ac6ee1b836834f6fa23fb",
+    "utils.py": "05468edeb0cca52c7aa27486935297d3102e55a365090889e64b3754c6cd94e1",
+    "vault.py": "05c33738572356524e5830de772ede268af0f7d06675960b54527d950b9f27ed",
+    "vault_crypto.py": "10c0133525d4087322215dee184bbd841300e90badc8ad091398e503c3e893ab",
+    "vault_format.py": "f3b85fb95d3f5dc4edfee89b28e5e7441ffa3d3e3244122eacd09d2308a011f1",
+    "vault_io.py": "124256ce13c8d54544629e6f151695c84ff21c721154a4923d847596160eea2a",
+    "vault_signing.py": "fb2ea9d6ba323f0e82fcaed553a173f582182e047aaca4fa392f8f1db6f14bf1",
+    "verify.py": "1339b3c584b1de222b45daa280669df624d20c6dbb880f4c84271d2a9c7a9869",
+    "research/benchmarks/phase5_2a.py": "29a697ca3d4063773e3be9856a9a3e70fba7d4671e37c89613d0fc775a579410",
+    "research/benchmarks/phase5_2a_charts.ps1": "c16f1c4b70003cededb9fd29815f8603bc3c19c002642c2878d87c76d9d83bcd",
+    "research/benchmarks/phase5_2b_analysis.py": "6d961eaa38eb8865ff322d772314bdb34122549cdfe0091e374d3dcf1bd1b50b",
+    "research/benchmarks/phase5_2b_charts.ps1": "effb1839fd2eece882ca8671071fe0cb23243a157669621d1f16ffb7ca5177a9",
+    "research/benchmarks/phase5_2b_collect.py": "63adc7086f6282118cffe921670f824020055d3d5608b06f574f5d95eee98e37",
+    "research/benchmarks/phase5_3_charts.ps1": "ef0625086f9b1978a2306df94e4ec1bfaa7b4ed8d0d61d14c19f30cf7775c6ef",
+    "research/benchmarks/phase5_3_thesis.py": "3de45a92b0c68e1b34508aedf1d4b89d97c5b6759efc06ca36868c33d9783002",
+    "docs/figures/phase5-3/hybrid-sign-session-variability.png": "0fb79dacfb42d114f6766ba6ea1e1cfb79d41ff9e4485be0f22252ff5576f7cb",
+    "docs/figures/phase5-3/hybrid-sign.png": "3f6662b4bb9186e76c2524f34cf0cd068a110989765037859d34071a1283499c",
+    "docs/figures/phase5-3/hybrid-verify.png": "fc78e379a09030f9d780445c86a9accf2674bfc618bddb5f55216f7ad3ce750e",
+    "docs/figures/phase5-3/primitive-sign.png": "c5c69044c5d32eadff2d0834470ad183216d3b462a0ee7beac6b376c454bedb1",
+    "docs/figures/phase5-3/primitive-verify.png": "8cdefab2a47877b4f7402f3a223dc1487f028f30e79c53cf9851d6a195e1ea08",
+    "docs/phase5-1-experiment-gap-analysis.md": "d24e24f34661b8cb5976804afe1b0bebebb46a3534bc5cc0e2413ede4351e6ba",
+    "docs/phase5-1-implementation-evidence.md": "ac429be25e30ebc7cb563390689b122fed1cd766996367d01d94196a448f1015",
+    "docs/phase5-1-research-audit.md": "2e5ba4d5c777afbf8702e8916ea37d220c2c65e854592b8d9119ed3e5c27e714",
+    "docs/phase5-1-thesis-traceability.md": "6407598da5097706b296f6d1ed0c5b94bed3defae8c42b67d8eab81529e4481f",
+    "docs/phase5-1a-signature-integrity-audit.md": "33b6fa43aeba4cf21437d9997536443949350ff106c0a2bbc1608cbfdeea1e35",
+    "docs/phase5-2a-benchmark-methodology.md": "73ee86557142fbd5c9f4c1fbfb4cc4377fa6bd3f9489b00582180841819ad6ef",
+    "docs/phase5-2a-pilot-analysis.md": "e83170ead00b16f01d656a415788b6b67b079a9c37ddb847a5e64445e1210546",
+    "docs/phase5-2b-experimental-results.md": "0b1ad52ce3aba4eb5de98d3c6b92ca6710ca04d5e0710bc8ddc0368a53e7146c",
+    "docs/phase5-2b-statistical-analysis.md": "11cca50bd71c048ccd5829f8c017a65de6ab29f23b6c7e7c3137a229367d1811",
+    "docs/phase5-3-evidence-index.md": "746d9d48f31737ba60b1c625d85f2f2d357f25ecb6a0080fa0a0ddb57dc885c3"
+  },
+  "frozen_fixture_file_sha256": "72b82ae5013248a727803d6c56338905ccd989c1f321f0e927173bc1a4457aa0",
+  "frozen_cases": [
+    {
+      "name": "Phase 1 regression",
+      "sha256": {
+        "pdf_base64": "14602e8cb8975b52f96bf87bd970f1bc579456a567bcd83374fb7972a624efed",
+        "ed25519_public_base64": "d0c27dee32a92f134b1ac37c9506fc0971fbce3406562d7224c5325844c973fc",
+        "falcon_public_base64": "48353c2dfe7ff8028b913592db05903553e3a3a1aa502059c4bad090b994fc1e"
+      }
+    },
+    {
+      "name": "Phase 1 alternate document",
+      "sha256": {
+        "pdf_base64": "5a4ceeb68a703ee1b9fc571aff7492a1167fd14ecf507e4d361a600d3ae93549",
+        "ed25519_public_base64": "d0c27dee32a92f134b1ac37c9506fc0971fbce3406562d7224c5325844c973fc",
+        "falcon_public_base64": "48353c2dfe7ff8028b913592db05903553e3a3a1aa502059c4bad090b994fc1e"
+      }
+    }
+  ],
+  "public_sample": {
+    "status": "MATCH",
+    "sha256": "2d94ba434bbbfda3ffcd78731f2e94146352e5dc7680dcd566d2ca0614a20639",
+    "expected": "2d94ba434bbbfda3ffcd78731f2e94146352e5dc7680dcd566d2ca0614a20639",
+    "bytes": 742
+  },
+  "historical_dataset": {
+    "benchmark/sign_benchmark_10mb.csv": {
+      "status": "MATCH",
+      "sha256": "d5b06c3aadc1101aca7bde453417f5df37d67c8c2390dc46bbdd144ad392e3e9",
+      "expected": "d5b06c3aadc1101aca7bde453417f5df37d67c8c2390dc46bbdd144ad392e3e9",
+      "bytes": 21990
+    },
+    "benchmark/sign_benchmark_1mb.csv": {
+      "status": "MATCH",
+      "sha256": "6e1e900892835d871a248a30259e37d5715d4a71460e68b18f55263a3b8b4abe",
+      "expected": "6e1e900892835d871a248a30259e37d5715d4a71460e68b18f55263a3b8b4abe",
+      "bytes": 20156
+    },
+    "benchmark/sign_benchmark_200mb.csv": {
+      "status": "MATCH",
+      "sha256": "a51eee99341722d958a8a611e777f964a53ef3eea7ca728ff0f2ae6e97beccd0",
+      "expected": "a51eee99341722d958a8a611e777f964a53ef3eea7ca728ff0f2ae6e97beccd0",
+      "bytes": 21035
+    },
+    "benchmark/sign_benchmark_500mb.csv": {
+      "status": "MATCH",
+      "sha256": "f72d6d1d56ebe830de03aa99e508f05c0eb65ac0b33cd95180742d8df7e3cca4",
+      "expected": "f72d6d1d56ebe830de03aa99e508f05c0eb65ac0b33cd95180742d8df7e3cca4",
+      "bytes": 20816
+    },
+    "benchmark/sign_benchmark_50mb.csv": {
+      "status": "MATCH",
+      "sha256": "7ecfd4b1d3c55bbcf3f9df7226e77ccf77449d5fb15ab179a88cb485d194e266",
+      "expected": "7ecfd4b1d3c55bbcf3f9df7226e77ccf77449d5fb15ab179a88cb485d194e266",
+      "bytes": 21986
+    },
+    "benchmark/verify_benchmark_10mb.csv": {
+      "status": "MATCH",
+      "sha256": "2e1a71843729edbcc4ec58d8b42f7612d604c19503cdd264c0e612bcd95f8c9d",
+      "expected": "2e1a71843729edbcc4ec58d8b42f7612d604c19503cdd264c0e612bcd95f8c9d",
+      "bytes": 18151
+    },
+    "benchmark/verify_benchmark_1mb.csv": {
+      "status": "MATCH",
+      "sha256": "fad2fc2da7398b53a98214c4636645b505daae1dccff6f09deb7cad49a0837fb",
+      "expected": "fad2fc2da7398b53a98214c4636645b505daae1dccff6f09deb7cad49a0837fb",
+      "bytes": 14196
+    },
+    "benchmark/verify_benchmark_200mb.csv": {
+      "status": "MATCH",
+      "sha256": "e1be9ee1c61626a3baa23baeb4afd451de9ee96bfeb14fa95bfcdcf26b95f348",
+      "expected": "e1be9ee1c61626a3baa23baeb4afd451de9ee96bfeb14fa95bfcdcf26b95f348",
+      "bytes": 18844
+    },
+    "benchmark/verify_benchmark_500mb.csv": {
+      "status": "MATCH",
+      "sha256": "0345fede236f2716e027ba618ba9579a2757120c97b088c416a5060007fbb5d2",
+      "expected": "0345fede236f2716e027ba618ba9579a2757120c97b088c416a5060007fbb5d2",
+      "bytes": 18658
+    },
+    "benchmark/verify_benchmark_50mb.csv": {
+      "status": "MATCH",
+      "sha256": "60d187524f50d267493e3fa6306d0c71ff6ce2040eac36a2ecca91c41122d6c3",
+      "expected": "60d187524f50d267493e3fa6306d0c71ff6ce2040eac36a2ecca91c41122d6c3",
+      "bytes": 19503
+    },
+    "data_test/file_test_10mb.pdf": {
+      "status": "MATCH",
+      "sha256": "62da9b3bec0f8d8e2ad7e7aa693de2020f4dcff18e0632f8fac9913f0f1d194c",
+      "expected": "62da9b3bec0f8d8e2ad7e7aa693de2020f4dcff18e0632f8fac9913f0f1d194c",
+      "bytes": 10485760
+    },
+    "data_test/file_test_1mb.pdf": {
+      "status": "MATCH",
+      "sha256": "a2bac5c94265b320c7723436e748efcc94fa8d1de3a74852c13a32b163d29d82",
+      "expected": "a2bac5c94265b320c7723436e748efcc94fa8d1de3a74852c13a32b163d29d82",
+      "bytes": 1048576
+    },
+    "data_test/file_test_200mb.pdf": {
+      "status": "MATCH",
+      "sha256": "72abf2ca8f36943ebe2e49ca3a51d409ca5f0bfcffab6c9d25643c17c32889da",
+      "expected": "72abf2ca8f36943ebe2e49ca3a51d409ca5f0bfcffab6c9d25643c17c32889da",
+      "bytes": 209715200
+    },
+    "data_test/file_test_500mb.pdf": {
+      "status": "MATCH",
+      "sha256": "657241928b7bbbbdd0f6f24f8ccbe6bba668e39dd7645ee5c3c0715fac28ae53",
+      "expected": "657241928b7bbbbdd0f6f24f8ccbe6bba668e39dd7645ee5c3c0715fac28ae53",
+      "bytes": 509715200
+    },
+    "data_test/file_test_50mb.pdf": {
+      "status": "MATCH",
+      "sha256": "8fc6ab5f152880d97b377ac137fa9641ba5af22df9e35ab92539318c90efdf33",
+      "expected": "8fc6ab5f152880d97b377ac137fa9641ba5af22df9e35ab92539318c90efdf33",
+      "bytes": 55715200
+    }
+  },
+  "release_artifacts": {
+    "dist/installer-validated/HybridSign-Setup-Phase4C2B-win-x64.exe": {
+      "status": "MATCH",
+      "sha256": "7e1dc008c8238a8df93ca8c5cbc75db11a5b8fe77b09ed708ab0daf7ab89d8ae",
+      "expected": "7e1dc008c8238a8df93ca8c5cbc75db11a5b8fe77b09ed708ab0daf7ab89d8ae",
+      "bytes": 13483887
+    },
+    "dist/portable/HybridSign/HybridSign.exe": {
+      "status": "MATCH",
+      "sha256": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc",
+      "expected": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc",
+      "bytes": 4267288
+    },
+    "dist/portable/HybridSign-Phase4C2A-win-x64-portable.zip": {
+      "status": "MATCH",
+      "sha256": "6f6364e0c53921aa0370e75def1b07e4e36d0b52739563058d778db3c447a293",
+      "expected": "6f6364e0c53921aa0370e75def1b07e4e36d0b52739563058d778db3c447a293",
+      "bytes": 14912004
+    }
+  },
+  "portable_payload": {
+    "_internal/_asyncio.pyd": {
+      "status": "MATCH",
+      "sha256": "746bc8fa88282afe19dc60e426cc0a75bea3bd137cca06a0b57a30bd31459403",
+      "expected": "746bc8fa88282afe19dc60e426cc0a75bea3bd137cca06a0b57a30bd31459403",
+      "bytes": 65304
+    },
+    "_internal/_bz2.pyd": {
+      "status": "MATCH",
+      "sha256": "00b8ca9a338d2b47285c9e56d6d893db2a999b47216756f18439997fb80a56e3",
+      "expected": "00b8ca9a338d2b47285c9e56d6d893db2a999b47216756f18439997fb80a56e3",
+      "bytes": 84760
+    },
+    "_internal/_cffi_backend.cp311-win_amd64.pyd": {
+      "status": "MATCH",
+      "sha256": "0b5c05bf3e9da14c33566d2c546fb7618ac7fc2b89365a66cfb1082ffe3d898d",
+      "expected": "0b5c05bf3e9da14c33566d2c546fb7618ac7fc2b89365a66cfb1082ffe3d898d",
+      "bytes": 179712
+    },
+    "_internal/_ctypes.pyd": {
+      "status": "MATCH",
+      "sha256": "c148292328f0aab7863af82f54f613961e7cb95b7215f7a81cafaf45bd4c42b7",
+      "expected": "c148292328f0aab7863af82f54f613961e7cb95b7215f7a81cafaf45bd4c42b7",
+      "bytes": 124696
+    },
+    "_internal/_decimal.pyd": {
+      "status": "MATCH",
+      "sha256": "980a63f2b39cf16910f44384398e25f24482346a482addb00de42555b17d4278",
+      "expected": "980a63f2b39cf16910f44384398e25f24482346a482addb00de42555b17d4278",
+      "bytes": 255768
+    },
+    "_internal/_elementtree.pyd": {
+      "status": "MATCH",
+      "sha256": "02e30b6a2bee5be5336e40a9c89575603051bde86f9c9cdc78b7fa7d9b7bd1f0",
+      "expected": "02e30b6a2bee5be5336e40a9c89575603051bde86f9c9cdc78b7fa7d9b7bd1f0",
+      "bytes": 128792
+    },
+    "_internal/_hashlib.pyd": {
+      "status": "MATCH",
+      "sha256": "87dd0c858620287454fd6d31d52b6a48eddbb2a08e09e8b2d9fdb0b92200d766",
+      "expected": "87dd0c858620287454fd6d31d52b6a48eddbb2a08e09e8b2d9fdb0b92200d766",
+      "bytes": 65304
+    },
+    "_internal/_lzma.pyd": {
+      "status": "MATCH",
+      "sha256": "f5e01b516c2c23035f7703e23569dec26c5616c05a929b2580ae474a5c6722c5",
+      "expected": "f5e01b516c2c23035f7703e23569dec26c5616c05a929b2580ae474a5c6722c5",
+      "bytes": 159512
+    },
+    "_internal/_multiprocessing.pyd": {
+      "status": "MATCH",
+      "sha256": "975c1947798e3c39898c86675ca1eb68249f77361f41f172f9800275227213b9",
+      "expected": "975c1947798e3c39898c86675ca1eb68249f77361f41f172f9800275227213b9",
+      "bytes": 34584
+    },
+    "_internal/_overlapped.pyd": {
+      "status": "MATCH",
+      "sha256": "ca106e4dfdeafeabf9e98956d3d8d0cb73e109f1a96f1a7e35bc47dbd7c7e164",
+      "expected": "ca106e4dfdeafeabf9e98956d3d8d0cb73e109f1a96f1a7e35bc47dbd7c7e164",
+      "bytes": 51480
+    },
+    "_internal/_queue.pyd": {
+      "status": "MATCH",
+      "sha256": "3f8e7e6aa13b417acc78b63434fb1144e6319a010a9fc376c54d6e69b638fe4c",
+      "expected": "3f8e7e6aa13b417acc78b63434fb1144e6319a010a9fc376c54d6e69b638fe4c",
+      "bytes": 32024
+    },
+    "_internal/_socket.pyd": {
+      "status": "MATCH",
+      "sha256": "a19e3c7c03ef1b5625790b1c9c42594909311ab6df540fbf43c6aa93300ab166",
+      "expected": "a19e3c7c03ef1b5625790b1c9c42594909311ab6df540fbf43c6aa93300ab166",
+      "bytes": 79640
+    },
+    "_internal/_ssl.pyd": {
+      "status": "MATCH",
+      "sha256": "ba5388d6a6557d431e086734a3323621dc447f63ba299b0a815e5837cf869678",
+      "expected": "ba5388d6a6557d431e086734a3323621dc447f63ba299b0a815e5837cf869678",
+      "bytes": 178456
+    },
+    "_internal/_uuid.pyd": {
+      "status": "MATCH",
+      "sha256": "e6aa7f1637e211251c9d6f467203b2b6d85e5bc2d901699f2a55af637fa89250",
+      "expected": "e6aa7f1637e211251c9d6f467203b2b6d85e5bc2d901699f2a55af637fa89250",
+      "bytes": 25368
+    },
+    "_internal/base_library.zip": {
+      "status": "MATCH",
+      "sha256": "ae51310b989411cb94e1160a76cfdb04cf2d8d2641d3d230829af72e6fac8963",
+      "expected": "ae51310b989411cb94e1160a76cfdb04cf2d8d2641d3d230829af72e6fac8963",
+      "bytes": 1443565
+    },
+    "_internal/bottle-0.13.4.dist-info/entry_points.txt": {
+      "status": "MATCH",
+      "sha256": "875cf070e8c1e00b75c8f2852536ff18fde842942b433e3f874fba283a3da50e",
+      "expected": "875cf070e8c1e00b75c8f2852536ff18fde842942b433e3f874fba283a3da50e",
+      "bytes": 39
+    },
+    "_internal/bottle-0.13.4.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/bottle-0.13.4.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "af150257b1f7cce92b6207854f2e8f90ea9ae52d7cac758d13a47bd12e2a2443",
+      "expected": "af150257b1f7cce92b6207854f2e8f90ea9ae52d7cac758d13a47bd12e2a2443",
+      "bytes": 1066
+    },
+    "_internal/bottle-0.13.4.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "441619180223f6ae8a92d1e88e4bbd48159c452bedae1e7c9c27f0673fa720d1",
+      "expected": "441619180223f6ae8a92d1e88e4bbd48159c452bedae1e7c9c27f0673fa720d1",
+      "bytes": 1604
+    },
+    "_internal/bottle-0.13.4.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "91638877d7366bcb1fb35247107e59a0eb7a1da83fc03b0a77e37d4bd5256a21",
+      "expected": "91638877d7366bcb1fb35247107e59a0eb7a1da83fc03b0a77e37d4bd5256a21",
+      "bytes": 910
+    },
+    "_internal/bottle-0.13.4.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "70af26a42d5652f5490152f55ec8c2a021a40fed1873ea5caea7c7d1f4579218",
+      "expected": "70af26a42d5652f5490152f55ec8c2a021a40fed1873ea5caea7c7d1f4579218",
+      "bytes": 7
+    },
+    "_internal/bottle-0.13.4.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "24d5a1d459b551dc08415d3be609429f8315b8246cd2ca2d248abe27aadbc425",
+      "expected": "24d5a1d459b551dc08415d3be609429f8315b8246cd2ca2d248abe27aadbc425",
+      "bytes": 109
+    },
+    "_internal/cffi-2.1.1.dist-info/entry_points.txt": {
+      "status": "MATCH",
+      "sha256": "a6b6108011f8e27050fe5269bba88c8051b414697880d3b0b6fbe3a03a0b001c",
+      "expected": "a6b6108011f8e27050fe5269bba88c8051b414697880d3b0b6fbe3a03a0b001c",
+      "bytes": 132
+    },
+    "_internal/cffi-2.1.1.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/cffi-2.1.1.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63",
+      "expected": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63",
+      "bytes": 1123
+    },
+    "_internal/cffi-2.1.1.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "67b6a7595df7ede2195016a05d285faa7d362a8f57c238984edb8bb674b5770d",
+      "expected": "67b6a7595df7ede2195016a05d285faa7d362a8f57c238984edb8bb674b5770d",
+      "bytes": 2594
+    },
+    "_internal/cffi-2.1.1.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "e554db9e4c7a94d51ac5b80a03e3c594f6e7ca5dd1bee75934bc695ad8bb5278",
+      "expected": "e554db9e4c7a94d51ac5b80a03e3c594f6e7ca5dd1bee75934bc695ad8bb5278",
+      "bytes": 3511
+    },
+    "_internal/cffi-2.1.1.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "ac4ed6477ad97cd2b1588f7e8e7ea1b0708097b303901f859ae41bc568c57a14",
+      "expected": "ac4ed6477ad97cd2b1588f7e8e7ea1b0708097b303901f859ae41bc568c57a14",
+      "bytes": 19
+    },
+    "_internal/cffi-2.1.1.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "0b81650649feb673233bd9f4ddac78c902452a1d8bf79cf7362558225eedf1c6",
+      "expected": "0b81650649feb673233bd9f4ddac78c902452a1d8bf79cf7362558225eedf1c6",
+      "bytes": 101
+    },
+    "_internal/clr_loader/ffi/dlls/amd64/ClrLoader.dll": {
+      "status": "MATCH",
+      "sha256": "07f62bcb1b70320f221ffb2cfc5ce6133815195f3e7cdb8d833222506188c2ac",
+      "expected": "07f62bcb1b70320f221ffb2cfc5ce6133815195f3e7cdb8d833222506188c2ac",
+      "bytes": 10752
+    },
+    "_internal/clr_loader-0.3.1.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/clr_loader-0.3.1.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "dd6bdca10cdc3b24c6b0b6cef5fd611b7feb6917f127833283ddcdb310d3b453",
+      "expected": "dd6bdca10cdc3b24c6b0b6cef5fd611b7feb6917f127833283ddcdb310d3b453",
+      "bytes": 1079
+    },
+    "_internal/clr_loader-0.3.1.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "5ef5654ad82dc3ab9cc752f6c72f6ea88a3e401aa3d80243596724566a1ca7c8",
+      "expected": "5ef5654ad82dc3ab9cc752f6c72f6ea88a3e401aa3d80243596724566a1ca7c8",
+      "bytes": 1381
+    },
+    "_internal/clr_loader-0.3.1.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "c1f69c170392c7aae3c91d4a407ea8c97bdc2d138ca388fc5acf719462c09302",
+      "expected": "c1f69c170392c7aae3c91d4a407ea8c97bdc2d138ca388fc5acf719462c09302",
+      "bytes": 3009
+    },
+    "_internal/clr_loader-0.3.1.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "2d23336bd75b77f914212f1cdf3caeb2ba24b33c417990e713c244391e6be3ce",
+      "expected": "2d23336bd75b77f914212f1cdf3caeb2ba24b33c417990e713c244391e6be3ce",
+      "bytes": 11
+    },
+    "_internal/clr_loader-0.3.1.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9",
+      "expected": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9",
+      "bytes": 91
+    },
+    "_internal/cryptography/hazmat/bindings/_rust.pyd": {
+      "status": "MATCH",
+      "sha256": "1d4332a447cab13dec8e3a533ad579e0e562b79e40822c931f33769758fc7156",
+      "expected": "1d4332a447cab13dec8e3a533ad579e0e562b79e40822c931f33769758fc7156",
+      "bytes": 9897472
+    },
+    "_internal/cryptography-50.0.2.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/cryptography-50.0.2.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb",
+      "expected": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb",
+      "bytes": 197
+    },
+    "_internal/cryptography-50.0.2.dist-info/licenses/LICENSE.APACHE": {
+      "status": "MATCH",
+      "sha256": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe",
+      "expected": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe",
+      "bytes": 11360
+    },
+    "_internal/cryptography-50.0.2.dist-info/licenses/LICENSE.BSD": {
+      "status": "MATCH",
+      "sha256": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb",
+      "expected": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb",
+      "bytes": 1532
+    },
+    "_internal/cryptography-50.0.2.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "047cfc71226409de4318b360aef15c63a2adf609731e3dcf7fe932f14ea042ee",
+      "expected": "047cfc71226409de4318b360aef15c63a2adf609731e3dcf7fe932f14ea042ee",
+      "bytes": 4394
+    },
+    "_internal/cryptography-50.0.2.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "507b6c9a2ea50ab133ef42c685eb3c53200d1b1413e45faf26052f9d21819ee3",
+      "expected": "507b6c9a2ea50ab133ef42c685eb3c53200d1b1413e45faf26052f9d21819ee3",
+      "bytes": 17959
+    },
+    "_internal/cryptography-50.0.2.dist-info/REQUESTED": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/cryptography-50.0.2.dist-info/sboms/cryptography-rust.cyclonedx.json": {
+      "status": "MATCH",
+      "sha256": "246af194b4c524807c5aaffd2b7ff86c2c9bee3eb3fceeac987709ad76e4e7ef",
+      "expected": "246af194b4c524807c5aaffd2b7ff86c2c9bee3eb3fceeac987709ad76e4e7ef",
+      "bytes": 45629
+    },
+    "_internal/cryptography-50.0.2.dist-info/sboms/sbom.json": {
+      "status": "MATCH",
+      "sha256": "5b5eea08dd952a16eef188f7a85ad439a4409efa0e2bce9ca339a4de9c8db3f0",
+      "expected": "5b5eea08dd952a16eef188f7a85ad439a4409efa0e2bce9ca339a4de9c8db3f0",
+      "bytes": 1223
+    },
+    "_internal/cryptography-50.0.2.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "9efe56059dbb731c438c822ac4132a2b670e174db90f09059aa246a8bdd2a575",
+      "expected": "9efe56059dbb731c438c822ac4132a2b670e174db90f09059aa246a8bdd2a575",
+      "bytes": 96
+    },
+    "_internal/frontend/dist/assets/index-CB5LyBcz.css": {
+      "status": "MATCH",
+      "sha256": "36b838fdd8d1c30d66657def8a6ef9e08ce57d986a97058264cde181b08356dc",
+      "expected": "36b838fdd8d1c30d66657def8a6ef9e08ce57d986a97058264cde181b08356dc",
+      "bytes": 71622
+    },
+    "_internal/frontend/dist/assets/index-Cy0LirpI.js": {
+      "status": "MATCH",
+      "sha256": "f49fc510903cb1305157e913a6e85bd11bed23f857876b48264e4b4ab4b6ceb9",
+      "expected": "f49fc510903cb1305157e913a6e85bd11bed23f857876b48264e4b4ab4b6ceb9",
+      "bytes": 424844
+    },
+    "_internal/frontend/dist/assets/inter-latin-400-normal-C38fXH4l.woff2": {
+      "status": "MATCH",
+      "sha256": "8909904ab6c872eb994093482a88a28eca2cd95912d7b6fecd72103b0dc07edc",
+      "expected": "8909904ab6c872eb994093482a88a28eca2cd95912d7b6fecd72103b0dc07edc",
+      "bytes": 23664
+    },
+    "_internal/frontend/dist/assets/inter-latin-400-normal-CyCys3Eg.woff": {
+      "status": "MATCH",
+      "sha256": "e20fa0b4fd2dd26e4d14b3ac3cc922509c3a63fa5e910e90c614544aa042dd45",
+      "expected": "e20fa0b4fd2dd26e4d14b3ac3cc922509c3a63fa5e910e90c614544aa042dd45",
+      "bytes": 30696
+    },
+    "_internal/frontend/dist/assets/inter-latin-500-normal-BL9OpVg8.woff": {
+      "status": "MATCH",
+      "sha256": "9b42c108da48b5ed55a3072e815ffee2d271562e6c0dd6998910e8f9c09e0a3d",
+      "expected": "9b42c108da48b5ed55a3072e815ffee2d271562e6c0dd6998910e8f9c09e0a3d",
+      "bytes": 31284
+    },
+    "_internal/frontend/dist/assets/inter-latin-500-normal-Cerq10X2.woff2": {
+      "status": "MATCH",
+      "sha256": "f3779f1efccc4bdcdf9c0a02ab95bf6bd092ed09c48c08cedc725889edd1d19f",
+      "expected": "f3779f1efccc4bdcdf9c0a02ab95bf6bd092ed09c48c08cedc725889edd1d19f",
+      "bytes": 24272
+    },
+    "_internal/frontend/dist/assets/inter-latin-600-normal-CiBQ2DWP.woff": {
+      "status": "MATCH",
+      "sha256": "6a9cb3a509b4eeaf12b7dda6c4aacac3e85d07f4201bf4dd716e332e692b87bd",
+      "expected": "6a9cb3a509b4eeaf12b7dda6c4aacac3e85d07f4201bf4dd716e332e692b87bd",
+      "bytes": 31260
+    },
+    "_internal/frontend/dist/assets/inter-latin-600-normal-LgqL8muc.woff2": {
+      "status": "MATCH",
+      "sha256": "f9a06e79cd3a2a20951c0f0e28f66dd0e6d3fda73911d640a2125c8fcb78f21a",
+      "expected": "f9a06e79cd3a2a20951c0f0e28f66dd0e6d3fda73911d640a2125c8fcb78f21a",
+      "bytes": 24452
+    },
+    "_internal/frontend/dist/assets/inter-latin-700-normal-BLAVimhd.woff": {
+      "status": "MATCH",
+      "sha256": "7c5ed5655730de337704d3fc94628515cd7e3d8d32368871709bf56ac0397e7a",
+      "expected": "7c5ed5655730de337704d3fc94628515cd7e3d8d32368871709bf56ac0397e7a",
+      "bytes": 31320
+    },
+    "_internal/frontend/dist/assets/inter-latin-700-normal-Yt3aPRUw.woff2": {
+      "status": "MATCH",
+      "sha256": "6f56409fd3d64bb85f7d070bce20749db2d66b6d63cec586cc22d1c761be2491",
+      "expected": "6f56409fd3d64bb85f7d070bce20749db2d66b6d63cec586cc22d1c761be2491",
+      "bytes": 24356
+    },
+    "_internal/frontend/dist/index.html": {
+      "status": "MATCH",
+      "sha256": "53676620624c17cba6bd4dd36c1516e663af1e83bed40159363f9fb9eba2a55b",
+      "expected": "53676620624c17cba6bd4dd36c1516e663af1e83bed40159363f9fb9eba2a55b",
+      "bytes": 671
+    },
+    "_internal/frontend/dist/mark.svg": {
+      "status": "MATCH",
+      "sha256": "d4095503ae7326f71f1f5e639dff70c3cefbce3a6f8c37a3888bbeb583de55d7",
+      "expected": "d4095503ae7326f71f1f5e639dff70c3cefbce3a6f8c37a3888bbeb583de55d7",
+      "bytes": 297
+    },
+    "_internal/libcrypto-3.dll": {
+      "status": "MATCH",
+      "sha256": "05fe080eab7fc535c51e10c1bd76a2f3e6217f9c91a25034774588881c3f99de",
+      "expected": "05fe080eab7fc535c51e10c1bd76a2f3e6217f9c91a25034774588881c3f99de",
+      "bytes": 5191960
+    },
+    "_internal/libffi-8.dll": {
+      "status": "MATCH",
+      "sha256": "eff52743773eb550fcc6ce3efc37c85724502233b6b002a35496d828bd7b280a",
+      "expected": "eff52743773eb550fcc6ce3efc37c85724502233b6b002a35496d828bd7b280a",
+      "bytes": 39696
+    },
+    "_internal/libssl-3.dll": {
+      "status": "MATCH",
+      "sha256": "2e9fbcd8f7fdc13a5179533239811456554f2b3aa2fb10e1b17be0df81c79006",
+      "expected": "2e9fbcd8f7fdc13a5179533239811456554f2b3aa2fb10e1b17be0df81c79006",
+      "bytes": 787224
+    },
+    "_internal/logobig.ico": {
+      "status": "MATCH",
+      "sha256": "52d9b0ce877a66c396f926825520fe163f8bd81bf9120a92ceed12e925215b0f",
+      "expected": "52d9b0ce877a66c396f926825520fe163f8bd81bf9120a92ceed12e925215b0f",
+      "bytes": 270398
+    },
+    "_internal/markupsafe/_speedups.cp311-win_amd64.pyd": {
+      "status": "MATCH",
+      "sha256": "79d6891d23e7bb5acfae0ab87b2c8d59431450724999e9cfc3deb8877e1f4cb9",
+      "expected": "79d6891d23e7bb5acfae0ab87b2c8d59431450724999e9cfc3deb8877e1f4cb9",
+      "bytes": 11776
+    },
+    "_internal/markupsafe-3.0.4.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/markupsafe-3.0.4.dist-info/licenses/LICENSE.txt": {
+      "status": "MATCH",
+      "sha256": "4631ec0db5fd90a547e336817264c6798214338146f8ac94b4a57f96ee8c9ec4",
+      "expected": "4631ec0db5fd90a547e336817264c6798214338146f8ac94b4a57f96ee8c9ec4",
+      "bytes": 1503
+    },
+    "_internal/markupsafe-3.0.4.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "08fa79954ab288d778b0fee4f0e6c7dbc869e545a415747d1324622465d3b08d",
+      "expected": "08fa79954ab288d778b0fee4f0e6c7dbc869e545a415747d1324622465d3b08d",
+      "bytes": 2764
+    },
+    "_internal/markupsafe-3.0.4.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "5c763eb6da3894fb335bf76ce4de3e9e69e0f37137f3b549cf67c3b6d88a9eeb",
+      "expected": "5c763eb6da3894fb335bf76ce4de3e9e69e0f37137f3b549cf67c3b6d88a9eeb",
+      "bytes": 1104
+    },
+    "_internal/markupsafe-3.0.4.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "ab2d0f9637b9209bafb020637a32728430a310075c0cb2bfd9a81571ec7c67a5",
+      "expected": "ab2d0f9637b9209bafb020637a32728430a310075c0cb2bfd9a81571ec7c67a5",
+      "bytes": 11
+    },
+    "_internal/markupsafe-3.0.4.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "55ad5e704e1a425731c9b664712be1d8578dd7f0e50bc21a24d249b02258123d",
+      "expected": "55ad5e704e1a425731c9b664712be1d8578dd7f0e50bc21a24d249b02258123d",
+      "bytes": 101
+    },
+    "_internal/nacl/_sodium.pyd": {
+      "status": "MATCH",
+      "sha256": "57822e7aed944269943bcb855fc14560a5b6ae38869de4e3d00c380a5119ecc7",
+      "expected": "57822e7aed944269943bcb855fc14560a5b6ae38869de4e3d00c380a5119ecc7",
+      "bytes": 405504
+    },
+    "_internal/nacl/py.typed": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/pqcrypto/_sign/falcon_512.cp311-win_amd64.pyd": {
+      "status": "MATCH",
+      "sha256": "ad5983a68922b01d84332ee800e16b55f001d1353ef62b32efd8d5d1216da237",
+      "expected": "ad5983a68922b01d84332ee800e16b55f001d1353ef62b32efd8d5d1216da237",
+      "bytes": 116736
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "expected": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "bytes": 11560
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/licenses/NOTICE": {
+      "status": "MATCH",
+      "sha256": "82dc482929faf3aa824230b0ec44c4f5100efbdf385b7c18aff529d32ae8dc96",
+      "expected": "82dc482929faf3aa824230b0ec44c4f5100efbdf385b7c18aff529d32ae8dc96",
+      "bytes": 136
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "3cc0d35b107fc84c73f54ef3dcd1f8a343c98fa5f717e2ab985b9ea5b35325f7",
+      "expected": "3cc0d35b107fc84c73f54ef3dcd1f8a343c98fa5f717e2ab985b9ea5b35325f7",
+      "bytes": 5864
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "0b387504c7736846ad92459fbb83386e5f61a1c984d1059644efe98ec1cf0b0c",
+      "expected": "0b387504c7736846ad92459fbb83386e5f61a1c984d1059644efe98ec1cf0b0c",
+      "bytes": 29070
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/REQUESTED": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/pqcrypto-0.3.4.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "4d2982ccc65dd5c48668ee40412c5a92669af521c82e26f927daa2c7a3af75ac",
+      "expected": "4d2982ccc65dd5c48668ee40412c5a92669af521c82e26f927daa2c7a3af75ac",
+      "bytes": 96
+    },
+    "_internal/proxy_tools-0.1.0.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/proxy_tools-0.1.0.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "34f8db57e46ca03c6185c649a15cc52a0c9120f4f781e9b64701044b22a7fc86",
+      "expected": "34f8db57e46ca03c6185c649a15cc52a0c9120f4f781e9b64701044b22a7fc86",
+      "bytes": 527
+    },
+    "_internal/proxy_tools-0.1.0.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "bcc303fab8079606c5b5050c9814b273f0fddbaa3bc22c31c4aaafbf19ca8b35",
+      "expected": "bcc303fab8079606c5b5050c9814b273f0fddbaa3bc22c31c4aaafbf19ca8b35",
+      "bytes": 542
+    },
+    "_internal/proxy_tools-0.1.0.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "5787cceffb627f279f0ca8c359b2a84462a455fee63525f3fbde19c2de0ff252",
+      "expected": "5787cceffb627f279f0ca8c359b2a84462a455fee63525f3fbde19c2de0ff252",
+      "bytes": 12
+    },
+    "_internal/proxy_tools-0.1.0.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "98e75747d0b7c0c568bfb71263c3d8f970b3a374a6996087bc642be5cb09a1aa",
+      "expected": "98e75747d0b7c0c568bfb71263c3d8f970b3a374a6996087bc642be5cb09a1aa",
+      "bytes": 91
+    },
+    "_internal/pyexpat.pyd": {
+      "status": "MATCH",
+      "sha256": "c7c7564f7f874fb660a46384980a2cf28bc3e245ca83628a197ccf861eab5560",
+      "expected": "c7c7564f7f874fb660a46384980a2cf28bc3e245ca83628a197ccf861eab5560",
+      "bytes": 199448
+    },
+    "_internal/pynacl-1.6.2.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/pynacl-1.6.2.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "77af5bbded959114b6d7a5eea518b2be364e04f4f4a95f9e87d9870c27713d24",
+      "expected": "77af5bbded959114b6d7a5eea518b2be364e04f4f4a95f9e87d9870c27713d24",
+      "bytes": 9868
+    },
+    "_internal/pynacl-1.6.2.dist-info/licenses/licenses/LICENSE.libsodium.txt": {
+      "status": "MATCH",
+      "sha256": "93e7cac854d71cdafc9d9e4e9f8fd28d87ae541b3dda224d7c8fe23d37875704",
+      "expected": "93e7cac854d71cdafc9d9e4e9f8fd28d87ae541b3dda224d7c8fe23d37875704",
+      "bytes": 841
+    },
+    "_internal/pynacl-1.6.2.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "e4761a7bcc1975a303c4e4487100cd912386eb2e65e3e5a88e283645dce767d9",
+      "expected": "e4761a7bcc1975a303c4e4487100cd912386eb2e65e3e5a88e283645dce767d9",
+      "bytes": 10252
+    },
+    "_internal/pynacl-1.6.2.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "1fa920c61f9de649359cc12ef3788db9201c1d9e6838d1c9c679a107e6d87369",
+      "expected": "1fa920c61f9de649359cc12ef3788db9201c1d9e6838d1c9c679a107e6d87369",
+      "bytes": 4877
+    },
+    "_internal/pynacl-1.6.2.dist-info/REQUESTED": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/pynacl-1.6.2.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "c1f744388fc6d912339b3b0cca1a6a3f5ec7521e8972a8bdf6da3d6872c4b25a",
+      "expected": "c1f744388fc6d912339b3b0cca1a6a3f5ec7521e8972a8bdf6da3d6872c4b25a",
+      "bytes": 13
+    },
+    "_internal/pynacl-1.6.2.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "a6d2fed6d20e118c83b165c8df8258199ae5c5e38737cb53a751c65f76ee46fa",
+      "expected": "a6d2fed6d20e118c83b165c8df8258199ae5c5e38737cb53a751c65f76ee46fa",
+      "bytes": 99
+    },
+    "_internal/python3.dll": {
+      "status": "MATCH",
+      "sha256": "db84bc052cfb121fe4db36242ba5f1d2c031b600ef5d8d752cf25b7c02b6bac6",
+      "expected": "db84bc052cfb121fe4db36242ba5f1d2c031b600ef5d8d752cf25b7c02b6bac6",
+      "bytes": 67352
+    },
+    "_internal/python311.dll": {
+      "status": "MATCH",
+      "sha256": "0817a2a657a24c0d5fbb60df56960f42fc66b3039d522ec952dab83e2d869364",
+      "expected": "0817a2a657a24c0d5fbb60df56960f42fc66b3039d522ec952dab83e2d869364",
+      "bytes": 5800216
+    },
+    "_internal/pythonnet/runtime/Python.Runtime.deps.json": {
+      "status": "MATCH",
+      "sha256": "1df8757c717cda3d84ba1059d6c0c8d728a64013afcb2564f0edb5fe4582053f",
+      "expected": "1df8757c717cda3d84ba1059d6c0c8d728a64013afcb2564f0edb5fe4582053f",
+      "bytes": 5984
+    },
+    "_internal/pythonnet/runtime/Python.Runtime.dll": {
+      "status": "MATCH",
+      "sha256": "2ebd4492e28442ef1f1af587afe5b3a090c2ebfa220758ded4f1450f2a27f13a",
+      "expected": "2ebd4492e28442ef1f1af587afe5b3a090c2ebfa220758ded4f1450f2a27f13a",
+      "bytes": 451584
+    },
+    "_internal/pythonnet/runtime/Python.Runtime.xml": {
+      "status": "MATCH",
+      "sha256": "e4f896b8c692f79c55a766c4269c74d0bb2149a7fcef327c4eaf9faff8d28677",
+      "expected": "e4f896b8c692f79c55a766c4269c74d0bb2149a7fcef327c4eaf9faff8d28677",
+      "bytes": 189214
+    },
+    "_internal/pythonnet-3.2.1.dist-info/entry_points.txt": {
+      "status": "MATCH",
+      "sha256": "2c9aa7730043d17f758fe0f5f136e38404a7d5b30f851d36ef71d804e0ce5a61",
+      "expected": "2c9aa7730043d17f758fe0f5f136e38404a7d5b30f851d36ef71d804e0ce5a61",
+      "bytes": 65
+    },
+    "_internal/pythonnet-3.2.1.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/pythonnet-3.2.1.dist-info/licenses/AUTHORS.md": {
+      "status": "MATCH",
+      "sha256": "65a13631f078bed51e9a4033dea257e57a7f23097f3003b1ce1ba1c8a9136c93",
+      "expected": "65a13631f078bed51e9a4033dea257e57a7f23097f3003b1ce1ba1c8a9136c93",
+      "bytes": 5096
+    },
+    "_internal/pythonnet-3.2.1.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "e1dc3a6ff017a6800dc27a7220500f512b95fbcd996d38ebbbff85c693245369",
+      "expected": "e1dc3a6ff017a6800dc27a7220500f512b95fbcd996d38ebbbff85c693245369",
+      "bytes": 1104
+    },
+    "_internal/pythonnet-3.2.1.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "2bf043c02e68e1fa3b8d55469ef42ab0c4cc180e374fe4322ace1848da3e0f62",
+      "expected": "2bf043c02e68e1fa3b8d55469ef42ab0c4cc180e374fe4322ace1848da3e0f62",
+      "bytes": 6507
+    },
+    "_internal/pythonnet-3.2.1.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "bec9e4b32bbea9f0eae466065b46da96158a67794bcff858521ffcc3fb545c1e",
+      "expected": "bec9e4b32bbea9f0eae466065b46da96158a67794bcff858521ffcc3fb545c1e",
+      "bytes": 1617
+    },
+    "_internal/pythonnet-3.2.1.dist-info/REQUESTED": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/pythonnet-3.2.1.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "b7f71618074ca7097b60eefddfe68dc4da481144213837a08d15175ddd5a95f0",
+      "expected": "b7f71618074ca7097b60eefddfe68dc4da481144213837a08d15175ddd5a95f0",
+      "bytes": 14
+    },
+    "_internal/pythonnet-3.2.1.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "58e5768e1686c667bf169df1ee66729038bf22586f1813fa72abbb89bf09e27a",
+      "expected": "58e5768e1686c667bf169df1ee66729038bf22586f1813fa72abbb89bf09e27a",
+      "bytes": 173
+    },
+    "_internal/pywebview-6.2.1.dist-info/entry_points.txt": {
+      "status": "MATCH",
+      "sha256": "f4b0b8e4f0af704f8a11ff469c43a04689bf75e2ec0b1a215163ac5dfe34287f",
+      "expected": "f4b0b8e4f0af704f8a11ff469c43a04689bf75e2ec0b1a215163ac5dfe34287f",
+      "bytes": 64
+    },
+    "_internal/pywebview-6.2.1.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/pywebview-6.2.1.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "4a988dd3598832cd3653de20dc33cb677d0fb53ab5551c879ca31280ae653675",
+      "expected": "4a988dd3598832cd3653de20dc33cb677d0fb53ab5551c879ca31280ae653675",
+      "bytes": 1518
+    },
+    "_internal/pywebview-6.2.1.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "8e7f87b5e50b992bc44d9f1dc03fb5218f0b6da5d6c4b9f21f93916bf44569c7",
+      "expected": "8e7f87b5e50b992bc44d9f1dc03fb5218f0b6da5d6c4b9f21f93916bf44569c7",
+      "bytes": 4937
+    },
+    "_internal/pywebview-6.2.1.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "7c3fee2119776558717481319e825f73a63f24ce17c3e9792dc179353f21965b",
+      "expected": "7c3fee2119776558717481319e825f73a63f24ce17c3e9792dc179353f21965b",
+      "bytes": 8531
+    },
+    "_internal/pywebview-6.2.1.dist-info/REQUESTED": {
+      "status": "MATCH",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "_internal/pywebview-6.2.1.dist-info/top_level.txt": {
+      "status": "MATCH",
+      "sha256": "7794a9695d720645a4ded6abf95ac4397f9b04cf635cf955755369379150af10",
+      "expected": "7794a9695d720645a4ded6abf95ac4397f9b04cf635cf955755369379150af10",
+      "bytes": 8
+    },
+    "_internal/pywebview-6.2.1.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9",
+      "expected": "69e6228a0d35958183cc1812f07c565ce837b95eb51bd8a33acba9fa4f68d6c9",
+      "bytes": 91
+    },
+    "_internal/select.pyd": {
+      "status": "MATCH",
+      "sha256": "bae0974390945520eb99ab32486c6a964691f8f4a028ac408d98fa8fb0db7d90",
+      "expected": "bae0974390945520eb99ab32486c6a964691f8f4a028ac408d98fa8fb0db7d90",
+      "bytes": 30488
+    },
+    "_internal/typing_extensions-4.16.0.dist-info/INSTALLER": {
+      "status": "MATCH",
+      "sha256": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "expected": "ceebae7b8927a3227e5303cf5e0f1f7b34bb542ad7250ac03fbcde36ec2f1508",
+      "bytes": 4
+    },
+    "_internal/typing_extensions-4.16.0.dist-info/licenses/LICENSE": {
+      "status": "MATCH",
+      "sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+      "expected": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf",
+      "bytes": 13936
+    },
+    "_internal/typing_extensions-4.16.0.dist-info/METADATA": {
+      "status": "MATCH",
+      "sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46",
+      "expected": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46",
+      "bytes": 3310
+    },
+    "_internal/typing_extensions-4.16.0.dist-info/RECORD": {
+      "status": "MATCH",
+      "sha256": "61d86db5843e537a7a8d095771289016a5bbfe26fdeace2b655dd0c7503f042a",
+      "expected": "61d86db5843e537a7a8d095771289016a5bbfe26fdeace2b655dd0c7503f042a",
+      "bytes": 580
+    },
+    "_internal/typing_extensions-4.16.0.dist-info/WHEEL": {
+      "status": "MATCH",
+      "sha256": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+      "expected": "1b68144734c4b66791f27add5d425f3620775585718a03d0f9b110ba3a4d88db",
+      "bytes": 82
+    },
+    "_internal/unicodedata.pyd": {
+      "status": "MATCH",
+      "sha256": "37c68617fa02a2cadced17ef724e2d450ef12a8a37215da789a4679fde1c5c02",
+      "expected": "37c68617fa02a2cadced17ef724e2d450ef12a8a37215da789a4679fde1c5c02",
+      "bytes": 1140504
+    },
+    "_internal/VCRUNTIME140.dll": {
+      "status": "MATCH",
+      "sha256": "4d292623516f65c80482081e62d5dadb759dc16e851de5db24c3cbb57b87db83",
+      "expected": "4d292623516f65c80482081e62d5dadb759dc16e851de5db24c3cbb57b87db83",
+      "bytes": 119192
+    },
+    "_internal/webview/js/api.js": {
+      "status": "MATCH",
+      "sha256": "cb68b8bed427fa356aea26376e497552f55d91329c093c026a65230d074e2b27",
+      "expected": "cb68b8bed427fa356aea26376e497552f55d91329c093c026a65230d074e2b27",
+      "bytes": 8612
+    },
+    "_internal/webview/js/customize.js": {
+      "status": "MATCH",
+      "sha256": "ed14d0b594266dfe3834cc8565b44a8157420432aeef4f733ab505bd6ed89b8a",
+      "expected": "ed14d0b594266dfe3834cc8565b44a8157420432aeef4f733ab505bd6ed89b8a",
+      "bytes": 4443
+    },
+    "_internal/webview/js/finish.js": {
+      "status": "MATCH",
+      "sha256": "751443083dd1d2b2ef4142692f25bc4f6e04f8de4d82c455c73473700f00c8cb",
+      "expected": "751443083dd1d2b2ef4142692f25bc4f6e04f8de4d82c455c73473700f00c8cb",
+      "bytes": 357
+    },
+    "_internal/webview/js/lib/dom_json.js": {
+      "status": "MATCH",
+      "sha256": "70fae2a8a8ebc790dc616aa7976074cedd802275c173c90ad4bf3bd14163f9c4",
+      "expected": "70fae2a8a8ebc790dc616aa7976074cedd802275c173c90ad4bf3bd14163f9c4",
+      "bytes": 26097
+    },
+    "_internal/webview/js/lib/polyfill.js": {
+      "status": "MATCH",
+      "sha256": "481a08f5337a770acf49b38c2f58dd0c95f92bf9dbd92bf82b596836ea343ab5",
+      "expected": "481a08f5337a770acf49b38c2f58dd0c95f92bf9dbd92bf82b596836ea343ab5",
+      "bytes": 27434
+    },
+    "_internal/webview/js/state.js": {
+      "status": "MATCH",
+      "sha256": "68ee87ec01563cbcab77a57704a32f19b47436c9d5e254bfba9675a51c132075",
+      "expected": "68ee87ec01563cbcab77a57704a32f19b47436c9d5e254bfba9675a51c132075",
+      "bytes": 1828
+    },
+    "_internal/webview/lib/Microsoft.Web.WebView2.Core.dll": {
+      "status": "MATCH",
+      "sha256": "8219a3135436c147f8eb02fb831e99596103eebc18b6d7b794ca93f4c67018a2",
+      "expected": "8219a3135436c147f8eb02fb831e99596103eebc18b6d7b794ca93f4c67018a2",
+      "bytes": 649800
+    },
+    "_internal/webview/lib/Microsoft.Web.WebView2.WinForms.dll": {
+      "status": "MATCH",
+      "sha256": "c48f8d729dc531288d2c53a6241effe7922ed1b947850b2442008a945c098c48",
+      "expected": "c48f8d729dc531288d2c53a6241effe7922ed1b947850b2442008a945c098c48",
+      "bytes": 39016
+    },
+    "_internal/webview/lib/runtimes/win-arm64/native/platform-directory.txt": {
+      "status": "MATCH",
+      "sha256": "a5bb8fd402c2cd749d914f6256ec445900c064e0a0a8c21ecb936bcf77f0c1af",
+      "expected": "a5bb8fd402c2cd749d914f6256ec445900c064e0a0a8c21ecb936bcf77f0c1af",
+      "bytes": 163
+    },
+    "_internal/webview/lib/runtimes/win-x64/native/WebView2Loader.dll": {
+      "status": "MATCH",
+      "sha256": "eb5335edeaa6f2122c044e82aab2351dc8c9b4e0fe5e578c71922fb61be285e7",
+      "expected": "eb5335edeaa6f2122c044e82aab2351dc8c9b4e0fe5e578c71922fb61be285e7",
+      "bytes": 161864
+    },
+    "_internal/webview/lib/runtimes/win-x86/native/platform-directory.txt": {
+      "status": "MATCH",
+      "sha256": "a5bb8fd402c2cd749d914f6256ec445900c064e0a0a8c21ecb936bcf77f0c1af",
+      "expected": "a5bb8fd402c2cd749d914f6256ec445900c064e0a0a8c21ecb936bcf77f0c1af",
+      "bytes": 163
+    },
+    "HybridSign.exe": {
+      "status": "MATCH",
+      "sha256": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc",
+      "expected": "1fa00d14171336bfcd8a16aabff776e3905946f5bb15bb6f389cd81c1322bfdc",
+      "bytes": 4267288
+    },
+    "README.txt": {
+      "status": "MATCH",
+      "sha256": "78dc9ff77c0c0f78b032260a0a1a3cbd93451e2779fade4650f5e7fcdeaf8733",
+      "expected": "78dc9ff77c0c0f78b032260a0a1a3cbd93451e2779fade4650f5e7fcdeaf8733",
+      "bytes": 1614
+    },
+    "THIRD-PARTY-NOTICES.txt": {
+      "status": "MATCH",
+      "sha256": "923ba01b876a77f1cee57571b588289a1feef6aee0a6d5210308bb131116169a",
+      "expected": "923ba01b876a77f1cee57571b588289a1feef6aee0a6d5210308bb131116169a",
+      "bytes": 192333
+    }
+  }
+}

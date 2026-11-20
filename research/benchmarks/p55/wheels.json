@@ -1,0 +1,187 @@
+{
+  "id": "p55a-cp3119-x64-v1",
+  "python": "3.11.9",
+  "architecture": "x64",
+  "falcon_lineage": "pqcrypto 0.3.4/PQClean clean 2cc64716044832eea747234ddbffc06746ab815d (source lineage; not a reproducible build proof)",
+  "wheels": {
+    "windows": {
+      "PyNaCl": {
+        "file": "pynacl-1.6.2-cp38-abi3-win_amd64.whl",
+        "sha256": "62985f233210dee6548c223301b6c25440852e13d59a8b81490203c3227c5ba0",
+        "url": "https://files.pythonhosted.org/packages/41/ad/334600e8cacc7d86587fe5f565480fde569dfb487389c8e1be56ac21d8ac/pynacl-1.6.2-cp38-abi3-win_amd64.whl",
+        "native_member": "nacl/_sodium.pyd",
+        "native_sha256": "57822e7aed944269943bcb855fc14560a5b6ae38869de4e3d00c380a5119ecc7"
+      },
+      "pqcrypto": {
+        "file": "pqcrypto-0.3.4-cp311-cp311-win_amd64.whl",
+        "sha256": "36ec272e32d24cd137fd937bf218d0c86f4b0d5d17ed26828708e1a71b667380",
+        "url": "https://files.pythonhosted.org/packages/63/a8/7d11a701dfb1777bbdaf231cc86b5d5598412f826c27195204855775af62/pqcrypto-0.3.4-cp311-cp311-win_amd64.whl",
+        "native_member": "pqcrypto/_sign/falcon_512.cp311-win_amd64.pyd",
+        "native_sha256": "ad5983a68922b01d84332ee800e16b55f001d1353ef62b32efd8d5d1216da237"
+      },
+      "pytest": {
+        "file": "pytest-8.4.2-py3-none-any.whl",
+        "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+        "url": "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl"
+      },
+      "cffi": {
+        "file": "cffi-2.0.0-cp311-cp311-win_amd64.whl",
+        "sha256": "66f011380d0e49ed280c789fbd08ff0d40968ee7b665575489afa95c98196ab5",
+        "url": "https://files.pythonhosted.org/packages/ae/8f/dc5531155e7070361eb1b7e4c1a9d896d0cb21c49f807a6c03fd63fc877e/cffi-2.0.0-cp311-cp311-win_amd64.whl",
+        "native_member": "_cffi_backend.cp311-win_amd64.pyd",
+        "native_sha256": "8100f667a3f64eeb37b9326d0c53a931e0ea3cea4ade5dbdc638c368355c0948"
+      },
+      "pycparser": {
+        "file": "pycparser-2.23-py3-none-any.whl",
+        "sha256": "e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934",
+        "url": "https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl"
+      },
+      "pluggy": {
+        "file": "pluggy-1.6.0-py3-none-any.whl",
+        "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+        "url": "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl"
+      },
+      "packaging": {
+        "file": "packaging-25.0-py3-none-any.whl",
+        "sha256": "29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+        "url": "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl"
+      },
+      "pygments": {
+        "file": "pygments-2.19.2-py3-none-any.whl",
+        "sha256": "86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b",
+        "url": "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl"
+      },
+      "iniconfig": {
+        "file": "iniconfig-2.1.0-py3-none-any.whl",
+        "sha256": "9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760",
+        "url": "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl"
+      },
+      "PyYAML": {
+        "file": "pyyaml-6.0.3-cp311-cp311-win_amd64.whl",
+        "sha256": "9f3bfb4965eb874431221a3ff3fdcddc7e74e3b07799e0e84ca4a0f867d449bf",
+        "url": "https://files.pythonhosted.org/packages/da/e3/ea007450a105ae919a72393cb06f122f288ef60bba2dc64b26e2646fa315/pyyaml-6.0.3-cp311-cp311-win_amd64.whl"
+      },
+      "colorama": {
+        "file": "colorama-0.4.6-py2.py3-none-any.whl",
+        "sha256": "4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+        "url": "https://files.pythonhosted.org/packages/d1/d6/3965ed04c63042e047cb6a3e6ed1a63a35087b6a609aa3a15ed8ac56c221/colorama-0.4.6-py2.py3-none-any.whl"
+      }
+    },
+    "linux": {
+      "PyNaCl": {
+        "file": "pynacl-1.6.2-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "sha256": "22de65bb9010a725b0dac248f353bb072969c94fa8d6b1f34b87d7953cf7bbe4",
+        "url": "https://files.pythonhosted.org/packages/7f/81/d60984052df5c97b1d24365bc1e30024379b42c4edcd79d2436b1b9806f2/pynacl-1.6.2-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "native_member": "nacl/_sodium.abi3.so",
+        "native_sha256": "1ee652a7b8a74a84061c54880a0f66b032b1b630e77dff4cd243b01ffac922fd"
+      },
+      "pqcrypto": {
+        "file": "pqcrypto-0.3.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "sha256": "7b48f4048f22b4dcacb012dd46b21df01f7962ef01a0c3032166cca3b9dab508",
+        "url": "https://files.pythonhosted.org/packages/55/62/d4ceb5e97affb2a2b2a945ea104c08b3ed990e6601c85088c091c3267be8/pqcrypto-0.3.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+        "native_member": "pqcrypto/_sign/falcon_512.cpython-311-x86_64-linux-gnu.so",
+        "native_sha256": "50977ae2d63515605559fc8aae03c4967e401e69946c8bdb1f62dc88122e2010"
+      },
+      "pytest": {
+        "file": "pytest-8.4.2-py3-none-any.whl",
+        "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+        "url": "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl"
+      },
+      "cffi": {
+        "file": "cffi-2.0.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "sha256": "8941aaadaf67246224cee8c3803777eed332a19d909b47e29c9842ef1e79ac26",
+        "url": "https://files.pythonhosted.org/packages/d7/91/500d892b2bf36529a75b77958edfcd5ad8e2ce4064ce2ecfeab2125d72d1/cffi-2.0.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+        "native_member": "_cffi_backend.cpython-311-x86_64-linux-gnu.so",
+        "native_sha256": "812107bf4eef2162f6e8adffb62c367bfac9cd31acdf5356dbee772b42765f67"
+      },
+      "pycparser": {
+        "file": "pycparser-2.23-py3-none-any.whl",
+        "sha256": "e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934",
+        "url": "https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl"
+      },
+      "pluggy": {
+        "file": "pluggy-1.6.0-py3-none-any.whl",
+        "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+        "url": "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl"
+      },
+      "packaging": {
+        "file": "packaging-25.0-py3-none-any.whl",
+        "sha256": "29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+        "url": "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl"
+      },
+      "pygments": {
+        "file": "pygments-2.19.2-py3-none-any.whl",
+        "sha256": "86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b",
+        "url": "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl"
+      },
+      "iniconfig": {
+        "file": "iniconfig-2.1.0-py3-none-any.whl",
+        "sha256": "9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760",
+        "url": "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl"
+      },
+      "PyYAML": {
+        "file": "pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+        "sha256": "b8bb0864c5a28024fac8a632c443c87c5aa6f215c0b126c449ae1a150412f31d",
+        "url": "https://files.pythonhosted.org/packages/71/60/917329f640924b18ff085ab889a11c763e0b573da888e8404ff486657602/pyyaml-6.0.3-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl"
+      }
+    },
+    "macos": {
+      "PyNaCl": {
+        "file": "pynacl-1.6.2-cp38-abi3-macosx_10_10_universal2.whl",
+        "sha256": "c949ea47e4206af7c8f604b8278093b674f7c79ed0d4719cc836902bf4517465",
+        "url": "https://files.pythonhosted.org/packages/be/7b/4845bbf88e94586ec47a432da4e9107e3fc3ce37eb412b1398630a37f7dd/pynacl-1.6.2-cp38-abi3-macosx_10_10_universal2.whl",
+        "native_member": "nacl/_sodium.abi3.so",
+        "native_sha256": "49032c357199dde6ae341319e558ce3ed9daa80f5ac83972aa9a63158b0b5371"
+      },
+      "pqcrypto": {
+        "file": "pqcrypto-0.3.4-cp311-cp311-macosx_10_9_x86_64.whl",
+        "sha256": "0274de7296be38ff9e1f5474953240eb876f45cd560ef5c51140144638b261ae",
+        "url": "https://files.pythonhosted.org/packages/99/e6/52591f51ef859c6a98b299b181f2aef74127955b0a4e26eca6c1c4f9a957/pqcrypto-0.3.4-cp311-cp311-macosx_10_9_x86_64.whl",
+        "native_member": "pqcrypto/_sign/falcon_512.cpython-311-darwin.so",
+        "native_sha256": "e9310f05b87440bf4052fbeddcfddeaa953f6962c0e34beeea19dc3b7755ffeb"
+      },
+      "pytest": {
+        "file": "pytest-8.4.2-py3-none-any.whl",
+        "sha256": "872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79",
+        "url": "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl"
+      },
+      "cffi": {
+        "file": "cffi-2.0.0-cp311-cp311-macosx_10_13_x86_64.whl",
+        "sha256": "b4c854ef3adc177950a8dfc81a86f5115d2abd545751a304c5bcf2c2c7283cfe",
+        "url": "https://files.pythonhosted.org/packages/12/4a/3dfd5f7850cbf0d06dc84ba9aa00db766b52ca38d8b86e3a38314d52498c/cffi-2.0.0-cp311-cp311-macosx_10_13_x86_64.whl",
+        "native_member": "_cffi_backend.cpython-311-darwin.so",
+        "native_sha256": "055a6103847f5173fbc3e48dd8c710abea75dc13f9bb5ae77adfbbbf9748b423"
+      },
+      "pycparser": {
+        "file": "pycparser-2.23-py3-none-any.whl",
+        "sha256": "e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934",
+        "url": "https://files.pythonhosted.org/packages/a0/e3/59cd50310fc9b59512193629e1984c1f95e5c8ae6e5d8c69532ccc65a7fe/pycparser-2.23-py3-none-any.whl"
+      },
+      "pluggy": {
+        "file": "pluggy-1.6.0-py3-none-any.whl",
+        "sha256": "e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+        "url": "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl"
+      },
+      "packaging": {
+        "file": "packaging-25.0-py3-none-any.whl",
+        "sha256": "29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484",
+        "url": "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl"
+      },
+      "pygments": {
+        "file": "pygments-2.19.2-py3-none-any.whl",
+        "sha256": "86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b",
+        "url": "https://files.pythonhosted.org/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl"
+      },
+      "iniconfig": {
+        "file": "iniconfig-2.1.0-py3-none-any.whl",
+        "sha256": "9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760",
+        "url": "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl"
+      },
+      "PyYAML": {
+        "file": "pyyaml-6.0.3-cp311-cp311-macosx_10_13_x86_64.whl",
+        "sha256": "44edc647873928551a01e7a563d7452ccdebee747728c1080d881d68af7b997e",
+        "url": "https://files.pythonhosted.org/packages/6d/16/a95b6757765b7b031c9374925bb718d55e0a9ba8a1b6a12d25962ea44347/pyyaml-6.0.3-cp311-cp311-macosx_10_13_x86_64.whl"
+      }
+    }
+  }
+}
