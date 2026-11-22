@@ -45,12 +45,12 @@ function DemoSignDocument() {
       </WorkflowStep>
       <WorkflowStep number={3} title="Review and sign" active={step === 3} disabled={!ready || task.busy} onSelect={() => setStep(3)}>
         <dl className="review-details"><DetailsRow label="Document">{document?.name}</DetailsRow><DetailsRow label="Demo vault">{vault?.name}</DetailsRow><DetailsRow label="Sequence">Ed25519 → Falcon-512</DetailsRow></dl>
-        <Notice title="Native signing is unavailable">No PDF will be signed. You can preview the interface and download a labelled JSON summary.</Notice>
+        <Notice title="PDF signing is unavailable in this preview">Try the workflow and download a JSON summary of the preview.</Notice>
       </WorkflowStep>
       {task.error && <div className="result-area"><Notice tone="error" title="Preview could not complete">{task.error}</Notice></div>}
       {task.result && <div className="result-area" role="status"><div className="result-heading"><Info size={20} aria-hidden="true" /><h2>Signing workflow previewed</h2><Badge tone="indigo">DEMO</Badge></div><p>No PDF was signed or changed.</p><Button variant="secondary" disabled={desktop} onClick={() => downloadPreviewSummary(task.result!)}><Download size={15} aria-hidden="true" />Download preview summary</Button><small>{desktop ? 'Native downloads are disabled in this desktop phase.' : 'JSON only · not a signed document'}</small></div>}
     </section><DocumentPreview document={document} /></div>
-    <TaskFooter label="Signing actions" title={step === 1 ? 'Choose a PDF to begin' : step === 2 ? 'Next: select your vault' : 'Review complete · demo only'} description={<span id="sign-unavailable">Native signer not connected. No PDF will be signed.</span>}>
+    <TaskFooter label="Signing actions" title={step === 1 ? 'Choose a PDF to begin' : step === 2 ? 'Next: select your vault' : 'Review complete · demo only'} description={<span id="sign-unavailable">Use a desktop build with signing support to sign this PDF.</span>}>
       {step > 1 && <Button variant="ghost" disabled={task.busy} onClick={() => setStep(step - 1)}><ArrowLeft size={16} aria-hidden="true" />Back</Button>}
       {step === 1 && <Button disabled={!document} onClick={() => setStep(2)}>Continue to vault<ArrowRight size={16} aria-hidden="true" /></Button>}
       {step === 2 && (vault?.state === 'unlocked' ? <Button onClick={() => setStep(3)}>Continue to review<ArrowRight size={16} aria-hidden="true" /></Button> : <Button onClick={() => setDialog(vault ? 'unlock' : 'create')}><LockKeyhole size={16} aria-hidden="true" />{vault ? 'Preview unlock' : 'Create demo vault'}</Button>)}

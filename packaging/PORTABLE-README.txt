@@ -1,28 +1,30 @@
-HybridSign - Falcon-512 + Ed25519 thesis research prototype
+HybridSign 0.1.0 - Windows portable edition
 
-Keep this complete folder together. Double-click HybridSign.exe.
-Python, Node.js and npm are NOT required on the target computer.
+Extract the complete folder to a local drive, then open HybridSign.exe.
+Keep the files and subfolders together. The package includes its own
+Python runtime.
 
-External prerequisites (not downloaded or installed by HybridSign):
-- Windows x64; tested Windows build and runtimes are in the release manifest.
-- Microsoft Edge WebView2 Evergreen Runtime 111 or newer.
-- Microsoft .NET Framework 4.6.2 or newer.
+Windows requirements
+- Windows x64. The tested configuration is listed in the release record.
+- Microsoft Edge WebView2 Evergreen Runtime 111 or later.
+- Microsoft .NET Framework 4.6.2 or later.
 
-Extract/copy to an ordinary local folder before launching. Store all encrypted
-vaults, PDFs and signing outputs in a separate trusted user-owned fixed local
-NTFS folder, outside this application folder. Never weaken filesystem ACLs.
-Do not run as Administrator merely to bypass a denied operation.
+Get missing runtimes from Microsoft. HybridSign does not install them.
+Keep your encrypted vaults, PDFs and signing outputs in a separate folder
+controlled by your Windows account on a fixed local NTFS drive. If Windows
+refuses access, choose an appropriate folder. Keep the existing permissions
+and security settings.
 
-Signing requires an authenticated unlocked vault. Passwords are entered in native
-Windows dialogs. Restart never restores unlocked signing access. Losing the vault
-or its password can mean losing signing access: no password recovery is provided.
+Open Key Vault to create or unlock a vault. Enter its password in the Windows
+dialog. You need an unlocked vault to sign. After restart, unlock the same
+vault to use its keys again. Keep a protected copy of the vault file and retain its password separately. HybridSign cannot recover a forgotten password.
 
-HYBRID VALID describes both mathematical signatures under the selected keys.
-Trusted signer identity, trusted timestamps, CMS/PAdES/FIPS compliance and general
-PDF reader interoperability are NOT established. This is not production-certified.
-No updater, telemetry, accounts or backend service is included.
+HYBRID VALID means both signatures passed with the selected public keys.
+Signer identity and signing time require separate evidence. The application
+uses a custom PDF signature format. CMS, PAdES, FIPS 206 and reader support
+remain unverified. The app has no accounts, telemetry or automatic updater.
 
-The executable is unsigned. SHA-256 checksums detect mismatched artifacts but do
-not authenticate the publisher. Verify the complete release through a trusted
-channel. Windows SmartScreen/antivirus behavior and clean-machine compatibility
-require separate acceptance; never disable security software to launch this app.
+The executable is unsigned. Compare SHA-256 values with the release record
+from a trusted source. A matching checksum identifies the package. Follow the
+security policy on your computer for unsigned software. Clean-machine and
+SmartScreen acceptance are recorded separately from the release checks.

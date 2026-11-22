@@ -57,7 +57,7 @@ for (const [width, height] of sizes) for (const theme of ['light', 'dark']) {
     await page.setViewportSize({ width, height })
     await go(page, 'settings')
     await page.getByRole('radio', { name: new RegExp(theme, 'i') }).check()
-    await expect(page.locator('.preview-indicator')).toHaveText('Desktop Connected')
+    await expect(page.locator('.preview-indicator')).toHaveText('Desktop')
     for (const route of routes) {
       await page.getByRole('link', { name: { dashboard: 'Dashboard', sign: 'Sign Document', verify: 'Verify Signature', vault: 'Key Vault', settings: 'Settings' }[route], exact: true }).click()
       await expect(page.locator('h1')).toBeFocused()
@@ -132,7 +132,7 @@ for (const state of ['invalid', 'failed']) test(`resizing preserves ${state} and
   for (const [width, height] of sizes) {
     await page.setViewportSize({ width, height })
     await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible()
-    await expect(page.getByText('Authenticated at selection', { exact: true })).toBeVisible()
+    await expect(page.getByText('Vault unlocked when selected', { exact: true })).toBeVisible()
     await expect(page.locator('main')).toContainText('Signer identity is not established')
     await layout(page)
   }

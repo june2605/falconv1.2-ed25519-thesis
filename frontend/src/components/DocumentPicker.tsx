@@ -4,7 +4,7 @@ import type { DocumentSelection } from '../models'
 import { sampleDocument, selectPdf } from '../services/demo'
 import { Badge, Button, Notice } from './ui'
 
-export function fileSize(size: number): string { return size < 1024 * 1024 ? `${(size / 1024).toFixed(0)} KB` : `${(size / 1024 / 1024).toFixed(1)} MB` }
+export function fileSize(size: number): string { return size < 1024 * 1024 ? `${(size / 1024).toFixed(0)} KiB` : `${(size / 1024 / 1024).toFixed(1)} MiB` }
 
 export function DocumentPicker({ value, onChange, disabled = false }: { value: DocumentSelection | null; onChange: (value: DocumentSelection | null) => void; disabled?: boolean }) {
   const input = useRef<HTMLInputElement>(null)
@@ -36,7 +36,7 @@ export function DocumentPicker({ value, onChange, disabled = false }: { value: D
       : <div className={`dropzone ${dragging ? 'dragging' : ''} ${disabled ? 'disabled' : ''}`}
         onDragOver={event => { event.preventDefault(); if (!disabled) setDragging(true) }} onDragLeave={() => setDragging(false)} onDrop={drop}>
         <span className="upload-icon"><FileUp size={25} strokeWidth={1.5} aria-hidden="true" /><span><Upload size={10} /></span></span>
-        <strong>Drop a PDF here</strong><span>PDF only · up to 50 MB</span>
+        <strong>Drop a PDF here</strong><span>PDF only, up to 50 MiB</span>
         <Button variant="secondary" busy={reading} disabled={disabled} onClick={() => input.current?.click()}><FolderOpen size={15} />Choose PDF</Button>
       </div>}
     {!value && <button className="text-button sample-button" disabled={disabled || reading} onClick={() => { setError(''); onChange({ ...sampleDocument }) }}>Just exploring? Use a sample document <span aria-hidden="true">↗</span></button>}

@@ -190,7 +190,7 @@ def create(*args, **kwargs):
                   if(performance.now()-ready.at<200)return false;
                   window.__probeButtonReady=null; b.click(); return true;
                 }})()""")
-            wait("document.querySelector('.preview-indicator')?.textContent.trim()==='Desktop Connected'")
+            wait("document.querySelector('.preview-indicator')?.textContent.trim()==='Desktop'")
             window.evaluate_js("window.location.hash='/vault'; void 0")
             wait("!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Create Vault' && !b.disabled)")
             if mode == "create":
@@ -207,7 +207,7 @@ def create(*args, **kwargs):
                         provider = NativeDialogs(window)
                         timer = Timer()
                         timer.Interval = 150
-                        expected = "HybridSign — Save a new encrypted vault" if creating else "HybridSign — Open encrypted vault"
+                        expected = "HybridSign - Save a new encrypted vault" if creating else "HybridSign - Open encrypted vault"
                         def cancel_owned(*_):
                             def visit(hwnd, _):
                                 title = ctypes.create_unicode_buffer(256)
@@ -247,7 +247,7 @@ def create(*args, **kwargs):
                 wait("!!document.querySelector('[role=alert]')")
                 assert vault_path.read_bytes() == before
                 assert window.evaluate_js("document.querySelector('[role=alert]').textContent.includes(\"Couldn't unlock vault\")")
-                assert not window.evaluate_js("document.querySelector('main').textContent.includes('Vault state unavailable')")
+                assert not window.evaluate_js("document.querySelector('main').textContent.includes('Vault status unconfirmed')")
                 assert not window.evaluate_js("document.querySelector('.toast-region').textContent.includes('Vault locked')")
                 assert window.evaluate_js("document.querySelector('.vault-status-line').textContent.includes('Locked')")
                 window.on_top = True
@@ -309,7 +309,7 @@ def create(*args, **kwargs):
                 time.sleep(.15)
                 capture(window, 'signing-review.png')
                 click('Sign PDF')
-                wait("document.querySelector('main').textContent.includes('Signing and self-verifying')")
+                wait("document.querySelector('main').textContent.includes('Signing and checking the PDF')")
                 from System import Action
                 window.native.BeginInvoke(Action(window.native.Close))
                 deadline = time.monotonic() + 2

@@ -5,12 +5,13 @@ trong kiểm thử. [Báo cáo kỹ thuật và bằng chứng](phase4c3-final-r
 
 ## Vì sao kết hợp Ed25519 và Falcon-512?
 
-Ed25519 cung cấp một lớp chữ ký khóa công khai cổ điển. Falcon-512 cung cấp
-một lớp chữ ký dựa trên bài toán lưới, được nghiên cứu cho bối cảnh hậu lượng tử.
-Bộ kiểm tra yêu cầu đồng thời cả hai lớp với cặp khóa đã chọn. Cách kết hợp
-giúp nghiên cứu lợi ích và chi phí của việc dùng hai giả định mật mã khác nhau.
+Ed25519 là chữ ký số truyền thống dựa trên đường cong elliptic. Falcon-512 là
+chữ ký hậu lượng tử dựa trên mạng NTRU.
+Bộ kiểm tra yêu cầu đồng thời cả hai lớp với cặp khóa đã chọn. Mục đích kết hợp
+hai họ thuật toán là giảm phụ thuộc vào một họ giả thiết mật mã.
 Bảo đảm tổng thể còn phụ thuộc cách kết hợp, chất lượng triển khai và việc
-người kiểm tra có xác định đúng nguồn khóa.
+người xác minh có xác định đúng nguồn khóa. Hai khóa vẫn dùng chung thiết bị
+và tiến trình ký, nên sự cố tại đó có thể ảnh hưởng cả hai lớp.
 
 ## Vì sao dùng thứ tự Ed25519 rồi Falcon-512?
 
@@ -35,12 +36,14 @@ thứ tự, ranh giới, ByteRange, metadata, mã hex và padding chuẩn. Nhờ
 thể bác bỏ thêm byte cuối tệp, cắt tệp, hoặc đổi padding Falcon dù phần
 padding ấy nằm ngoài thông điệp Falcon. Bài trình diễn giữ nguyên nguồn khóa
 và chỉ đổi bản PDF để cô lập nguyên nhân.
-[Kiểm tra padding](phase2b2-regression.md) · [Kiểm tra cặp chữ ký](phase2b3-regression.md)
+Phạm vi kiểm thử là các biến đổi đã thử. Tính duy nhất của biểu diễn chữ ký
+Falcon trong vùng lưu bên ngoài thông điệp ký vẫn là câu hỏi mở.
+[Kiểm tra phần đệm](phase2b2-regression.md) · [Kiểm tra cặp chữ ký](phase2b3-regression.md) · [Kiểm toán biểu diễn byte](phase5-1a-signature-integrity-audit.md#impact-assessment)
 
 ## HYBRID VALID nghĩa là gì? Nếu một chữ ký lỗi thì sao?
 
 Với đúng bản byte được chụp cho lần kiểm tra, cặp container hợp lệ về cấu
-trúc và cả Ed25519 lẫn Falcon-512 đều qua kiểm tra bằng hai khóa công khai
+trúc và cả Ed25519 lẫn Falcon-512 đều qua xác minh bằng hai khóa công khai
 đã chọn. Một lớp thất bại là đủ để không có kết quả hợp lệ. INVALID cũng
 có thể do PDF sai cấu trúc hoặc chọn sai khóa. Việc chọn tệp chưa thực hiện
 kiểm tra. Lỗi I/O hoặc trạng thái chưa xác nhận được hiển thị theo luồng lỗi.
@@ -51,10 +54,10 @@ không suy ra kết quả riêng từng lớp. [Bộ kiểm tra Python](../verif
 ## Hai loại khóa được dùng thế nào?
 
 Khóa riêng Ed25519 và Falcon tạo chữ ký. Hai khóa công khai tương ứng đủ
-cho bộ kiểm tra và có thể được cung cấp qua nguồn đã xác minh. Desktop 0.1.0
-chọn khóa từ vault đã xác thực hoặc đọc phần công khai của tệp vault. Có thể
-kiểm tra bằng snapshot công khai đã chọn sau khi khóa vault. Cần giữ tệp vault
-ở thư mục riêng dù phần header chứa thông tin công khai.
+cho bộ kiểm tra và có thể được cung cấp qua nguồn đã xác minh. HybridSign 0.1.0
+cho phép dùng khóa từ kho đã mở hoặc đọc khóa công khai từ tệp kho. Các khóa
+công khai đã chọn vẫn dùng được sau khi khóa kho. Tệp kho vẫn chứa phần
+khóa riêng đã mã hóa và cần được lưu ở thư mục riêng.
 
 ## Khóa riêng được bảo vệ ra sao?
 
@@ -71,9 +74,10 @@ khóa kho không bảo đảm xóa sạch mọi bản sao bộ nhớ. [Đặc t�
 
 ID dạng `hybrid-v1:<hex>` là SHA-256 của một miền dành riêng cho ID, tiếp theo
 là tên thuật toán và khóa công khai Ed25519, rồi tên thuật toán và khóa công
-khai Falcon. Mỗi trường có độ dài 4 byte big-endian. Đổi khóa làm thay đổi
+khai Falcon. Mỗi trường có tiền tố 4 byte theo thứ tự big-endian để ghi độ dài. Đổi khóa làm thay đổi
 giá trị băm như kỳ vọng. ID có ích để đối chiếu đúng cặp qua lần mở kho hoặc
-qua một kênh tin cậy riêng.
+qua một kênh tin cậy riêng. Riêng giá trị ID không chứng minh người dùng
+nắm giữ khóa riêng.
 
 Nếu chỉ đọc header trong **Choose encrypted vault**, dữ liệu được kiểm tra
 cấu trúc và đối chiếu ID nhưng chưa xác thực bằng mật khẩu. Nguồn này mang
@@ -105,32 +109,28 @@ v1.2, FIPS 206 hay chứng nhận hệ thống.
 
 ## Chi phí hiệu năng đã được đo như thế nào?
 
-Bảng sau tóm tắt các CSV thừa kế trong `D:\Final_Thesis\benchmark`, sử dụng
-nhãn kích thước trong tên tệp. Mỗi kích thước có 100 dòng ký và 100 dòng kiểm
-tra. Cột ký là trung bình của `ed_total + fal_total` theo từng dòng, không
-gồm `keygen_total`. Cột kiểm tra lấy trung bình `total`. Các giá trị giây
-trong CSV được đổi sang mili giây.
+Phase 5.5C so sánh ba quy trình trên cùng PDF 742 byte, 1 MiB và 10 MiB.
+Chín phiên logic trên Windows, Ubuntu và macOS Intel ghi 4 050 lượt đo.
+Khoảng ký và xuất gồm kiểm tra khóa, tạo chữ ký, ghi và kiểm tra ứng viên
+trước khi xuất. Xác minh tệp đã lưu là phép đo riêng. Nhập mật khẩu, mở
+kho và thao tác giao diện nằm ngoài hai khoảng đo.
 
-| Nhãn bộ dữ liệu | Ký, tổng hai giai đoạn (ms) | Kiểm tra, tổng ghi trong CSV (ms) |
-| --- | ---: | ---: |
-| 1 MB | 83,67 | 25,10 |
-| 10 MB | 285,95 | 97,92 |
-| 50 MB | 1.265,91 | 399,11 |
-| 200 MB | 4.860,05 | 1.453,86 |
-| 500 MB | 11.666,55 | 3.434,77 |
+Với PDF 10 MiB trên Windows, trung vị hiệu ghép cặp của Hybrid là
+90,438 ms so với Ed25519 và 129,408 ms so với Falcon-512 khi ký và xuất.
+Mức tăng tệp là 4 626 byte theo khuôn vùng chứa mặc định. Độ trễ cao hơn
+của Ed25519 trên các runner macOS Intel lặp lại trong ba phiên. Môi trường
+thử khác phần cứng và cấu hình, nên chưa xác định được nguyên nhân.
 
-Đây là quan sát từ nguyên mẫu cũ, không phải phép đo từ lúc bấm nút đến lúc
-hoàn tất trong desktop 0.1.0. Desktop còn có mở vault, kiểm tra đường dẫn,
-snapshot, tự kiểm tra và I/O công bố. Giới hạn đầu vào desktop là 50 MiB. Các mốc 200 và 500 MB chỉ minh họa dữ liệu nghiên cứu thừa kế. Không chạy
-lại benchmark trong đợt này. Cả 15 hash của tập gốc được đối chiếu.
-[Mốc SHA-256 Phase 1](phase1-baseline.json) · [Phạm vi số đo của giao dịch ký](phase2b4b2-regression.md)
+Phase 5.2 ghi riêng kết quả Windows cục bộ và số đo công đoạn. Các CSV
+FALCON/eSign vẫn là dữ liệu kế thừa với ranh giới đo riêng.
+[Bảng so sánh Phase 5.5C](tables/phase5-5d-pdf-vi.md) · [Kết quả Phase 5.2](phase5-2b-experimental-results.md) · [Dữ liệu kế thừa](phase5-1-experiment-gap-analysis.md)
 
 ## Giới hạn của nguyên mẫu và điều kiện để dùng trong thực tế?
 
 Nguyên mẫu trình bày quy trình ký cục bộ, hai chữ ký lồng nhau, lưu khóa mã
 hóa và phát hiện bản bị sửa. Nó kiểm tra envelope PDF và định dạng chữ ký
-riêng, không phân tích hết nội dung hoặc mã hoạt động của PDF. Tệp và khóa
-vẫn phụ thuộc an toàn của thiết bị, ACL và chất lượng mật khẩu. Khóa phiên
+riêng, không phân tích hết nội dung hoặc mã hoạt động của PDF. An toàn của tệp và khóa phụ thuộc vào thiết bị, quyền truy cập Windows và
+chất lượng mật khẩu. Khóa phiên
 không xóa chắc chắn bộ nhớ. Công bố nguyên tử không bảo đảm bền vững khi
 mất điện. Quên mật khẩu có thể mất khả năng ký với cặp đó. Ứng dụng chưa có
 quy trình khôi phục mật khẩu.

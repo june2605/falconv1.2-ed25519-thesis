@@ -39,7 +39,7 @@ def create(*args, **kwargs):
         try:
             deadline = time.monotonic() + 12
             while time.monotonic() < deadline:
-                if window.evaluate_js("document.querySelector('.preview-indicator')?.textContent.trim()") == "Desktop Connected":
+                if window.evaluate_js("document.querySelector('.preview-indicator')?.textContent.trim()") == "Desktop":
                     break
                 time.sleep(0.1)
             else:
@@ -68,8 +68,8 @@ def create(*args, **kwargs):
             results["metadata"] = response
             results["checks"].append("correct_metadata_and_capability_flags")
             for route, heading in [("sign", "Sign a document"), ("verify", "Verify a signature"),
-                                   ("vault", "Manage your signing keys"), ("settings", "Personalize your workspace"),
-                                   ("dashboard", "Your digital signing workspace")]:
+                                   ("vault", "Manage your signing keys"), ("settings", "Settings"),
+                                   ("dashboard", "Dashboard")]:
                 window.evaluate_js(f"window.location.hash='/{route}'; void 0")
                 deadline = time.monotonic() + 2
                 while time.monotonic() < deadline and window.evaluate_js("document.querySelector('h1')?.textContent") != heading:
@@ -106,7 +106,7 @@ def create(*args, **kwargs):
             results["checks"].append("untrusted_navigation_and_popup_blocked")
             window.evaluate_js("window.chrome.webview.postMessage(['__class__.__init__','[]','123']); window.chrome.webview.postMessage(['pywebviewStateUpdate','{}','123']); void 0")
             time.sleep(0.1)
-            assert window.evaluate_js("document.querySelector('.preview-indicator').textContent.trim()") == "Desktop Connected"
+            assert window.evaluate_js("document.querySelector('.preview-indicator').textContent.trim()") == "Desktop"
             results["checks"].append("unapproved_raw_messages_ignored")
             window.evaluate_js("window.location.hash='/settings'; void 0")
             time.sleep(0.1)

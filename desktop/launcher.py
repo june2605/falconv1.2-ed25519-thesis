@@ -26,7 +26,7 @@ def launch():
     bridge = VerificationBridge(worker, trusted=lambda: False)
     server_type = make_server_type(snapshot)
     guard, failures = [], []
-    window = webview.create_window("HybridSign — Desktop Preview", str(snapshot.root / "index.html"),
+    window = webview.create_window("HybridSign 0.1.0", str(snapshot.root / "index.html"),
                                    js_api=bridge, width=1280, height=800, min_size=(960, 600),
                                    resizable=True, background_color="#f7f8fb", text_select=True)
     bridge._dialogs = NativeDialogs(window)

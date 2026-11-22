@@ -66,7 +66,7 @@ def picker(self, *, pdf):
         def visit(hwnd, _):
             title = ctypes.create_unicode_buffer(256)
             user.GetWindowTextW(hwnd, title, 256)
-            if title.value == 'HybridSign \u2014 Choose signed PDF':
+            if title.value == 'HybridSign - Choose signed PDF':
                 user.PostMessageW(hwnd, 0x10, 0, 0)
                 timer.Stop()
             return True
@@ -261,7 +261,7 @@ def create(*args, **kwargs):
                         'unpinInside': unpin_inside, 'unpinOutside': unpin_outside,
                         'autoInside': auto_inside, 'autoOutside': auto_outside,
                         'idStable': id_stable, 'fullIdExact': full_exact}
-            wait("document.querySelector('.preview-indicator')?.textContent==='Desktop Connected'")
+            wait("document.querySelector('.preview-indicator')?.textContent==='Desktop'")
             window.evaluate_js("window.location.hash='/verify'; void 0")
             wait("!![...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Choose signed PDF')")
             # There is no managed session in this child at all: public verification

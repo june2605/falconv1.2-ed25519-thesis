@@ -1,261 +1,152 @@
-# Falcon–Ed25519 thesis prototype
+# HybridSign 0.1.0
 
-Local Streamlit research application inherited from FALCON/eSign. Ed25519 signs
-the first document revision; Falcon-512 signs the subsequent revision containing
-that signature. Verification requires both layers and rejects bytes appended
-after the final container. See [project provenance](docs/PROJECT_PROVENANCE.md).
+HybridSign is a Windows research app for signing PDFs with Ed25519 and
+Falcon-512. Ed25519 signs the first revision. Falcon-512 signs the next revision
+with the Ed25519 signature included. Verification checks the complete pair
+against the public keys you select. Signing keys are stored in an encrypted
+vault on your computer. [Project provenance](docs/PROJECT_PROVENANCE.md)
 
-The container format is custom. CMS, PAdES, FIPS 206 compliance and PDF-reader
-interoperability have not been established. Historical prototype installers do
-not contain the hardening in this source tree.
+## Windows requirements
 
-## Local Windows setup
+- 64-bit Windows. The release was tested on Windows 11 Pro x64.
+- Microsoft Edge WebView2 Evergreen Runtime 111 or later.
+- Microsoft .NET Framework 4.6.2 or later.
 
-### Phase 4C.2B Windows installer
+Install any missing runtimes from Microsoft. The installer and portable build
+require both runtimes. They include their Python runtime. [WebView2 downloads](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) · [.NET Framework downloads](https://dotnet.microsoft.com/en-us/download/dotnet-framework)
 
-Run `HybridSign-Setup-Phase4C2B-win-x64.exe` for a per-user installation.
-Open **HybridSign** from the Start Menu. Use **Settings → Apps → Installed apps**
-to uninstall after closing the application. Keep vaults and PDFs in a separate
-trusted local NTFS folder. Setup requires WebView2 Evergreen 111+ and .NET
-Framework 4.6.2+. The release is unsigned.
+## Installation
 
-See the [installer release report](docs/phase4c2b-installer-release.md) for the
-approved payload, build command, checksums, and tested Windows configuration.
+- **Installer.** Use the approved `HybridSign-Setup-Phase4C2B-win-x64.exe` for
+  your Windows account. Open **HybridSign** from the Start Menu. To uninstall,
+  close the app after any signing finishes and use **Settings > Apps > Installed apps**.
+- **Portable.** Extract the complete `HybridSign-Phase4C2A-win-x64-portable.zip`
+  to a local folder and open `HybridSign.exe`. Keep its files and subfolders together.
 
-### Phase 4C.2A portable Windows desktop
+The release packages are unsigned and distributed separately from the source.
+Check their SHA-256 values against the release record obtained through a trusted
+channel. A matching checksum identifies the package from that record. Publisher
+authentication and clean-machine acceptance are separate checks.
+[Release checksums and limitations](docs/phase4c3-final-release-review.md#release-integrity) · [Installer record](docs/phase4c2b-installer-release.md) · [Portable record](docs/phase4c2a-portable-packaging.md)
 
-The local one-folder release launches by double-clicking **HybridSign.exe**.
-Keep the complete folder together. The target computer needs Microsoft Edge
-WebView2 Evergreen and .NET Framework; Python, Node.js and npm are build tools,
-not target-machine prerequisites. Store vaults and PDFs outside the application
-folder. No installer, single-file EXE, auto-updater or elevation is included.
+The instructions below use the labels in this source tree. The approved
+installer and portable build still show the earlier labels listed in the demo
+checklist. [Label differences](docs/thesis-demo-checklist.md#nhãn-trên-bản-phát-hành-và-bản-từ-mã-nguồn)
 
-See [portable build commands, prerequisites, checksums and actual EXE acceptance](docs/phase4c2a-portable-packaging.md).
-The executable and release archives are local generated artifacts, not committed
-source files. Clean-machine/SmartScreen acceptance remains a separate check.
+## First-time setup
 
-### Phase 4C.1 thesis demonstration
+Create a folder controlled by your Windows account on a fixed local NTFS drive.
+Keep vaults and PDFs there, outside the app and source folders. Use the
+[public sample PDF](demo_assets/sample-unsigned.pdf) to try the workflow.
 
-See the [desktop demo readiness report and 3–5 minute script](docs/phase4c1-demo-readiness.md).
-Use the generated, public [sample PDF](demo_assets/sample-unsigned.pdf), not a personal
-document. Prepare an existing trusted folder on fixed local NTFS outside the
-repository for disposable vaults and outputs. A Windows shortcut can launch the
-existing desktop module without PowerShell during the presentation; setup and
-manual acceptance steps are in the report. Portable packaging is covered above.
+## Create or unlock a vault
 
-Vault files, known sidecars and `demo-work/` are ignored as an additional guard
-against accidental Git inclusion. This is not secret discovery or a substitute
-for keeping credentials and generated artifacts outside the repository.
+1. Open **Key Vault** and select **Create Vault**. Choose a new `.hvault` file
+   and enter a password of at least 15 characters in the Windows dialog. The new
+   vault is locked.
+2. Select **Unlock Vault**, choose the file and enter its password. Confirm that
+   the vault shows **Unlocked** before signing.
+3. To end signing access, select **Lock Vault**. After restarting the app, open
+   the same vault to recover the same key pair. Use **View full ID** to compare
+   the Hybrid Key ID with a trusted record of the two public keys.
 
-### Phase 4B.3B Windows desktop, vault, signing and verification
+Keep the encrypted vault and its password. Password recovery, password changes
+and in-app backup or restore are unavailable. Locking ends signing access, but
+other copies of sensitive data may remain in process memory.
+[Vault behavior](docs/phase4b2a-real-vault-regression.md)
 
-HybridSign opens in a dedicated pywebview/WebView2 window. Key Vault now creates,
-unlocks and locks real encrypted hybrid-key vaults, with file selection and masked
-password entry in native Windows dialogs. Private keys stay in the Python worker;
-React receives public metadata and opaque references only. Sign Document now saves
-a real Ed25519 then Falcon-512 PDF using the authenticated vault on that same worker.
-Standalone hybrid verification is connected as well. Password changes,
-backups/restores and accounts remain unintegrated. Browser mode remains a UI preview.
+## Sign a PDF
 
-From the existing Python 3.11 x64 environment:
+1. Open **Sign Document** and use **Choose PDF** to select an unsigned PDF of
+   50 MiB or less.
+2. Review the document and unlocked vault. Select **Continue to review** and
+   then **Sign PDF**. Choose an output location in the Windows Save dialog.
+   Windows asks before replacing an existing PDF.
+3. Leave the app open while signing runs. **Signed PDF saved** appears after
+   HybridSign checks both signatures and confirms the saved output.
 
-```powershell
-Set-Location D:\Final_Thesis_GitHub
-.\.venv\Scripts\python.exe -m pip install -r requirements-desktop.txt
-Set-Location frontend
-npm run build
-Set-Location ..
-.\.venv\Scripts\python.exe -m desktop.launcher
-```
+If the signing status is unconfirmed, use **Check signing status** and inspect
+the chosen save location. A signed PDF may already exist and an existing file
+could be from an earlier operation. Verify the intended output before deciding
+whether to start another signing operation. [Signing behavior](docs/phase4b3a-real-signing-regression.md)
 
-Use `npm ci` before building on a fresh frontend installation. The current
-workspace already has its dependencies installed. The launcher serves only the
-compiled frontend and requires no Vite server. It never downloads WebView2 or
-falls back to a browser/legacy renderer. Install WebView2 Evergreen 111+ and
-.NET Framework 4.6.2+ separately if missing; current supported updates are recommended.
-See [native architecture, security limits and exact regression results](docs/phase4b1-native-bridge-regression.md).
+## Verify a PDF
 
-On **Key Vault**, choose **Create Vault** and a new filename in an existing
-trusted folder on a fixed local NTFS drive. Enter and confirm a password of at
-least 15 characters in the Windows dialog. The encrypted vault is created locked.
-Choose **Unlock Vault** to select and authenticate it; **Lock Vault** drops managed
-access. Close/reopen the application and select the same file to recover the
-original keys. Existing filenames are never overwritten. Unsupported storage or
-broader/foreign ACLs reject without permission repair. Locking does not guarantee
-memory erasure; lost passwords cannot be recovered here.
+1. In **Verify Signature**, select **Choose signed PDF**.
+2. Use **Choose encrypted vault** to read the public keys from a vault file
+   without a password. HybridSign labels this source **UNAUTHENTICATED**. Compare
+   the key ID with a trusted source before relying on the result. If the vault
+   is already unlocked, select **Use unlocked vault keys**. The selected public
+   keys stay available after locking.
+3. Select **Verify PDF**. **HYBRID VALID** means both signatures passed with the
+   selected keys. **HYBRID INVALID** means the pair was rejected. Check that
+   you chose the correct file and keys. An interrupted or unconfirmed check
+   does not report a cryptographic result. Use **Check verification status**
+   if it appears.
 
-See [real-vault integration, exact tests and remaining limitations](docs/phase4b2a-real-vault-regression.md).
-On **Sign Document**, choose an unsigned PDF through the Windows picker, select
-your unlocked vault, continue to review, then choose **Sign PDF** and a native
-Save location. Source overwrite, vault/sidecar aliases and unsafe paths reject.
-Replacing an existing PDF requires native confirmation; unrelated non-PDF files
-are not accepted as replacement targets. Input is limited to 50 MiB on the
-conservative fixed-local-NTFS profile. This is envelope validation, not complete
-PDF parsing or active-content inspection.
+Verification reads the PDF and leaves it unchanged. The Hybrid Key ID
+identifies a public-key pair. Establishing who signed requires a separate,
+trusted link between the keys and the signer. [Verification and key trust](docs/phase4b3b-real-verification-regression.md#public-key-source-trust)
 
-Signing runs as one tracked operation. Leave the application open until it
-settles; active signing prevents normal window close and conflicting vault
-operations. Completion means that the inherited signer verified both layers
-before atomic publication and Python verified the saved bytes again. If the
-status is uncertain, reconcile it and inspect the chosen output location before
-retrying; there is no post-queue cancellation promise. No PDF bytes, paths,
-passwords or private keys are passed through the JavaScript API.
+## Troubleshooting
 
-See [real-signing architecture, Windows evidence and exact regression results](docs/phase4b3a-real-signing-regression.md).
-On **Verify Signature**, choose a signed PDF and an encrypted `.hvault` through
-Windows dialogs. Public metadata can be read without a password or private key.
-It is shown as **UNAUTHENTICATED**. Alternatively, choose **Use authenticated vault**
-after unlocking on Key Vault; that public snapshot stays usable after locking.
-Authentication of a vault does not certify signer identity. Verify PDF reports
-only **HYBRID VALID / HYBRID INVALID** for the complete pair under selected keys;
-exceptions and changed inputs are failures, not invented layer results. A wrong
-key pair also causes INVALID. Verification never rewrites the PDF or key source.
+| If you see | What to check |
+| --- | --- |
+| Startup asks for WebView2 or .NET Framework | Install the required runtime from Microsoft and reopen HybridSign. |
+| Vault will not unlock | Confirm the file and password. A damaged vault can also prevent unlocking. |
+| Save location is refused | Choose a user-controlled local NTFS folder outside the app folder. Keep the input, output and vault as separate files. |
+| PDF is refused | Use a nonempty PDF of 50 MiB or less. Signing takes an unsigned input. |
+| Only demo results appear | Use the Windows app for real signing and verification. A regular browser shows the UI preview. |
 
-See [real-verification architecture, evidence and exact results](docs/phase4b3b-real-verification-regression.md).
-Human Windows picker acceptance, physical DPI and screen-reader checks remain
-manual. Browser mode stays entirely simulated; desktop verification has no example
-results. Existing Python verifier APIs remain available separately.
+## Known limitations
 
-### Phase 4A desktop UI preview
+HybridSign uses a project-specific PDF signature format. CMS, PAdES, reader
+interoperability and FIPS 206 conformance remain unverified. It does not
+establish signer identity or trusted signing time. Input checks cover the file
+envelope and signature format. The app does not render PDFs or inspect their
+active content. [Security and format limits](docs/phase5-1a-signature-integrity-audit.md) · [Falcon implementation](docs/falcon-implementation-provenance.md)
 
-The separate [HybridSign frontend](frontend/README.md) is an interactive React
-prototype with Dashboard, Sign Document, Verify Signature, Key Vault and Settings.
-In a regular browser it is **not connected to Python**; all workflow results are
-labelled UI previews. The native desktop above separately integrates local vaults and PDF signing.
+## Development and research
 
-```powershell
-Set-Location D:\Final_Thesis_GitHub\frontend
-npm ci
-npm run dev
-```
-
-Open `http://127.0.0.1:5173`. Tested with Node 26.13.0 and npm 11.20.0.
-The existing Streamlit application and Python setup below remain separate.
-
-### Existing Python prototype
-
-The regression environment uses Windows x64 and Python **3.11.9**, with
-`pqcrypto==0.3.4` (including `pqcrypto.sign.falcon_512`), `PyNaCl==1.6.2`,
-`streamlit==1.66.1` and `pytest==9.2.0`. These are observed tested versions,
-not a complete dependency lock; `requirements.txt` remains unpinned.
-
-From PowerShell, use the existing environment without activating it:
-
-```powershell
-Set-Location D:\Final_Thesis_GitHub
-.\.venv\Scripts\python.exe --version
-.\.venv\Scripts\python.exe -c "from pqcrypto.sign import falcon_512; print(falcon_512.PUBLIC_KEY_SIZE)"
-.\.venv\Scripts\python.exe -X utf8 -m streamlit run app.py --server.address 127.0.0.1 --server.port 8501 --server.headless true
-```
-
-Open `http://127.0.0.1:8501` in a local browser. If setting up a **new** environment
-instead, these commands install the observed top-level versions:
+To run the desktop app from source, use Windows x64, Python 3.11, the desktop
+runtimes above and a Node.js version supported by the frontend. The tested
+cryptographic profile uses `pqcrypto==0.3.4` and `PyNaCl==1.6.2`.
 
 ```powershell
 py -3.11 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install pqcrypto==0.3.4 PyNaCl==1.6.2 streamlit==1.66.1 pytest==9.2.0
+.\.venv\Scripts\python.exe -m pip install -r requirements-portable.txt
+Push-Location frontend
+npm ci
+npm run build
+Pop-Location
+.\.venv\Scripts\python.exe -m desktop.launcher
 ```
 
-PyInstaller is unnecessary for the local Streamlit workflow. The portable desktop
-build is separate; the inherited browser watcher is not part of that release.
-Start Streamlit directly as above when using the legacy application.
+- [Frontend setup, preview and tests](frontend/README.md)
+- [Thesis demonstration checklist](docs/thesis-demo-checklist.md) and [script](docs/thesis-demo-script-vi.md)
+- [Benchmark protocol and evidence](docs/phase5-5c-cross-platform-main.md)
+- [Thesis experimental chapter](docs/thesis-chapter-experiments-vi.md) and [discussion](docs/thesis-chapter-discussion-vi.md)
+- [In-memory signing and public-key verification APIs](docs/phase3-1-regression.md)
 
-## Generate, sign and verify
-
-1. In **QUẢN LÝ KHÓA**, generate and download all four raw key files:
-   `ed25519_pub.key`, `ed25519_priv.key`, `falcon_pub.key`, `falcon_priv.key`.
-   The inherited generator writes persistent plaintext files in the working
-   directory and can overwrite prior keys. Keep needed keys backed up privately.
-2. In **KÝ SỐ TÀI LIỆU**, upload an unsigned PDF, the **Ed25519 private seed**,
-   **Falcon private key**, and the **matching Falcon public key**. That public
-   key is mandatory for final verification; the Ed25519 public key is derived
-   from its private seed. An incorrect Falcon public key prevents download.
-3. Download the signed PDF only after both cryptographic checks succeed. The
-   backend stages, fsyncs and verifies its candidate before atomic replacement;
-   the UI also checks a snapshot of the exact bytes supplied for download.
-4. In **XÁC THỰC TÀI LIỆU**, upload the signed PDF and both corresponding public
-   keys. Altered content, malformed containers, noncanonical padding, truncation,
-   appended bytes or wrong public keys produce rejection.
-
-The public signing API requires a keyword-only Falcon public-key path:
-
-```python
-from sign import sign_file
-from verify import verify_file
-
-result = sign_file("source.pdf", "signed.pdf", "ed25519_priv.key",
-                   "falcon_priv.key", pk_falcon="falcon_pub.key")
-valid, *_ = verify_file(result[0], "ed25519_pub.key", "falcon_pub.key")
-```
-
-There is no four-argument fallback. Both public functions retain their
-11-element return tuples. Inspect the verifier's first boolean, not tuple
-truthiness. Signing rejects source/key destination aliases, already-signed
-input and reserved marker collisions; it never strips old signatures.
-
-## Phase 3.1 in-memory foundation
-
-The new Python APIs keep private-key material in memory and share the inherited
-PDF protocol and atomic publication logic:
-
-```python
-from keygen import generate_hybrid_key_pair
-from sign import sign_with_key_material
-from verify import verify_bytes
-
-pair = generate_hybrid_key_pair()  # Generates and validates both pairs; no files.
-result = sign_with_key_material("source.pdf", "signed.pdf", pair)
-with open(result[0], "rb") as document:
-    report = verify_bytes(document.read(), pair.public_keys.ed25519_public_key,
-                          pair.public_keys.falcon_public_key)
-assert report[0] is True
-```
-
-PDF stages still use owned temporary files; the memory-key signer creates no
-key files. `pair.key_id` identifies the ordered public-key tuple, not a trusted
-identity. This is an in-memory foundation, not encrypted storage or a memory
-isolation boundary. The Streamlit UI and legacy `generate_keys()` export still
-use plaintext key files. See [Phase 3.1](docs/phase3-1-regression.md) and the
-[Falcon provenance investigation](docs/falcon-implementation-provenance.md).
-
-## Operational limits
-
-- Run this prototype locally. Streamlit uploads reach its Python process;
-  exposing that process remotely would send private keys to the remote server.
-  This is not a browser-side cryptography or multi-user key-storage system.
-- Upload copies are isolated in owned temporary directories and cleaned before
-  results/downloads, on success and ordinary exceptions. One cleanup retry handles
-  a transient OS failure. Persistent permission/sharing denial is reported with
-  the affected upload directory and prevents a signed download. Stop using the
-  affected directory and remove leftovers after resolving the denial.
-- Process termination, power loss and native crashes can leave temporary files.
-  Cleanup is not secure erasure; Streamlit/browser upload and download buffers
-  can retain bytes in memory. Generated working-directory keys are intentionally
-  persistent and are not temporary upload artifacts.
-- Atomic replacement provides visibility on supported filesystems, not a
-  power-loss durability guarantee. Path/fingerprint checks do not eliminate
-  concurrent filesystem races. Use trusted local directories and suitable ACLs.
-- Upload validation checks for nonempty data and a PDF header. It does not fully
-  parse PDF syntax, render documents, detect active content or establish signer
-  identity. Public keys must come from a trusted source. Key generation remains
-  non-transactional; a failed regeneration can leave partial persistent keys.
-
-## Regression tests
+Run Python regression tests in an environment with pytest installed.
+Use a Windows desktop session for native dialog and WebView2 tests.
 
 ```powershell
 .\.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
 ```
 
-Tests use small synthetic PDFs and disposable keys, including both frozen
-Phase 1 signatures. Original benchmark data is neither required nor changed.
-Eight native symlink cases skip on the current Windows environment because
-Developer Mode/symlink privilege is unavailable (error 1314); native hard-link
-and Windows file-sharing cases run normally. No elevation is required for the
-rest of the suite.
+### Legacy Streamlit app
 
-The launch command enables Python UTF-8 mode because redirected Streamlit CLI
-help/output can otherwise fail under Windows legacy console encodings.
+`app.py` is the inherited local research workflow. It also needs Streamlit
+(`streamlit==1.66.1` in the tested setup). Run it on loopback to keep uploads
+on this machine.
 
-See [Phase 2B.4B.3 regression results](docs/phase2b4b3-regression.md) for exact
-counts, fault coverage and remaining limits. Earlier phases are recorded in
-[docs/](docs/).
+```powershell
+.\.venv\Scripts\python.exe -X utf8 -m streamlit run app.py --server.address 127.0.0.1 --server.port 8501 --server.headless true
+```
+
+The key generator writes persistent plaintext key files and can replace prior
+keys. The signing screen requires the Ed25519 private seed, Falcon private
+key and matching Falcon public key. The verification screen requires both
+public keys. Upload cleanup and the path-based Python API have separate
+regression records. [Legacy signing and cleanup](docs/phase2b4b3-regression.md) · [Path-based API](docs/phase2b4b2-regression.md)

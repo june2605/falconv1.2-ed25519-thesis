@@ -141,12 +141,12 @@ def actual_dialog(provider, kind, original, *args, **kwargs):
     planned_kind, destination, approval = plans.popleft()
     assert planned_kind == kind
     titles = {
-        'vault-save': 'HybridSign \u2014 Save a new encrypted vault',
-        'vault-open': 'HybridSign \u2014 Open encrypted vault',
-        'pdf-open': 'HybridSign \u2014 Choose unsigned PDF',
-        'pdf-save': 'HybridSign \u2014 Save signed PDF',
-        'verify-open': 'HybridSign \u2014 Choose signed PDF',
-        'notice': 'HybridSign \u2014 Operation in progress',
+        'vault-save': 'HybridSign - Save a new encrypted vault',
+        'vault-open': 'HybridSign - Open encrypted vault',
+        'pdf-open': 'HybridSign - Choose unsigned PDF',
+        'pdf-save': 'HybridSign - Save signed PDF',
+        'verify-open': 'HybridSign - Choose signed PDF',
+        'notice': 'HybridSign - Operation in progress',
     }
     timer, status, errors = Timer(), ['waiting'], []
     timer.Interval = 150
@@ -421,7 +421,7 @@ def create(*args, **kwargs):
                 wait("!![...document.querySelectorAll('h2')].find(n=>n.textContent==='HYBRID " + expected + "')")
                 assert reply['ok'] and reply['data']['hybridValid'] is (expected == 'VALID')
 
-            wait("document.querySelector('.preview-indicator')?.textContent==='Desktop Connected'")
+            wait("document.querySelector('.preview-indicator')?.textContent==='Desktop'")
             initial = api('get_vault_state')
             assert initial['ok'] and initial['data']['vault'] is None
             assert not window.evaluate_js("!!document.querySelector('input[type=password],input[type=file]')")
@@ -499,7 +499,7 @@ def create(*args, **kwargs):
             stage = 'signing safety and actual publication'
             plans.append(('pdf-save', paths['output'], True))
             window.evaluate_js("(()=>{const b=[...document.querySelectorAll('button')].find(n=>n.textContent.trim()==='Sign PDF');b.click();b.click();})()")
-            wait("!!document.querySelector('main').textContent.includes('Signing and self-verifying')")
+            wait("!!document.querySelector('main').textContent.includes('Signing and checking the PDF')")
             go('vault')
             assert window.evaluate_js("[...document.querySelectorAll('button')].find(n=>n.textContent.trim()==='Lock Vault').disabled")
             rejected = api('lock_vault', [public['vaultId'], public['sessionId']])
@@ -529,7 +529,7 @@ def create(*args, **kwargs):
             stage = 'matching public verification'
             go('verify')
             choose('verify-open', paths['output'], 'Choose signed PDF')
-            click('Use authenticated vault'); verify('VALID'); capture('verify-valid.png')
+            click('Use unlocked vault keys'); verify('VALID'); capture('verify-valid.png')
             stage = 'cancelled verification clears VALID'
             choose('verify-open', None, 'Choose signed PDF')
             wait("!![...document.querySelectorAll('h2')].find(n=>n.textContent==='No verification performed')")
@@ -550,7 +550,7 @@ def create(*args, **kwargs):
             assert not window.evaluate_js("!![...document.querySelectorAll('h2')].find(n=>n.textContent==='HYBRID VALID')")
             report['invalidVaultRejected'] = window.evaluate_js("[...document.querySelectorAll('button')].find(n=>n.textContent.trim()==='Verify PDF').disabled&&!document.querySelector('.key-source-note')")
             assert report['invalidVaultRejected']
-            click('Use authenticated vault'); verify('VALID')
+            click('Use unlocked vault keys'); verify('VALID')
             stage = 'lock then public-only verification'
             go('vault'); click('Lock Vault')
             wait("document.querySelector('.vault-status-line')?.textContent.includes('Locked')")

@@ -214,7 +214,7 @@ test('all routes and native vault, selected signing document and verification st
   }
   await expect(page.getByRole('button',{name:'Review and sign step',exact:true})).toHaveAttribute('aria-expanded','true')
   await expect(page.getByRole('button',{name:'Sign PDF',exact:true})).toBeEnabled()
-  for(const [name,title] of [['Dashboard','Your digital signing workspace'],['Key Vault','Manage your signing keys'],['Settings','Personalize your workspace'],['Verify Signature','Verify a signature']]) {
+  for(const [name,title] of [['Dashboard','Dashboard'],['Key Vault','Manage your signing keys'],['Settings','Settings'],['Verify Signature','Verify a signature']]) {
     await page.getByRole('link',{name,exact:true}).click()
     await expect(page.locator('h1')).toHaveText(title)
     await expect(page.getByRole('link',{name,exact:true})).toHaveAttribute('aria-current','page')
@@ -238,7 +238,7 @@ test('sidebar modes remain readable in both themes and representative captures',
       await page.setViewportSize({width,height})
       await page.mouse.move(width-10,100)
       await expect(sidebar(page)).toHaveAttribute('data-docked','false')
-      await expect(page.locator('.preview-indicator')).toHaveText('Desktop Connected')
+      await expect(page.locator('.preview-indicator')).toHaveText('Desktop')
       if(info.project.name==='desktop-1366') {
         await mkdir('qa/phase4b3b1-interactions',{recursive:true})
         await page.screenshot({path:`qa/phase4b3b1-interactions/${width}x${height}-${theme}.png`,animations:'disabled'})
@@ -256,13 +256,13 @@ test('sidebar modes remain readable in both themes and representative captures',
 test('sidebar changes cannot cancel or reset an active native signing job', async ({ page }) => {
   await responsiveHost(page,'valid','unauthenticated-metadata','running')
   await page.setViewportSize({width:1100,height:700}); await go(page,'sign')
-  await expect(page.getByText('Signing and self-verifying…',{exact:true})).toBeVisible()
+  await expect(page.getByText('Signing and checking the PDF…',{exact:true})).toBeVisible()
   await page.getByRole('button',{name:'Expand sidebar',exact:true}).click()
   await page.keyboard.press('Escape')
   await page.setViewportSize({width:1440,height:900})
   await page.getByRole('button',{name:'Expand sidebar',exact:true}).click()
   await page.getByRole('button',{name:'Collapse sidebar',exact:true}).click()
-  await expect(page.getByText('Signing and self-verifying…',{exact:true})).toBeVisible()
+  await expect(page.getByText('Signing and checking the PDF…',{exact:true})).toBeVisible()
   await expect(page.getByRole('button',{name:'Sign PDF',exact:true})).toBeDisabled()
   await page.getByRole('link',{name:'Key Vault',exact:true}).click()
   await expect(page.locator('.vault-status-line')).toContainText('Unlocked')

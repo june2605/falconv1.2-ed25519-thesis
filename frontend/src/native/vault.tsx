@@ -23,21 +23,21 @@ class VaultRequestError extends Error {
   constructor(message: string, readonly code = 'INVALID_RESPONSE') { super(message) }
 }
 const errors: Record<string, string> = {
-  'vault.unlock': 'The password may be incorrect, or the vault could not be authenticated. Please try again.',
-  'vault.exists': 'Destination already exists. Choose a new filename.',
+  'vault.unlock': 'Check the password and try again. A damaged vault can also prevent unlocking.',
+  'vault.exists': 'A file with that name already exists. Choose a new name.',
   'vault.security': 'A fixed local NTFS drive and the approved Windows permissions are required.',
-  'vault.path': 'Select a safe local vault path without links or aliases.',
+  'vault.path': 'Choose a vault file on a local drive without links or shortcuts.',
   'vault.permission': 'Windows denied vault access. Permissions were not changed.',
   'vault.format': 'The selected file is not a supported encrypted vault.',
   'vault.profile': 'The selected vault profile is not supported.',
-  'vault.conflict': 'Vault changed. Its session was locked; reopen it explicitly.',
-  'vault.file_locked': 'Vault is in use by another operation. Retry explicitly.',
-  'vault.io': 'Vault I/O failed. Inspect the selected location before retrying; publication or cleanup may have completed.',
+  'vault.conflict': 'The vault changed and was locked. Select it again to unlock it.',
+  'vault.file_locked': 'Another operation is using the vault. Wait for it to finish.',
+  'vault.io': 'HybridSign could not finish working with the vault. Check the selected folder before trying again.',
   STALE_SESSION: 'Vault session is no longer valid. Refresh its status.',
   STALE_SELECTION: 'The selected vault is no longer available. Select it again.',
   VAULT_ACTIVE: 'Lock the current vault before opening or creating another.',
   BUSY: 'Another native operation is in progress.',
-  TIMEOUT: 'Native operation timed out. Inspect the vault location before retrying.',
+  TIMEOUT: 'The vault operation timed out. Check the selected folder before trying again.',
   UNAVAILABLE: 'Native vault connection is unavailable.',
 }
 
@@ -63,7 +63,7 @@ async function request(operation: Operation, refs: string[] = []): Promise<Vault
     reply = operation === 'get_vault_state' ? await Promise.race([invoked, new Promise((_, reject) => {
       timer = window.setTimeout(() => reject(new Error()), 2000)
     })]) : await invoked
-  } catch { throw new VaultRequestError('Native vault connection is unavailable. No success was confirmed.', 'UNAVAILABLE') }
+  } catch { throw new VaultRequestError('HybridSign could not confirm the vault operation. Check the vault status.', 'UNAVAILABLE') }
   finally { if (timer !== undefined) window.clearTimeout(timer) }
   if (exact(reply, ['ok', 'protocolVersion', 'error']) && reply.ok === false && reply.protocolVersion === 1 && exact(reply.error, ['code', 'message'])) {
     const code = typeof reply.error.code === 'string' ? reply.error.code : 'INVALID_RESPONSE'
@@ -71,11 +71,11 @@ async function request(operation: Operation, refs: string[] = []): Promise<Vault
   }
   const result = response(reply)
   const extended = exact(result, ['vault', 'cancelled', 'selectionId', 'operation'])
-  if (!(exact(result, ['vault', 'cancelled']) || extended) || !result || typeof result.cancelled !== 'boolean' || !(result.vault === null || publicVault(result.vault))) throw new VaultRequestError('Invalid native vault response. No success was confirmed.')
+  if (!(exact(result, ['vault', 'cancelled']) || extended) || !result || typeof result.cancelled !== 'boolean' || !(result.vault === null || publicVault(result.vault))) throw new VaultRequestError('HybridSign could not confirm the vault operation. Check the vault status.')
   if (extended && (!(result.selectionId === null || typeof result.selectionId === 'string' && /^[0-9a-f]{32}$/.test(result.selectionId))
-    || typeof result.operation !== 'string' || !['idle', 'reading-state', 'selecting-file', 'waiting-password', 'unlocking', 'creating', 'locking'].includes(result.operation))) throw new VaultRequestError('Invalid native vault progress. No success was confirmed.')
+    || typeof result.operation !== 'string' || !['idle', 'reading-state', 'selecting-file', 'waiting-password', 'unlocking', 'creating', 'locking'].includes(result.operation))) throw new VaultRequestError('Could not confirm vault progress. Check the vault status.')
   if (!result.cancelled && (operation === 'create_vault' || operation === 'lock_vault') && (!result.vault || result.vault.state !== 'locked')
-    || !result.cancelled && operation === 'unlock_vault' && (!result.vault || result.vault.state !== 'unlocked')) throw new VaultRequestError('Invalid native vault state. No success was confirmed.')
+    || !result.cancelled && operation === 'unlock_vault' && (!result.vault || result.vault.state !== 'unlocked')) throw new VaultRequestError('Could not confirm the vault status. Refresh status before continuing.')
   return { selectionId: null, operation: 'idle', ...result } as unknown as VaultReply
 }
 
@@ -154,7 +154,7 @@ export function NativeVaultProvider({ children }: PropsWithChildren) {
       } else if (mounted.current) { setVault(null); setKnown(false); setSelectionId(null) }
       if (mounted.current) setError({ code: failure instanceof VaultRequestError ? failure.code : 'INVALID_RESPONSE',
         title: authenticationFailed ? "Couldn't unlock vault" : 'Vault operation not confirmed',
-        message: failure instanceof VaultRequestError ? failure.message : 'Invalid native vault response. No success was confirmed.' })
+        message: failure instanceof VaultRequestError ? failure.message : 'HybridSign could not confirm the vault operation. Check the vault status.' })
     } finally {
       stopPolling()
       running.current = false
@@ -170,7 +170,7 @@ export function NativeVaultProvider({ children }: PropsWithChildren) {
   }, [integrated, run])
   const progress = operation ? ({ 'waiting-password': 'Waiting for password', unlocking: 'Unlocking vault',
     creating: 'Creating vault', locking: 'Locking vault', 'selecting-file': 'Choose a vault in Windows',
-    'reading-state': 'Reading native vault state…', idle: operation === 'unlock_vault' ? 'Unlocking vault' : 'Completing vault operation…' }[phase])
+    'reading-state': 'Checking vault status…', idle: operation === 'unlock_vault' ? 'Unlocking vault' : 'Completing vault operation…' }[phase])
     : error?.code === 'vault.unlock' ? 'Unable to unlock' : vault?.state === 'unlocked' ? 'Vault unlocked' : null
   return <VaultContext.Provider value={{ integrated, vault, busy: busy || signingBusy, known, error, progress, canRetry: !!selectionId,
     dismissError: () => setError(null), retry: () => run('unlock_vault', selectionId ? [selectionId] : []),

@@ -36,7 +36,7 @@ async function host(page: import('@playwright/test').Page, fault = '') {
 test('native vault starts empty and never presents the demo vault as real', async ({ page }) => {
   await host(page)
   await go(page, 'vault')
-  await expect(page.locator('.preview-indicator')).toHaveText('Desktop Connected')
+  await expect(page.locator('.preview-indicator')).toHaveText('Desktop')
   await expect(page.getByRole('button', { name: 'Create Vault', exact: true }).first()).toBeVisible()
   await expect(page.getByRole('button', { name: 'Unlock Vault', exact: true }).first()).toBeVisible()
   await expect(page.locator('main')).not.toContainText('DEMO VAULT')

@@ -34,10 +34,12 @@ class NativeSigningError extends Error {
   constructor(message: string, readonly rejected = false) { super(message) }
 }
 const errors: Record<string, string> = {
-  PDF_INVALID: 'Choose a supported unsigned PDF up to 50 MiB. Already-signed or reserved-marker files are rejected.',
-  STALE_SESSION: 'Unlock the native vault again before signing.', STALE_DOCUMENT: 'Choose the PDF again.',
-  DOCUMENT_CHANGED: 'The selected PDF changed. Choose it again.', BUSY: 'A native operation is already in progress.',
+  PDF_INVALID: 'Choose an unsigned PDF of 50 MiB or less that HybridSign can read.',
+  STALE_SESSION: 'Unlock the vault again before signing.', STALE_DOCUMENT: 'Choose the PDF again.',
+  DOCUMENT_CHANGED: 'The selected PDF changed. Choose it again.', BUSY: 'Wait for the current operation to finish.',
 }
+const unconfirmedSigning = 'A signed PDF may already exist. Check the signing status and save location before trying again.'
+
 async function invoke(method: string, args: string[] = [], bounded = false): Promise<unknown> {
   let timer: number | undefined
   try {
@@ -46,14 +48,14 @@ async function invoke(method: string, args: string[] = [], bounded = false): Pro
     const call = (host.api[method] as (...args: string[]) => Promise<unknown>)(...args)
     const reply = bounded ? await Promise.race([call, new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error()), 2000) })]) : await call
     if (exact(reply, ['ok', 'protocolVersion', 'error']) && reply.ok === false && reply.protocolVersion === 1 && exact(reply.error, ['code', 'message'])) {
-      throw new NativeSigningError(typeof reply.error.code === 'string' ? errors[reply.error.code] ?? 'Native request rejected. Inspect the selected output location before retrying.' : 'Native request rejected.', reply.error.code !== 'SIGN_UNCERTAIN')
+      throw new NativeSigningError(typeof reply.error.code === 'string' ? errors[reply.error.code] ?? 'Signing request rejected. Check the save location before trying again.' : 'HybridSign could not accept the request.', reply.error.code !== 'SIGN_UNCERTAIN')
     }
     const value = response(reply)
     if (!value) throw new Error()
     return value
   } catch (error) {
     if (error instanceof NativeSigningError) throw error
-    throw new NativeSigningError('Native communication could not confirm the outcome. Reconcile status and inspect the output location before starting another job.')
+    throw new NativeSigningError(method === 'choose_pdf' ? 'The selection could not be confirmed. Choose the PDF again.' : unconfirmedSigning)
   } finally { if (timer !== undefined) window.clearTimeout(timer) }
 }
 interface SigningState {
@@ -85,7 +87,7 @@ export function NativeSigningProvider({ children }: PropsWithChildren) {
         if (['completed', 'cancelled'].includes(value.state)) setError(null)
       }
     } catch {
-      if (mounted.current && epoch === generation.current && operation.current) { setUncertain(true); setError('Signing outcome not confirmed. Reconcile native status; a PDF may already exist.') }
+      if (mounted.current && epoch === generation.current && operation.current) { setUncertain(true); setError(unconfirmedSigning) }
     } finally { polling.current = false }
   }
   useEffect(() => {
@@ -109,7 +111,7 @@ export function NativeSigningProvider({ children }: PropsWithChildren) {
       const value = await invoke('choose_pdf')
       if (!exact(value, ['document', 'cancelled']) || typeof value.cancelled !== 'boolean' || !(value.document === null || pdf(value.document))) throw new Error()
       if (!value.cancelled && value.document) { setDocument(value.document as unknown as NativePdf); setJob(null); operation.current = null }
-    } catch (failure) { setError(failure instanceof NativeSigningError ? failure.message : 'Native PDF selection could not be validated.'); setDocument(null) }
+    } catch (failure) { setError(failure instanceof NativeSigningError ? failure.message : 'The selection could not be confirmed. Choose the PDF again.'); setDocument(null) }
     finally { inflight.current = false; setPending(false) }
   }
   async function sign(vaultId: string, sessionId: string) {
@@ -122,7 +124,7 @@ export function NativeSigningProvider({ children }: PropsWithChildren) {
       if (!job(value) || value.operationId !== operation.current) throw new Error()
       setJob(value); setUncertain(false)
     } catch (failure) {
-      setError(failure instanceof NativeSigningError ? failure.message : 'Native signing outcome is not confirmed.')
+      setError(failure instanceof NativeSigningError ? failure.message : unconfirmedSigning)
       if (failure instanceof NativeSigningError && failure.rejected) {
         setUncertain(false); setJob(null); operation.current = null
       } else {

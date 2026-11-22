@@ -21,7 +21,7 @@ METHODS = METHODS | frozenset({'choose_verification_pdf', 'choose_verification_k
     'use_authenticated_vault_keys', 'verify_pdf', 'get_verification_state'})
 ERRORS = {"INVALID_REQUEST": "Invalid desktop request.",
           "UNAVAILABLE": "Desktop connection is unavailable.",
-          "BUSY": "Desktop worker is busy.",
+          "BUSY": "Wait for the current operation to finish.",
           "TIMEOUT": "Desktop request timed out.",
           "INTERNAL_ERROR": "Desktop request could not complete."}
 ERRORS.update({"CANCELLED": "Operation cancelled.", "STALE_SESSION": "Vault session is no longer valid.",
@@ -39,20 +39,20 @@ ERRORS.update({"CANCELLED": "Operation cancelled.", "STALE_SESSION": "Vault sess
                "vault.security": "Vault requires a fixed local NTFS drive and the approved Windows permissions.",
                "vault.permission": "Windows denied vault access. Permissions were not changed.",
                "vault.io": "Vault operation failed. Inspect the selected location before retrying; publication or cleanup may have completed.",
-               "vault.file_locked": "Vault is in use by another operation. Try again explicitly.",
-               "vault.conflict": "Vault changed. The session was locked; reopen it explicitly.",
+               "vault.file_locked": "Another operation is using the vault. Wait for it to finish.",
+               "vault.conflict": "The vault changed and was locked. Select it again to unlock it.",
                "vault.verification": "Encrypted vault validation failed.",
                "vault.locked": "Vault is locked.", "vault.handle": "Vault session is not valid."})
-ERRORS.update({'PDF_INVALID': 'Select a supported unsigned PDF, at most 50 MiB.',
+ERRORS.update({'PDF_INVALID': 'Choose a PDF of 50 MiB or less that HybridSign can read.',
                'STALE_DOCUMENT': 'Select the PDF again.', 'DOCUMENT_CHANGED': 'Selected PDF changed. Select it again.',
-               'STALE_OPERATION': 'Signing operation is not known in this application session.',
-               'SIGN_PATH': 'Output is unsafe or no longer matches native approval.',
+               'STALE_OPERATION': 'This signing job is unavailable in the current session.',
+               'SIGN_PATH': 'The selected save location is unsafe or has changed. Choose another location.',
                'SIGN_FAILED': 'Signing did not complete. No new signed output was confirmed.',
-               'SIGN_UNCERTAIN': 'The output may have been published. Inspect the selected location before retrying.'})
+               'SIGN_UNCERTAIN': 'A signed PDF may already exist. Check the selected save location before trying again.'})
 ERRORS.update({'STALE_KEY_SOURCE': 'Choose the public-key source again.',
-               'VERIFY_FAILED': 'Verification could not complete. No cryptographic result was established.',
+               'VERIFY_FAILED': 'Verification could not complete. There is no signature result.',
                'VERIFY_IO': 'The selected verification file could not be read safely. Check access and select it again.',
-               'VERIFY_UNCERTAIN': 'Verification outcome is not confirmed. Reconcile native status without resubmitting.'})
+               'VERIFY_UNCERTAIN': 'Check the verification status before submitting another request.'})
 
 
 class PublicError(TypedDict):

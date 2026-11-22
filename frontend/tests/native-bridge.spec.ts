@@ -28,19 +28,19 @@ async function mockNative(page: import('@playwright/test').Page, fault: Fault = 
 test('browser preview remains available without a native host', async ({ page }) => {
   await go(page, 'dashboard')
   await expect(page.locator('.preview-indicator')).toHaveText('UI PREVIEW')
-  await expect(page.locator('.sidebar-note')).toContainText('Native bridge unavailable')
-  await expect(page.getByText('Desktop Connected', { exact: true })).toHaveCount(0)
+  await expect(page.locator('.sidebar-note')).toContainText('Browser preview')
+  await expect(page.getByText('Desktop', { exact: true })).toHaveCount(0)
 })
 
 for (const delayed of [false, true]) {
   test(`native metadata handshake ${delayed ? 'waits for event' : 'handles already-ready API'}`, async ({ page }) => {
     await mockNative(page, 'none', delayed)
     await go(page, 'dashboard')
-    await expect(page.locator('.preview-indicator')).toHaveText('Desktop Connected')
-    await expect(page.locator('.sidebar-note')).toContainText('Vault / PDF not integrated')
+    await expect(page.locator('.preview-indicator')).toHaveText('Desktop')
+    await expect(page.locator('.sidebar-note')).toContainText('PDF tools unavailable')
     for (const label of ['Sign Document', 'Verify Signature', 'Key Vault', 'Settings', 'Dashboard']) {
       await page.getByRole('navigation').getByRole('link', { name: label, exact: true }).click()
-      await expect(page.locator('.preview-indicator')).toHaveText('Desktop Connected')
+      await expect(page.locator('.preview-indicator')).toHaveText('Desktop')
     }
     await page.getByRole('link', { name: 'Key Vault', exact: true }).click(); await unlock(page)
     await page.getByRole('link', { name: 'Sign Document', exact: true }).click(); await sample(page); await review(page)
@@ -71,7 +71,7 @@ test('hung native calls have a bounded initialization timeout', async ({ page })
   await go(page, 'dashboard')
   await page.waitForTimeout(3200)
   await expect(page.locator('.preview-indicator')).toHaveText('UI PREVIEW')
-  await expect(page.locator('.sidebar-note')).toContainText('Native bridge unavailable')
+  await expect(page.locator('.sidebar-note')).toContainText('Browser preview')
 })
 
 test('presence of pywebview alone does not enable native status', async ({ page }) => {

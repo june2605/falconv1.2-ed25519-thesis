@@ -261,14 +261,14 @@ begin
   Result := CloseMessage;
   if not AppCanBeServiced then Exit;
   Target := RemoveBackslashUnlessRoot(ExpandConstant('{app}'));
-  Result := 'Choose a dedicated folder on a fixed local drive without junctions or other reparse points.';
+  Result := 'Choose a dedicated folder on a fixed local drive. The folder path must not go through a link or junction.';
   if (DriveType(AddBackslash(ExtractFileDrive(Target))) <> 3) or not SafeDirectoryTree(Target) then Exit;
   if RegKeyExists(HKCU64, UninstallKey) then begin
     Result := 'A registered HybridSign installation already exists. Use its original location and release, or uninstall it first.';
     if not RegQueryStringValue(HKCU64, UninstallKey, 'Inno Setup: App Path', Previous) or
        not RegQueryStringValue(HKCU64, UninstallKey, 'DisplayVersion', Version) or
        (CompareText(Target, RemoveBackslashUnlessRoot(Previous)) <> 0) or (Version <> '{#ProductVersion}') then Exit;
-    Result := 'An installed application file has changed. Move any personal files to safe storage before repairing HybridSign.';
+    Result := 'Setup stopped because it could not verify the installed files. Keep your vaults and PDFs in a separate folder.';
     if not PayloadIsSafe(Target) then Exit;
   end else begin
     Result := 'Choose a new or empty folder. Setup leaves existing files untouched.';
@@ -305,7 +305,7 @@ begin
     Exit;
   end;
   if not PayloadIsSafe(ExpandConstant('{app}')) then begin
-    SuppressibleMsgBox('An application file has changed or a link was found. Uninstall stopped to protect your files. Move any personal files to safe storage, then retry.',
+    SuppressibleMsgBox('Uninstall stopped because it could not verify the installed files. Your files were left in place.',
       mbError, MB_OK, IDOK);
     Exit;
   end;

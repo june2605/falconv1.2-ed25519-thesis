@@ -1,18 +1,20 @@
 HybridSign 0.1.0
-Falcon-512 + Ed25519 thesis research prototype
+Windows research app for PDF signatures with Ed25519 and Falcon-512.
 
-Setup installs HybridSign for the current Windows user. It creates a Start Menu
-shortcut, with an optional Desktop shortcut. Close any running HybridSign windows
-after their signing operations finish before installing or uninstalling.
+Setup installs HybridSign for the current Windows user. Open it from the
+Start Menu or choose to add a Desktop shortcut. Before installing or
+uninstalling, let any signing finish and close HybridSign.
 
-Requirements: Windows x64, Microsoft Edge WebView2 Evergreen Runtime 111 or later,
-and Microsoft .NET Framework 4.6.2 or later. Obtain missing runtimes from Microsoft.
-Setup does not download or install them. The installer and application are unsigned.
+You need Windows x64, Microsoft Edge WebView2 Evergreen Runtime 111 or later
+and Microsoft .NET Framework 4.6.2 or later. Get missing runtimes from
+Microsoft before running Setup. Setup and the application are unsigned.
 
-Choose a dedicated application folder. Keep encrypted vaults and PDFs in a
-separate trusted local NTFS folder. Uninstall removes the installed application
-and its shortcuts. It leaves unrelated files and user storage in place.
+Choose a dedicated app folder on a local drive. Store your encrypted vaults
+and PDFs in a separate user-controlled folder on a fixed local NTFS drive.
+Uninstall removes the installed app and its shortcuts. Your vaults and
+PDFs kept in separate storage stay in place.
 
-The application uses a custom signature format. A valid signature pair verifies
-under the selected public keys. Trusted signer identity, trusted timestamps and
-CMS/PAdES/FIPS compliance have not been established.
+Verification checks both signatures with the public keys you select.
+Signer identity and signing time require separate evidence. HybridSign
+uses a custom signature format. CMS, PAdES and FIPS 206 conformance have
+not been established.

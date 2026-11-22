@@ -26,10 +26,24 @@ khác. Kiểm thử trên máy ảo Windows sạch **chưa thực hiện**.
   bộ ZIP trên ổ đĩa cục bộ, giữ thư mục `HybridSign` cùng `_internal`,
   rồi mở `HybridSign.exe` từ Explorer. Trên sân khấu chỉ cần ứng dụng và
   Explorer. Không cần VS Code, PowerShell, Python, Node hoặc máy chủ phát triển.
-- [ ] Kiểm tra **Desktop Connected**. Nếu cần trình bày ngoại tuyến, tập mở
+- [ ] Kiểm tra chỉ báo **Desktop** hoặc **Desktop Connected**, tùy bản đang chạy. Nếu cần trình bày ngoại tuyến, tập mở
   ứng dụng và chạy quy trình khi máy đã ngắt mạng theo chính sách cơ sở.
   Ghi kết quả thực tế. Ứng dụng dùng tài nguyên cục bộ nhưng việc có sẵn
   và hoạt động của runtime trên máy này cần được xác nhận.
+
+### Nhãn trên bản phát hành và bản từ mã nguồn
+
+Bản cài và bản portable đã đối chiếu SHA-256 vẫn dùng nhãn của lần nghiệm thu trước.
+Bản chạy từ mã nguồn sau đợt biên tập dùng các nhãn dưới đây. Xác định phiên bản
+gói đang dùng trước khi tập trình diễn.
+
+| Thao tác | Nhãn trong mã nguồn hiện tại | Nhãn trong gói đã nghiệm thu |
+| --- | --- | --- |
+| Chỉ báo trên thanh trên cùng | Desktop | Desktop Connected |
+| Xác nhận tệp đã lưu | Both signatures verified | Completed self-verification |
+| Chọn khóa từ kho đã mở | Use unlocked vault keys | Use authenticated vault |
+| Kiểm tra thao tác ký đang chờ xác nhận | Check signing status | Reconcile native status |
+| Kiểm tra thao tác xác minh đang chờ xác nhận | Check verification status | Reconcile native status |
 
 ## 2. Chuẩn bị bộ tệp trình diễn
 
@@ -42,7 +56,7 @@ các kiểm tra ACL và đường dẫn của ứng dụng.
 | Tên tệp | Vai trò |
 | --- | --- |
 | `sample-unsigned.pdf` | Bản sao nguyên byte của [mẫu công khai](../demo_assets/sample-unsigned.pdf) 742 byte. |
-| `presentation.hvault` | Kho mã hóa dùng riêng cho buổi trình diễn. Mật khẩu do người trình bày tự đặt và chỉ gõ vào hộp thoại native. |
+| `presentation.hvault` | Kho mã hóa dùng riêng cho buổi trình diễn. Mật khẩu do người trình bày tự đặt và chỉ gõ vào hộp thoại Windows. |
 | `rehearsal-signed.pdf` | Bản hợp lệ đã ký và kiểm tra từ trước với cặp khóa trong `presentation.hvault`. |
 | `rehearsal-tampered.pdf` | Bản sao của `rehearsal-signed.pdf` đã đổi `APPROVED` thành `REJECTED`. |
 | `wrong-keys.hvault` | Kho thử thứ hai với cặp khóa độc lập. Chỉ đọc metadata công khai khi thử sai khóa. |
@@ -56,7 +70,7 @@ các kiểm tra ACL và đường dẫn của ứng dụng.
   trong lệnh, biến môi trường, clipboard, ảnh chụp, tài liệu hay Git.
 - [ ] Mở đúng kho, ghi lại Hybrid Key ID công khai bằng **View full ID**.
   Ký mẫu theo kịch bản và lưu thành `rehearsal-signed.pdf`. Kiểm tra bản
-  vừa lưu bằng **Use authenticated vault** và ghi nhận **HYBRID VALID**.
+  vừa lưu bằng **Use unlocked vault keys** và ghi nhận **HYBRID VALID**.
 - [ ] Sao chép riêng bản đã ký thành `rehearsal-tampered.pdf`. Với chính
   mẫu ASCII này, mở bản sao bằng Notepad (**File → Open**, chọn **All files**).
   Thay đúng một `APPROVED` bằng `REJECTED` (cùng 8 byte ASCII) rồi lưu bản sao
@@ -91,7 +105,7 @@ các kiểm tra ACL và đường dẫn của ứng dụng.
   màn hình, độ rộng nội dung và không che nút thao tác. Nếu cửa sổ hẹp, dùng
   nút mở tay khi cần.
 - [ ] Dùng Tab/Shift+Tab, Enter/Space và Escape cho điều hướng, nút, chi tiết
-  About và hộp thoại. Kiểm tra focus trở về đúng chỗ. Bấm **View full ID** để mở rồi bấm lại để thu gọn.
+  About và hộp thoại. Kiểm tra focus trở về đúng chỗ. Bấm **View full ID** để mở rồi chọn **Hide full ID** để thu gọn.
   Thử **Copy full ID** và xác nhận dán ra đúng ID công khai. Thử công cụ
   đọc màn hình nếu người trình bày hoặc hội đồng cần sử dụng.
 - [ ] Xác nhận các hộp thoại Open, Save, xác nhận ghi đè và mật khẩu nằm
@@ -113,10 +127,10 @@ các kiểm tra ACL và đường dẫn của ứng dụng.
 | --- | --- |
 | Nhập sai mật khẩu | Chọn **Try Again** khi ứng dụng còn giữ đúng lựa chọn, rồi dùng hộp thoại mới. Nếu tệp đã thay đổi hoặc lựa chọn hết hiệu lực, chọn lại kho. Nếu quên mật khẩu, dùng bản ký thử với khóa công khai của kho đã chuẩn bị. Tạo kho mới chỉ khi chủ động bắt đầu một quy trình ký mới. |
 | Chọn nhầm PDF hoặc nhầm nguồn khóa | Dừng trước khi trình bày kết quả, chọn lại đúng tên tệp và Hybrid Key ID. Chạy **Verify PDF** sau khi đổi lựa chọn. Phân biệt bản hợp lệ, bản đã sửa và kho thử. |
-| Hủy picker hoặc đóng hộp thoại | Đọc thông báo hủy và xem lại tệp và nguồn khóa đang hiển thị vì lựa chọn trước có thể còn tồn tại. Sau đó chọn lại. Nếu hủy Save trước khi xếp hàng, giao diện xác nhận chưa có job mới. |
+| Hủy hộp thoại chọn tệp | Đọc thông báo hủy và xem lại tệp và nguồn khóa đang hiển thị vì lựa chọn trước có thể còn tồn tại. Sau đó chọn lại. Nếu hủy Save trước khi xếp hàng, giao diện xác nhận chưa có job mới. |
 | Tên đầu ra đã tồn tại | Chọn **No** hoặc **Cancel** và đặt tên mới trong thư mục thử. Giữ bản ký và bản đối chứng đã kiểm tra. Không xác nhận ghi đè chỉ để tiếp tục buổi trình diễn. |
 | Đang ký mất nhiều thời gian | Chờ trạng thái cuối, giữ ứng dụng mở và không bấm **Sign PDF** nhiều lần. Nếu cần chuyển nội dung trong khi chờ, dùng ảnh ghi rõ là kết quả lần thử trước. Chỉ dùng luồng kiểm tra trong app khi thao tác đã ổn định. |
-| Trạng thái ký không chắc chắn | Dùng **Reconcile native status** cho cùng thao tác nếu nút xuất hiện. Kiểm tra thư mục đích và xác minh đúng tệp, cặp khóa và phiên bản đầu vào đã chọn. Tệp tồn tại có thể là bản cũ. Nếu vẫn chưa phân biệt được, giữ nguyên tệp và trình bày trạng thái chưa xác nhận. Chỉ bắt đầu thao tác mới sau khi xác minh trạng thái và ý định lưu. |
+| Trạng thái ký không chắc chắn | Dùng **Check signing status** cho cùng thao tác nếu nút xuất hiện. Kiểm tra thư mục đích và xác minh đúng tệp, cặp khóa và phiên bản đầu vào đã chọn. Tệp tồn tại có thể là bản cũ. Nếu vẫn chưa phân biệt được, giữ nguyên tệp và trình bày trạng thái chưa xác nhận. Chỉ bắt đầu thao tác mới sau khi xác minh trạng thái và ý định lưu. |
 | Quyền ghi/đọc bị từ chối | Chọn thư mục NTFS riêng đã được kiểm tra, ngoài thư mục ứng dụng và repo. Giữ nguyên dữ liệu cũ, ACL và chính sách bảo vệ. |
 | Thiếu WebView2 hoặc .NET Framework | Ghi đúng thông báo và chuẩn bị runtime chính thức trước khi thử lại. Bản portable cũng cần hai runtime này. Dùng máy dự phòng đã nghiệm thu nếu máy hiện tại chưa sẵn sàng. |
 | Setup hoặc EXE không mở | Đối chiếu gói, kiến trúc và checksum. Kiểm tra giải nén đủ, lối tắt đúng, runtime và chính sách máy. Thử bản portable đã kiểm tra sẵn hoặc máy dự phòng nếu được phép. Nếu không thể chạy trực tiếp, trình bày ảnh kết quả đã lưu, ghi rõ xuất xứ và sự cố hiện tại. |

@@ -48,7 +48,7 @@ export const demoService = {
 export async function selectPdf(file: File): Promise<DocumentSelection> {
   if (!file.name.toLowerCase().endsWith('.pdf')) throw new Error('Choose a PDF document with a .pdf extension.')
   if (file.size === 0) throw new Error('This file is empty. Choose a nonempty PDF document.')
-  if (file.size > 50 * 1024 * 1024) throw new Error('This UI preview accepts PDFs up to 50 MB.')
+  if (file.size > 50 * 1024 * 1024) throw new Error('This preview accepts PDFs up to 50 MiB.')
   if (await file.slice(0, 5).text() !== '%PDF-') throw new Error('This file does not start with a PDF header.')
   return { name: file.name, size: file.size, modifiedAt: file.lastModified, source: 'browser-selection' }
 }

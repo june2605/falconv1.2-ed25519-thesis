@@ -38,7 +38,7 @@ for (const viewport of [{ width: 1280, height: 720 }, { width: 1366, height: 768
     await page.getByRole('button', { name: 'Continue to review', exact: true }).click()
     const sign = page.getByRole('button', { name: 'Sign PDF', exact: true })
     await inViewport(page, sign); await expect(sign).toBeDisabled()
-    await expect(page.getByRole('region', { name: 'Signing actions' })).toContainText('Native signer not connected')
+    await expect(page.getByRole('region', { name: 'Signing actions' })).toContainText('Use a desktop build with signing support')
     await capture('sign-review')
     await page.getByRole('button', { name: 'Review and sign step', exact: true }).focus()
     await page.getByRole('main').evaluate(element => { element.scrollTop = element.scrollHeight })

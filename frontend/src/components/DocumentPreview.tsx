@@ -15,11 +15,11 @@ export function PaperPreview({ selected = false, compact = false }: { selected?:
 export function DocumentPreview({ document }: { document: DocumentSelection | null }) {
   const [expanded, setExpanded] = useState(false)
   return <>
-    <aside className="card preview-panel"><div className="panel-header"><h2>Document workspace</h2><button className="icon-button" aria-label="Expand preview layout" onClick={() => setExpanded(true)}><Maximize2 size={16} /></button></div>
+    <aside className="card preview-panel"><div className="panel-header"><h2>Document workspace</h2><button className="icon-button" aria-label="Expand document illustration" onClick={() => setExpanded(true)}><Maximize2 size={16} /></button></div>
       {document ? <div className="preview-canvas"><PaperPreview selected /><span className="illustration-label">ILLUSTRATIVE LAYOUT · NOT YOUR PDF</span></div> : <div className="preview-empty"><FileText size={30} strokeWidth={1.4} aria-hidden="true" /><h3>Your document workspace</h3><p>Select a PDF to view its metadata.<br />Native PDF rendering is not connected.</p></div>}
       <div className="preview-caption"><FileText size={17} aria-hidden="true" /><div><strong>{document?.name ?? 'Your PDF will appear here'}</strong><p>{document ? `${fileSize(document.size)} · file content is not rendered` : 'Select a document to begin'}</p></div></div>
     </aside>
-    <Modal open={expanded} onOpenChange={setExpanded} title="A place for your document" description="This is an illustrative layout, not a rendering of your PDF. No document content is uploaded or signed.">
+    <Modal open={expanded} onOpenChange={setExpanded} title="Document illustration" description="This illustration is an example. The preview only displays the selected file name and size.">
       <div className="expanded-paper"><PaperPreview selected={!!document} /></div><Badge tone="indigo">PDF rendering not connected</Badge>
     </Modal>
   </>

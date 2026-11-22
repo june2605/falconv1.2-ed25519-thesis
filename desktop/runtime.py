@@ -28,7 +28,7 @@ def resource_root():
 
 def _native_startup_message(message):
     import ctypes
-    ctypes.windll.user32.MessageBoxW(None, message, 'HybridSign \u2014 Startup error', 0x2010)
+    ctypes.windll.user32.MessageBoxW(None, message, 'HybridSign - Startup error', 0x2010)
 
 
 def validate_user_destination(path):

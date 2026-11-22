@@ -77,8 +77,8 @@ class NativeDialogs:
         except (ValueError, OSError):
             from System.Windows.Forms import MessageBox
             MessageBox.Show(self._window.native,
-                            'Store encrypted vaults and signed PDFs outside the HybridSign application folder. Choose a separate trusted local NTFS folder.',
-                            'HybridSign \u2014 Choose another location')
+                            'Choose a folder on a local NTFS drive, outside the HybridSign application folder.',
+                            'HybridSign - Choose another location')
             return False
 
     def _pdf_dialog(self, suggested_name, *, verification=False):
@@ -89,8 +89,8 @@ class NativeDialogs:
         approved = []
         try:
             self._active = dialog
-            dialog.Title = 'HybridSign — Save signed PDF' if saving else 'HybridSign — Choose unsigned PDF'
-            if verification: dialog.Title = 'HybridSign — Choose signed PDF'
+            dialog.Title = 'HybridSign - Save signed PDF' if saving else 'HybridSign - Choose unsigned PDF'
+            if verification: dialog.Title = 'HybridSign - Choose signed PDF'
             dialog.Filter = 'PDF document (*.pdf)|*.pdf'
             dialog.DefaultExt, dialog.AddExtension = 'pdf', True
             dialog.RestoreDirectory = dialog.CheckPathExists = True
@@ -118,15 +118,15 @@ class NativeDialogs:
         """GUI closing event only; do not marshal/join from this callback."""
         from System.Windows.Forms import MessageBox
         MessageBox.Show(self._window.native,
-                        'A cryptographic operation is in progress. Wait for its result before closing. Signing publication cannot be cancelled here.',
-                        'HybridSign — Operation in progress')
+                        'HybridSign is still working. Wait for the operation to finish before closing the app.',
+                        'HybridSign - Operation in progress')
 
     def _file_dialog(self, creating):
         from System.Windows.Forms import DialogResult, OpenFileDialog, SaveFileDialog
         dialog = SaveFileDialog() if creating else OpenFileDialog()
         try:
             self._active = dialog
-            dialog.Title = "HybridSign — Save a new encrypted vault" if creating else "HybridSign — Open encrypted vault"
+            dialog.Title = "HybridSign - Save a new encrypted vault" if creating else "HybridSign - Open encrypted vault"
             dialog.Filter = "Encrypted hybrid vault (*.hvault)|*.hvault|All files (*.*)|*.*"
             dialog.DefaultExt = "hvault"
             dialog.AddExtension = True
@@ -159,7 +159,7 @@ class NativeDialogs:
         from System.Drawing import Point, Size
         from System.Windows.Forms import (AutoScaleMode, Button, DialogResult,
                                          FormBorderStyle, FormStartPosition, Label, TextBox)
-        form.Text = "HybridSign — Create encrypted vault" if creating else "HybridSign — Unlock encrypted vault"
+        form.Text = "HybridSign - Create encrypted vault" if creating else "HybridSign - Unlock encrypted vault"
         form.ClientSize = Size(510, 285 if creating else 235)
         form.FormBorderStyle = FormBorderStyle.FixedDialog
         form.StartPosition = FormStartPosition.CenterParent
@@ -167,12 +167,12 @@ class NativeDialogs:
         form.MinimizeBox = form.MaximizeBox = False
         form.ShowInTaskbar = False
         label = Label()
-        label.Text = "Password stays in local Python/.NET memory; never sent to the web UI."
+        label.Text = "Enter your vault password here. It stays on this device."
         label.AutoSize = False
         label.Location, label.Size = Point(18, 15), Size(475, 36)
         form.Controls.Add(label)
         boxes = []
-        for index, caption in enumerate(["New password (15+ characters)", "Confirm password"] if creating else ["Vault password"]):
+        for index, caption in enumerate(["New password (at least 15 characters)", "Confirm password"] if creating else ["Vault password"]):
             label = Label()
             label.Text, label.AutoSize = caption, True
             label.Location = Point(18, 60 + 58 * index)
@@ -209,7 +209,7 @@ class NativeDialogs:
             try:
                 validate_password(password, confirmation, creating=creating)
             except VaultPasswordError:
-                error.Text = "Passwords must match. New passwords need 15+ characters; maximum 1024 UTF-8 bytes." if creating else "Enter a nonempty password of at most 1024 UTF-8 bytes."
+                error.Text = "Enter matching passwords with at least 15 characters and at most 1024 UTF-8 bytes." if creating else "Enter the vault password (up to 1024 UTF-8 bytes)."
                 return
             selected.append(password)
             form.DialogResult = DialogResult.OK

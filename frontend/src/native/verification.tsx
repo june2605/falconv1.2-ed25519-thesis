@@ -33,11 +33,13 @@ const messages: Record<string, string> = {
   STALE_DOCUMENT: 'Choose the signed PDF again.', STALE_KEY_SOURCE: 'Choose the public-key source again.',
   DOCUMENT_CHANGED: 'The selected PDF changed. Choose it again.', 'vault.conflict': 'The public-key source changed. Select it again.',
   'vault.format': 'The encrypted vault header or public keys are invalid.', 'vault.profile': 'Unsupported encrypted vault profile.',
-  STALE_SESSION: 'Select an encrypted vault, or authenticate a vault before using that source.',
-  PDF_INVALID: 'Choose a supported PDF within the local size limit.', BUSY: 'Another native operation is in progress.',
+  STALE_SESSION: 'Choose a vault file or unlock a vault to use its keys.',
+  PDF_INVALID: 'Choose a signed PDF of 50 MiB or less that HybridSign can read.', BUSY: 'Wait for the current operation to finish.',
   VERIFY_IO: 'The verification file could not be read safely. Check access and select it again.',
-  VERIFY_FAILED: 'Verification could not complete. No mathematical result was established.',
+  VERIFY_FAILED: 'Verification could not complete. There is no signature result.',
 }
+const unconfirmedVerification = 'Check the verification status before submitting another request.'
+
 class RequestError extends Error { constructor(message: string, readonly rejected = false) { super(message) } }
 async function invoke(method: string, args: string[] = [], bounded = false): Promise<Record<string, unknown>> {
   let timer: number | undefined
@@ -47,14 +49,14 @@ async function invoke(method: string, args: string[] = [], bounded = false): Pro
     const call = (host.api[method] as (...args: string[]) => Promise<unknown>)(...args)
     const reply = bounded ? await Promise.race([call, new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error()), 2000) })]) : await call
     if (exact(reply, ['ok', 'protocolVersion', 'error']) && reply.ok === false && reply.protocolVersion === 1 && exact(reply.error, ['code', 'message'])) {
-      throw new RequestError(typeof reply.error.code === 'string' ? messages[reply.error.code] ?? 'Native verification request rejected. Select the inputs again.' : 'Native request rejected.', reply.error.code !== 'VERIFY_UNCERTAIN')
+      throw new RequestError(typeof reply.error.code === 'string' ? messages[reply.error.code] ?? 'Verification request rejected. Select the PDF and public keys again.' : 'HybridSign could not accept the request.', reply.error.code !== 'VERIFY_UNCERTAIN')
     }
     const value = response(reply)
     if (!value) throw new Error()
     return value
   } catch (error) {
     if (error instanceof RequestError) throw error
-    throw new RequestError('Native communication could not confirm a verification result. Reconcile this operation without submitting another job.')
+    throw new RequestError(method === 'verify_pdf' || method === 'get_verification_state' ? unconfirmedVerification : 'The selection could not be confirmed. Select it again.')
   } finally { if (timer !== undefined) window.clearTimeout(timer) }
 }
 interface VerificationState {
@@ -108,7 +110,7 @@ export function NativeVerificationProvider({ children }: PropsWithChildren) {
       }
     } catch (failure) {
       if (method === 'choose_verification_pdf') setPdf(null); else setSource(null)
-      setError(failure instanceof RequestError ? failure.message : 'Native selection could not be validated.')
+      setError(failure instanceof RequestError ? failure.message : 'The selection could not be confirmed. Select it again.')
     } finally { inflight.current = false; setPending(false) }
   }
   async function verify() {
@@ -120,7 +122,7 @@ export function NativeVerificationProvider({ children }: PropsWithChildren) {
       if (!job(value) || value.operationId !== operation.current) throw new Error()
       setJob(value); setUncertain(false)
     } catch (failure) {
-      setError(failure instanceof RequestError ? failure.message : 'Verification outcome is not confirmed.')
+      setError(failure instanceof RequestError ? failure.message : unconfirmedVerification)
       if (failure instanceof RequestError && failure.rejected) { operation.current = null; setUncertain(false) }
       else { setUncertain(true); await read() }
     } finally { inflight.current = false; setPending(false); setSubmitting(false) }

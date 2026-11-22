@@ -164,7 +164,7 @@ export function SmartSidebar({ page, connected, status, detail, phase, onAbout }
         <button className="icon-button sidebar-pin" data-expanded-only aria-label={mode === 'pinned' ? 'Unpin sidebar' : 'Pin sidebar'} aria-pressed={mode === 'pinned'}
           disabled={(mode !== 'pinned' && !wide) || resizing} aria-describedby={!wide ? hintId : undefined} onClick={pin}>{mode === 'pinned' ? <PinOff size={18} /> : <Pin size={18} />}</button>
         <button className="text-button sidebar-auto" data-expanded-only aria-label="Automatic sidebar" aria-pressed={autoEnabled} disabled={resizing}
-          title={autoEnabled ? 'Auto on: expand on hover and collapse after leaving. Click for manual control.' : 'Automatic behavior is off. Click to enable it.'}
+          title={autoEnabled ? 'Auto is on. The sidebar expands on hover and collapses when you move away.' : 'Auto is off. Select to expand on hover.'}
           onClick={automatic}><RotateCcw size={15} aria-hidden="true" />Auto {autoEnabled ? 'on' : 'off'}</button>
       </div></div>
       <div className="sidebar-scroll"><div className="sidebar-label" aria-hidden={!expanded}>WORKSPACE</div>
@@ -178,9 +178,9 @@ export function SmartSidebar({ page, connected, status, detail, phase, onAbout }
       <div className="sidebar-bottom">{!wide && <p id={hintId} className="sidebar-pin-hint" data-expanded-only>Pin on wider windows.</p>}<div className="sidebar-note" data-connected={connected} tabIndex={0} role="img" aria-label={detail}
         onPointerEnter={event => showTip(event.currentTarget, detail)} onPointerLeave={() => setTooltip(null)} onFocus={event => showTip(event.currentTarget, detail)}>
         <span className="status-dot" aria-hidden="true" /><span className="sidebar-status-copy" title={detail}>{status}</span><span className="badge sidebar-phase">{phase}</span>
-      </div><button className="sidebar-about" aria-label="About this prototype" onClick={onAbout}
-        onPointerEnter={event => showTip(event.currentTarget, 'About this prototype')} onPointerLeave={() => setTooltip(null)} onFocus={event => showTip(event.currentTarget, 'About this prototype')}>
-        <CircleHelp size={18} aria-hidden="true" /><span>About this prototype</span><ArrowUpRight size={14} aria-hidden="true" />
+      </div><button className="sidebar-about" aria-label="About this app" onClick={onAbout}
+        onPointerEnter={event => showTip(event.currentTarget, 'About this app')} onPointerLeave={() => setTooltip(null)} onFocus={event => showTip(event.currentTarget, 'About this app')}>
+        <CircleHelp size={18} aria-hidden="true" /><span>About this app</span><ArrowUpRight size={14} aria-hidden="true" />
       </button></div>
     </aside>
     {tooltip && !expanded && createPortal(<span id={tooltipId} className="sidebar-tooltip" role="tooltip" style={{ left: tooltip.left, top: tooltip.top }}>{tooltip.label}</span>, document.body)}

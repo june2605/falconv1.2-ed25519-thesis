@@ -41,7 +41,7 @@ export interface NativeBridgeV1 {
 
 export class NativeUnavailableError extends Error {
   constructor() {
-    super('Native operations are not connected in this UI preview.')
+    super('This preview cannot run desktop actions.')
     this.name = 'NativeUnavailableError'
   }
 }
