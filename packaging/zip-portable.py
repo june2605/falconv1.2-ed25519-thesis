@@ -1,14 +1,23 @@
 """Optional local archive. Only files from the validated release inventory."""
+import argparse
 import hashlib
 import json
 from pathlib import Path
-import sys
 import zipfile
 
-folder = Path(sys.argv[1]).resolve(strict=True)
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('payload', type=Path)
+parser.add_argument('--candidate', action='store_true', help='Use the separate Windows rc1 archive name')
+args = parser.parse_args()
+folder = args.payload.resolve(strict=True)
 manifest_path = folder.with_suffix('.manifest.json')
 record = json.loads(manifest_path.read_text(encoding='utf-8'))
-archive = folder.parent / 'HybridSign-Phase4C2A-win-x64-portable.zip'
+name = ('HybridSign-0.1.0-rc1-win-x64-portable.zip' if args.candidate
+        else 'HybridSign-Phase4C2A-win-x64-portable.zip')
+archive = folder.parent / name
+checksum = archive.with_suffix('.zip.sha256')
+if checksum.exists():
+    raise FileExistsError('The archive checksum already exists. Use a fresh release folder.')
 with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED, compresslevel=6) as output:
     for item in record['files']:
         path = folder / item['file']
@@ -20,5 +29,6 @@ with zipfile.ZipFile(archive, 'x', compression=zipfile.ZIP_DEFLATED, compresslev
 with zipfile.ZipFile(archive) as check:
     assert check.testzip() is None
 digest = hashlib.sha256(archive.read_bytes()).hexdigest()
-archive.with_suffix('.zip.sha256').write_text(digest + '  ' + archive.name + '\n', encoding='utf-8')
+with checksum.open('x', encoding='utf-8') as stream:
+    stream.write(digest + '  ' + archive.name + '\n')
 print(f'{archive.name}: {archive.stat().st_size} bytes; SHA-256 {digest}')

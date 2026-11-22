@@ -1,4 +1,10 @@
-#define ProductVersion "0.1.0"
+#ifdef ReleaseCandidate
+  #define ProductVersion "0.1.0-rc1"
+  #define SetupFilename "HybridSign-Setup-0.1.0-rc1-win-x64"
+#else
+  #define ProductVersion "0.1.0"
+  #define SetupFilename "HybridSign-Setup-Phase4C2B-win-x64"
+#endif
 #define ProductGuid "{3699C4A8-8612-4F01-BB26-F014797A9CBE}"
 #ifndef PayloadIncludes
   #error Build with packaging/build-installer.py to verify and enumerate the approved payload.
@@ -32,7 +38,7 @@ CloseApplications=no
 RestartApplications=no
 SetupMutex=Local\HybridSign-3699C4A8-Setup
 UninstallLogMode=append
-OutputBaseFilename=HybridSign-Setup-Phase4C2B-win-x64
+OutputBaseFilename={#SetupFilename}
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a &Desktop shortcut"; Flags: unchecked
